@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPF Interactive Lab</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --purple: #5B5EA6;
+            --red: #E8505B;
+            --teal: #14B8A6;
+            --navy: #2B2D42;
+            --gold: #F59E0B;
+            --green: #10B981;
+        }
+        
+        body {
+            font-family: system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--navy) 0%, #1a1b2e 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        
+        header { text-align: center; padding: 15px 0 10px; }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--teal), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-top: 4px; }
+        
+        .tabs { display: flex; justify-content: center; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
+        
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+            min-height: 44px;
+        }
+        
+        .tab-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--purple), var(--teal));
+            color: white;
+        }
+        .tab-btn.locked { opacity: 0.6; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .main-grid { display: grid; grid-template-columns: 1fr 360px; gap: 20px; }
+        @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } }
+        
+        .graph-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        canvas { 
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            cursor: crosshair; 
+            border-radius: 10px;
+            touch-action: none;
+        }
+        
+        .side-panel { display: flex; flex-direction: column; gap: 12px; }
+        
+        .card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 16px;
+        }
+        
+        .card-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--teal);
+            margin-bottom: 8px;
+        }
+        
+        .production-row { display: flex; gap: 10px; }
+        
+        .prod-box {
+            flex: 1;
+            text-align: center;
+            padding: 14px 10px;
+            border-radius: 10px;
+        }
+        
+        .prod-box.pizza { background: linear-gradient(135deg, var(--purple), #7c7fbb); }
+        .prod-box.taco { background: linear-gradient(135deg, var(--red), #f27a82); }
+        
+        .prod-box .icon { font-size: 1.5rem; margin-bottom: 2px; }
+        .prod-box .value { font-size: 1.8rem; font-weight: 800; }
+        .prod-box .label { font-size: 10px; font-weight: 600; letter-spacing: 1px; opacity: 0.9; }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            min-height: 44px;
+        }
+        
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-gold { background: linear-gradient(135deg, var(--gold), #d97706); color: white; }
+        .btn-purple { background: linear-gradient(135deg, var(--purple), var(--teal)); color: white; }
+        .btn-teal { background: var(--teal); color: var(--navy); }
+        
+        .status-badge {
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        
+        .status-badge.efficient { background: var(--teal); color: var(--navy); }
+        .status-badge.inefficient { background: var(--red); color: white; }
+        .status-badge.impossible { background: var(--purple); color: white; }
+        
+        .opp-cost {
+            background: linear-gradient(135deg, var(--teal), #2dd4bf);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        
+        .opp-cost .label { font-size: 10px; font-weight: 700; color: rgba(0,0,0,0.5); }
+        .opp-cost .text { color: var(--navy); font-size: 0.95rem; font-weight: 600; margin-top: 4px; }
+        .opp-cost .highlight { font-weight: 800; }
+        
+        .instructions {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .instructions strong { color: var(--teal); }
+        
+        /* Bidding */
+        .bid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .score-pill {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(245, 158, 11, 0.2);
+            padding: 6px 14px; border-radius: 50px;
+            border: 2px solid var(--gold);
+            font-weight: 700; color: var(--gold);
+        }
+        .round-info { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+        .question-card {
+            background: linear-gradient(135deg, var(--purple), #4a4d8a);
+            border-radius: 14px; padding: 20px;
+            text-align: center; margin-bottom: 12px;
+        }
+        .question-card .scenario { font-size: 0.85rem; opacity: 0.8; margin-bottom: 8px; }
+        .question-card .question { font-size: 1.1rem; font-weight: 700; line-height: 1.4; }
+        .question-card .highlight { color: var(--gold); }
+        .bid-input-area {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px; padding: 16px; text-align: center;
+        }
+        .bid-input-area label { display: block; font-size: 0.85rem; margin-bottom: 10px; opacity: 0.8; }
+        .bid-input {
+            width: 140px; padding: 12px;
+            font-size: 1.8rem; font-weight: 800;
+            text-align: center;
+            border: 3px solid var(--purple);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white; outline: none;
+        }
+        .bid-input:focus { border-color: var(--teal); }
+        .bid-result { margin-top: 12px; padding: 16px; border-radius: 12px; text-align: center; display: none; }
+        .bid-result.show { display: block; }
+        .bid-result.perfect { background: rgba(16, 185, 129, 0.2); border: 2px solid var(--green); }
+        .bid-result.close { background: rgba(245, 158, 11, 0.2); border: 2px solid var(--gold); }
+        .bid-result.off { background: rgba(232, 80, 91, 0.2); border: 2px solid var(--red); }
+        .bid-result .points { font-size: 1.5rem; font-weight: 800; }
+        .bid-result .explanation { font-size: 0.85rem; margin-top: 6px; opacity: 0.9; }
+        
+        /* Tycoon */
+        .tycoon-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+        .stat-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+        .stat-pill { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 50px; font-size: 0.85rem; font-weight: 700; }
+        .stat-pill.cash { background: rgba(16, 185, 129, 0.2); border: 2px solid var(--green); color: var(--green); }
+        .stat-pill.rep { background: rgba(245, 158, 11, 0.2); border: 2px solid var(--gold); color: var(--gold); }
+        .stat-pill.week { background: rgba(91, 94, 166, 0.3); border: 2px solid var(--purple); color: white; }
+        .event-banner { background: linear-gradient(135deg, var(--red), #c44); border-radius: 12px; padding: 14px; margin-bottom: 12px; display: none; }
+        .event-banner.show { display: block; }
+        .event-banner .event-title { font-weight: 800; font-size: 1rem; }
+        .event-banner .event-desc { font-size: 0.85rem; opacity: 0.9; margin-top: 4px; }
+        .market-section { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+        .market-section h4 { font-size: 0.75rem; letter-spacing: 1px; color: var(--teal); margin-bottom: 10px; }
+        .market-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .market-item { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; text-align: center; }
+        .market-item .price { font-size: 1.2rem; font-weight: 800; }
+        .market-item .item-name { font-size: 0.75rem; opacity: 0.7; }
+        .competitors { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+        .competitors h4 { font-size: 0.75rem; letter-spacing: 1px; color: var(--gold); margin-bottom: 10px; }
+        .competitor { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .competitor:last-child { border-bottom: none; }
+        .competitor .name { font-weight: 600; }
+        .competitor .strategy { font-size: 0.8rem; opacity: 0.7; }
+        .orders-section { background: rgba(245, 158, 11, 0.1); border: 2px solid var(--gold); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+        .orders-section h4 { font-size: 0.75rem; letter-spacing: 1px; color: var(--gold); margin-bottom: 10px; }
+        .order-card { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .order-card:last-child { margin-bottom: 0; }
+        .order-info .order-req { font-weight: 700; font-size: 0.95rem; }
+        .order-info .order-bonus { font-size: 0.8rem; color: var(--green); }
+        .order-actions { display: flex; gap: 6px; }
+        .order-btn { padding: 8px 14px; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; min-height: 44px; }
+        .order-btn.accept { background: var(--green); color: white; }
+        .order-btn.reject { background: rgba(255,255,255,0.2); color: white; }
+        .production-select { background: rgba(91, 94, 166, 0.2); border: 2px solid var(--purple); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+        .production-select h4 { font-size: 0.75rem; letter-spacing: 1px; color: white; margin-bottom: 10px; }
+        .projected-profit { background: var(--green); border-radius: 10px; padding: 12px; text-align: center; margin: 12px 0; }
+        .projected-profit .label { font-size: 0.75rem; color: rgba(0,0,0,0.6); }
+        .projected-profit .amount { font-size: 1.5rem; font-weight: 800; color: white; }
+        
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: var(--navy); border-radius: 20px; padding: 24px; max-width: 500px; width: 90%; border: 2px solid var(--purple); }
+        .modal h2 { text-align: center; margin-bottom: 16px; color: var(--gold); }
+        .modal p { text-align: center; font-size: 0.9rem; opacity: 0.8; margin-bottom: 16px; }
+        .upgrade-grid { display: flex; flex-direction: column; gap: 10px; }
+        .upgrade-option { background: rgba(255,255,255,0.08); border: 2px solid transparent; border-radius: 12px; padding: 14px; cursor: pointer; }
+        .upgrade-option:hover { border-color: var(--teal); }
+        .upgrade-option.selected { border-color: var(--gold); background: rgba(245, 158, 11, 0.2); }
+        .upgrade-option.owned { opacity: 0.5; cursor: not-allowed; }
+        .upgrade-option .upgrade-name { font-weight: 700; margin-bottom: 4px; }
+        .upgrade-option .upgrade-desc { font-size: 0.85rem; opacity: 0.8; }
+        .upgrade-option .upgrade-cost { font-size: 0.85rem; color: var(--gold); margin-top: 6px; }
+        
+        /* Game over */
+        .game-over { text-align: center; padding: 40px 20px; display: none; }
+        .game-over.show { display: block; }
+        .game-over h2 { font-size: 2rem; color: var(--gold); }
+        .final-score { font-size: 3rem; font-weight: 800; color: var(--gold); margin: 16px 0; }
+        .final-rep { font-size: 1.2rem; color: var(--gold); margin-bottom: 20px; }
+        .restart-btn { padding: 14px 32px; border: none; border-radius: 50px; font-size: 1rem; font-weight: 700; cursor: pointer; background: var(--purple); color: white; }
+        
+        /* Sound toggle */
+        .sound-toggle { position: fixed; bottom: 16px; right: 16px; background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; font-size: 1.3rem; }
+        
+        /* Help button */
+        .help-btn { position: fixed; bottom: 16px; right: 70px; background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; font-size: 1.3rem; color: white; }
+        
+        /* Instruction modals */
+        .instruction-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .instruction-modal.show { display: flex; }
+        .instruction-content {
+            background: linear-gradient(135deg, var(--navy), #1a1b2e);
+            border-radius: 20px; padding: 30px; max-width: 500px; width: 90%;
+            border: 2px solid var(--teal); max-height: 85vh; overflow-y: auto;
+        }
+        .instruction-content h2 { text-align: center; margin-bottom: 16px; font-size: 1.5rem; }
+        .instruction-content h2.explore-title { color: var(--teal); }
+        .instruction-content h2.bidding-title { color: var(--gold); }
+        .instruction-content h2.tycoon-title { color: var(--red); }
+        .instruction-content p { margin-bottom: 12px; line-height: 1.5; font-size: 0.95rem; }
+        .instruction-content ul { margin: 12px 0 12px 20px; }
+        .instruction-content li { margin-bottom: 8px; line-height: 1.4; }
+        .instruction-content .zone-list { list-style: none; margin-left: 0; }
+        .instruction-content .zone-list li { padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; }
+        .instruction-content .zone-efficient { background: rgba(20, 184, 166, 0.2); border-left: 3px solid var(--teal); }
+        .instruction-content .zone-inefficient { background: rgba(232, 80, 91, 0.2); border-left: 3px solid var(--red); }
+        .instruction-content .zone-impossible { background: rgba(91, 94, 166, 0.2); border-left: 3px solid var(--purple); }
+        .instruction-content .dont-show { display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 0.85rem; opacity: 0.8; }
+        .instruction-content .close-btn { width: 100%; margin-top: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PPF Interactive Lab</h1>
+            <p class="subtitle">Learn opportunity cost by doing</p>
+            <p style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:4px;">Best on Chromebook, laptop, or desktop</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('explore')">Explore</button>
+            <button class="tab-btn" onclick="switchTab('bidding')">Bidding War</button>
+            <button class="tab-btn locked" id="tycoon-tab-btn" onclick="switchTab('tycoon')">🔒 Factory Tycoon</button>
+        </div>
+        
+        <!-- EXPLORE TAB -->
+        <div id="explore-tab" class="tab-content active">
+            <div class="main-grid">
+                <div class="graph-container">
+                    <canvas id="exploreCanvas" width="500" height="450"></canvas>
+                    <div class="instructions"><strong>Click or drag</strong> anywhere on the graph to set production</div>
+                </div>
+                <div class="side-panel">
+                    <div class="card">
+                        <div class="card-label">YOUR PRODUCTION</div>
+                        <div class="production-row">
+                            <div class="prod-box pizza">
+                                <div class="icon">🍕</div>
+                                <div class="value" id="explore-pizza">20</div>
+                                <div class="label">PIZZAS</div>
+                            </div>
+                            <div class="prod-box taco">
+                                <div class="icon">🌮</div>
+                                <div class="value" id="explore-taco">75</div>
+                                <div class="label">TACOS</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="opp-cost">
+                        <div class="label">OPPORTUNITY COST</div>
+                        <div class="text" id="explore-cost">1 more pizza costs <span class="highlight">2.5 tacos</span></div>
+                    </div>
+                    
+                    <div id="explore-status" class="status-badge efficient">ON THE CURVE — Efficient!</div>
+                    
+                    <div class="card">
+                        <div class="card-label">QUICK SCENARIOS</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button class="btn btn-purple" onclick="exploreSet(0, 100, 'efficient')">All Tacos (0 pizzas)</button>
+                            <button class="btn btn-gold" onclick="exploreSet(40, 0, 'efficient')">All Pizzas (40 pizzas)</button>
+                            <button class="btn" style="background:var(--red);color:white" onclick="exploreSet(15, 45, 'inefficient')">Inefficient (Inside)</button>
+                            <button class="btn" style="background:var(--purple);color:white" onclick="exploreSet(20, 90, 'impossible')">Impossible (Outside)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- BIDDING WAR TAB -->
+        <div id="bidding-tab" class="tab-content">
+            <div class="main-grid">
+                <div class="graph-container">
+                    <canvas id="biddingCanvas" width="500" height="450"></canvas>
+                    <div class="instructions">Read the Y-axis at the target point. <strong>How many tacos can you make?</strong></div>
+                </div>
+                <div class="side-panel">
+                    <div class="bid-header">
+                        <div class="round-info">Round <span id="bid-round">1</span>/12</div>
+                        <div class="score-pill">⭐ <span id="bid-score">0</span></div>
+                    </div>
+                    
+                    <div class="question-card">
+                        <div class="scenario" id="bid-scenario">A customer places an order...</div>
+                        <div class="question" id="bid-question">
+                            If you make <span class="highlight">30 pizzas</span>, how many <span class="highlight">tacos</span> can you still produce?
+                        </div>
+                    </div>
+                    
+                    <div class="bid-input-area">
+                        <label>Your answer (tacos you CAN make):</label>
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" class="bid-input" id="bid-input" min="0" max="100" placeholder="?">
+                        <div style="margin-top: 12px;">
+                            <button class="btn btn-gold" id="bid-submit" onclick="submitBid()">Lock In Answer</button>
+                        </div>
+                    </div>
+                    
+                    <div class="bid-result" id="bid-result">
+                        <div class="points" id="bid-points">+100</div>
+                        <div class="explanation" id="bid-explanation">Perfect!</div>
+                    </div>
+                    
+                    <button class="btn btn-purple" id="bid-next" onclick="nextBidRound()" style="display: none;">Next Question →</button>
+                </div>
+            </div>
+            
+            <div class="game-over" id="bidding-gameover">
+                <h2>Bidding War Complete!</h2>
+                <p>You scored</p>
+                <div class="final-score" id="final-bid-score">0</div>
+                <p>out of 1,200 points</p>
+                <p style="margin-top:16px;color:var(--teal);">🏭 Factory Tycoon is now unlocked!</p>
+                <button class="restart-btn" onclick="initBidding()">Play Again</button>
+            </div>
+        </div>
+        
+        <!-- FACTORY TYCOON TAB -->
+        <div id="tycoon-tab" class="tab-content">
+            <div id="tycoon-game">
+                <div class="tycoon-header">
+                    <div class="stat-pills">
+                        <div class="stat-pill week">📅 Week <span id="ty-week">1</span>/8</div>
+                        <div class="stat-pill cash">💵 $<span id="ty-cash">500</span></div>
+                        <div class="stat-pill rep">⭐ <span id="ty-rep">50</span> rep</div>
+                    </div>
+                </div>
+                
+                <div class="event-banner" id="ty-event">
+                    <div class="event-title" id="ty-event-title">⚠️ CRISIS!</div>
+                    <div class="event-desc" id="ty-event-desc">Description</div>
+                </div>
+                
+                <div class="main-grid">
+                    <div class="graph-container">
+                        <canvas id="tycoonCanvas" width="500" height="450"></canvas>
+                        <div class="instructions"><strong>Click the graph</strong> to set this week's production</div>
+                    </div>
+                    
+                    <div class="side-panel">
+                        <div class="market-section">
+                            <h4>📈 MARKET PRICES</h4>
+                            <div class="market-grid">
+                                <div class="market-item">
+                                    <div class="price">$<span id="ty-pizza-price">10</span></div>
+                                    <div class="item-name">per Pizza 🍕</div>
+                                </div>
+                                <div class="market-item">
+                                    <div class="price">$<span id="ty-taco-price">5</span></div>
+                                    <div class="item-name">per Taco 🌮</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="competitors">
+                            <h4>🏭 COMPETITORS</h4>
+                            <div class="competitor">
+                                <div>
+                                    <div class="name">Big Tony's</div>
+                                    <div class="strategy" id="comp1-strategy">Making 30 pizzas</div>
+                                </div>
+                            </div>
+                            <div class="competitor">
+                                <div>
+                                    <div class="name">Taco Belle</div>
+                                    <div class="strategy" id="comp2-strategy">Making 80 tacos</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="orders-section" id="ty-orders">
+                            <h4>📋 CUSTOMER ORDERS</h4>
+                            <div id="orders-list"></div>
+                        </div>
+                        
+                        <div class="production-select">
+                            <h4>🎯 YOUR PRODUCTION</h4>
+                            <div class="production-row">
+                                <div class="prod-box pizza">
+                                    <div class="icon">🍕</div>
+                                    <div class="value" id="ty-pizza">--</div>
+                                    <div class="label">PIZZAS</div>
+                                </div>
+                                <div class="prod-box taco">
+                                    <div class="icon">🌮</div>
+                                    <div class="value" id="ty-taco">--</div>
+                                    <div class="label">TACOS</div>
+                                </div>
+                            </div>
+                            
+                            <div class="projected-profit">
+                                <div class="label">PROJECTED EARNINGS</div>
+                                <div class="amount">$<span id="ty-projected">0</span></div>
+                            </div>
+                            
+                            <button class="btn btn-gold" id="ty-confirm" onclick="confirmWeek()" disabled>Confirm Production →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-overlay" id="upgrade-modal">
+                <div class="modal">
+                    <h2>🔧 Upgrade Shop</h2>
+                    <p>Choose ONE upgrade (or skip to save money)</p>
+                    <div class="upgrade-grid" id="upgrade-list"></div>
+                    <div style="margin-top: 16px; display: flex; gap: 10px;">
+                        <button class="btn btn-purple" style="flex: 1;" onclick="buyUpgrade()">Buy Selected</button>
+                        <button class="btn" style="flex: 1; background: rgba(255,255,255,0.2);" onclick="skipUpgrade()">Skip</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-overlay" id="summary-modal">
+                <div class="modal">
+                    <h2 id="summary-title">Week 1 Results</h2>
+                    <div id="summary-content"></div>
+                    <button class="btn btn-gold" style="margin-top: 16px;" onclick="closeSummary()">Continue</button>
+                </div>
+            </div>
+            
+            <div class="game-over" id="tycoon-gameover">
+                <h2>Season Complete!</h2>
+                <p>Your factory earned</p>
+                <div class="final-score" id="final-ty-cash">$0</div>
+                <div class="final-rep" id="final-ty-rep">⭐ 0 reputation</div>
+                <p id="ty-verdict"></p>
+                <button class="restart-btn" onclick="initTycoon()">Play Again</button>
+            </div>
+        </div>
+    </div>
+    
+    <button class="help-btn" onclick="showHelp()">?</button>
+    <button class="sound-toggle" onclick="toggleSound()" id="sound-btn">🔊</button>
+    
+    <div style="text-align:center; padding:20px 10px; margin-top:40px; border-top:1px solid rgba(255,255,255,0.1); font-size:0.75rem; color:rgba(255,255,255,0.4);">
+        ClassClick by Robert Jones<br>© 2026 All rights reserved. | <span style="color:#bbb;font-size:10px;">SKELKEYTEC</span><br>
+        Licensed for single classroom use. Purchased via Teachers Pay Teachers.<br>
+        Redistribution or sharing prohibited.
+    </div>
+    
+    <!-- Instruction Modals -->
+    <div class="instruction-modal" id="explore-instructions">
+        <div class="instruction-content">
+            <h2 class="explore-title">📊 Explore Mode</h2>
+            <p>Welcome to the <strong>Production Possibilities Frontier!</strong> This graph shows all the combinations of pizzas and tacos your factory can produce.</p>
+            <p><strong>How to use:</strong> Click anywhere on the graph to set your production point, or click and drag to explore!</p>
+            <p><strong>Three zones to discover:</strong></p>
+            <ul class="zone-list">
+                <li class="zone-efficient"><strong>🟢 On the Curve (Efficient)</strong> — You're using ALL your resources. This is the best you can do!</li>
+                <li class="zone-inefficient"><strong>🔴 Inside the Curve (Inefficient)</strong> — You're wasting resources. You could make more!</li>
+                <li class="zone-impossible"><strong>🟣 Outside the Curve (Impossible)</strong> — You don't have enough resources to produce here.</li>
+            </ul>
+            <p><strong>Key concept:</strong> The <em>opportunity cost</em> is what you give up to get something else. More pizzas = fewer tacos!</p>
+            <label class="dont-show"><input type="checkbox" id="explore-dont-show"> Don't show this again</label>
+            <button class="btn btn-teal close-btn" onclick="closeInstructions('explore')">Got It!</button>
+        </div>
+    </div>
+    
+    <div class="instruction-modal" id="bidding-instructions">
+        <div class="instruction-content">
+            <h2 class="bidding-title">💰 Bidding War</h2>
+            <p>Test your PPF reading skills! You'll be given scenarios and must figure out the trade-offs.</p>
+            <p><strong>How to play:</strong></p>
+            <ul>
+                <li>Read the scenario and look at the highlighted point on the graph</li>
+                <li>Find how many <strong>tacos you CAN make</strong> at that pizza level</li>
+                <li>Type your answer and lock it in</li>
+            </ul>
+            <p><strong>Scoring:</strong></p>
+            <ul>
+                <li>🎯 <strong>Perfect (within 2)</strong> = 100 points</li>
+                <li>👍 <strong>Close (within 5)</strong> = 75 points</li>
+                <li>😐 <strong>Not bad (within 12)</strong> = 40 points</li>
+                <li>❌ <strong>Way off</strong> = 10 points</li>
+            </ul>
+            <p>12 rounds, 1,200 points possible. Complete this to unlock Factory Tycoon!</p>
+            <label class="dont-show"><input type="checkbox" id="bidding-dont-show"> Don't show this again</label>
+            <button class="btn btn-gold close-btn" onclick="closeInstructions('bidding')">Let's Go!</button>
+        </div>
+    </div>
+    
+    <div class="instruction-modal" id="tycoon-instructions">
+        <div class="instruction-content">
+            <h2 class="tycoon-title">🏭 Factory Tycoon</h2>
+            <p>Run your food factory for 8 weeks! Balance production, customer orders, and market prices.</p>
+            <p><strong>Each week:</strong></p>
+            <ul>
+                <li>📈 Check market prices (they change!)</li>
+                <li>📋 Accept or reject customer orders</li>
+                <li>🎯 Click the graph to set production</li>
+                <li>✅ Confirm and see your results</li>
+            </ul>
+            <p><strong>Watch out for:</strong></p>
+            <ul>
+                <li>⚠️ <strong>Random crises</strong> that limit production</li>
+                <li>🏭 <strong>Competitors</strong> affecting market prices</li>
+                <li>📉 <strong>Failed orders</strong> hurt your reputation</li>
+            </ul>
+            <p><strong>Every 2 weeks:</strong> Visit the Upgrade Shop to expand your PPF!</p>
+            <p>Goal: Maximize cash AND reputation by week 8!</p>
+            <label class="dont-show"><input type="checkbox" id="tycoon-dont-show"> Don't show this again</label>
+            <button class="btn btn-purple close-btn" onclick="closeInstructions('tycoon')">Start Factory!</button>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL
+        let soundEnabled = true;
+        let currentTab = 'explore';
+        
+        // PPF math
+        function maxTacos(p) { return Math.max(0, Math.round(100 - 0.0625 * p * p)); }
+        
+        // Audio
+        let audioCtx = null;
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+        
+        function playSound(type) {
+            if (!soundEnabled || !audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                gain.gain.value = 0.1;
+                if (type === 'click') { osc.frequency.value = 600; osc.start(); osc.stop(audioCtx.currentTime + 0.05); }
+                else if (type === 'success') { osc.frequency.value = 523; osc.start(); osc.stop(audioCtx.currentTime + 0.3); }
+                else if (type === 'fail') { osc.frequency.value = 300; osc.start(); osc.stop(audioCtx.currentTime + 0.2); }
+                else if (type === 'coin') { osc.frequency.value = 1200; osc.start(); osc.stop(audioCtx.currentTime + 0.15); }
+            } catch(e) {}
+        }
+        
+        function toggleSound() { soundEnabled = !soundEnabled; document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇'; }
+        
+        // Instruction tracking
+        var instructionsShown = { explore: false, bidding: false, tycoon: false };
+        try {
+            instructionsShown = {
+                explore: localStorage.getItem('ppf-explore-shown') === 'true',
+                bidding: localStorage.getItem('ppf-bidding-shown') === 'true',
+                tycoon: localStorage.getItem('ppf-tycoon-shown') === 'true'
+            };
+        } catch(e) {}
+        
+        function showHelp() {
+            document.getElementById(currentTab + '-instructions').classList.add('show');
+        }
+        
+        function closeInstructions(tab) {
+            document.getElementById(tab + '-instructions').classList.remove('show');
+            var dontShow = document.getElementById(tab + '-dont-show');
+            if (dontShow && dontShow.checked) {
+                try { localStorage.setItem('ppf-' + tab + '-shown', 'true'); } catch(e) {}
+                instructionsShown[tab] = true;
+            }
+        }
+        
+        function maybeShowInstructions(tab) {
+            if (!instructionsShown[tab]) {
+                document.getElementById(tab + '-instructions').classList.add('show');
+            }
+        }
+        
+        function switchTab(tab) {
+            // Lock tycoon until bidding is complete
+            if (tab === 'tycoon' && !biddingCompleted) {
+                alert('Complete Bidding War first to unlock Factory Tycoon!');
+                return;
+            }
+            
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(function(b, i) {
+                var tabs = ['explore', 'bidding', 'tycoon'];
+                b.classList.toggle('active', tabs[i] === tab);
+            });
+            document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+            document.getElementById(tab + '-tab').classList.add('active');
+            
+            if (tab === 'explore') { initExplore(); maybeShowInstructions('explore'); }
+            if (tab === 'bidding') { initBidding(); maybeShowInstructions('bidding'); }
+            if (tab === 'tycoon') { initTycoon(); maybeShowInstructions('tycoon'); }
+        }
+        
+        // EXPLORE MODE
+        let exploreState = { pizza: 20, taco: 75, zone: 'efficient' };
+        
+        function initExplore() {
+            const c = document.getElementById('exploreCanvas');
+            drawExplore();
+            updateExploreUI();
+            
+            // Click to set point
+            c.onclick = function(e) {
+                const r = c.getBoundingClientRect();
+                const scaleX = 500 / r.width;
+                const scaleY = 450 / r.height;
+                const x = (e.clientX - r.left) * scaleX;
+                const y = (e.clientY - r.top) * scaleY;
+                setExplorePoint(x, y);
+            };
+            
+            // Drag to move point
+            c.onmousedown = function(e) {
+                c.dataset.dragging = 'true';
+                const r = c.getBoundingClientRect();
+                const scaleX = 500 / r.width;
+                const scaleY = 450 / r.height;
+                const x = (e.clientX - r.left) * scaleX;
+                const y = (e.clientY - r.top) * scaleY;
+                setExplorePoint(x, y);
+            };
+            
+            c.onmousemove = function(e) {
+                if (c.dataset.dragging === 'true') {
+                    const r = c.getBoundingClientRect();
+                    const scaleX = 500 / r.width;
+                    const scaleY = 450 / r.height;
+                    const x = (e.clientX - r.left) * scaleX;
+                    const y = (e.clientY - r.top) * scaleY;
+                    setExplorePoint(x, y);
+                }
+            };
+            
+            c.onmouseup = function() { c.dataset.dragging = 'false'; };
+            c.onmouseleave = function() { c.dataset.dragging = 'false'; };
+        }
+        
+        function setExplorePoint(x, y) {
+            const pad = 50, gw = 400, gh = 350;
+            let p = Math.round(((x - pad) / gw) * 40);
+            let t = Math.round((1 - (y - pad) / gh) * 100);
+            p = Math.max(0, Math.min(40, p));
+            t = Math.max(0, Math.min(100, t));
+            const maxT = maxTacos(p);
+            
+            let zone = 'efficient';
+            if (t < maxT - 2) zone = 'inefficient';
+            else if (t > maxT + 2) zone = 'impossible';
+            else t = maxT;
+            
+            exploreState = { pizza: p, taco: t, zone: zone };
+            playSound('click');
+            drawExplore();
+            updateExploreUI();
+        }
+        
+        function exploreSet(p, t, zone) {
+            exploreState = { pizza: p, taco: t, zone: zone };
+            playSound('click');
+            drawExplore();
+            updateExploreUI();
+        }
+        
+        function drawExplore() {
+            const c = document.getElementById('exploreCanvas');
+            drawPPF(c, exploreState.pizza, exploreState.taco, exploreState.zone);
+        }
+        
+        function updateExploreUI() {
+            document.getElementById('explore-pizza').textContent = exploreState.pizza;
+            document.getElementById('explore-taco').textContent = exploreState.taco;
+            const st = document.getElementById('explore-status');
+            const oc = document.getElementById('explore-cost');
+            
+            if (exploreState.zone === 'inefficient') {
+                st.className = 'status-badge inefficient';
+                st.textContent = 'INSIDE THE CURVE — Inefficient!';
+                oc.innerHTML = 'You\'re <span class="highlight">wasting resources!</span> Could make more.';
+            } else if (exploreState.zone === 'impossible') {
+                st.className = 'status-badge impossible';
+                st.textContent = 'OUTSIDE THE CURVE — Impossible!';
+                oc.innerHTML = '<span class="highlight">Can\'t produce here!</span> Not enough resources.';
+            } else {
+                st.className = 'status-badge efficient';
+                st.textContent = 'ON THE CURVE — Efficient!';
+                const mc = (0.125 * exploreState.pizza).toFixed(1);
+                oc.innerHTML = exploreState.pizza === 0 ? '100% tacos. Any pizza costs some tacos.' :
+                              exploreState.pizza === 40 ? '100% pizzas. Maximum output!' :
+                              '1 more pizza costs <span class="highlight">' + mc + ' tacos</span>';
+            }
+        }
+        
+        // BIDDING WAR
+        let bidState = { round: 1, score: 0, target: 0, answer: 0, submitted: false };
+        let biddingCompleted = false;
+        
+        const bidQuestions = [
+            { scenario: "A local school needs lunch for a field trip.", target: 20 },
+            { scenario: "The taco truck broke down!", target: 15 },
+            { scenario: "Wedding reception order.", target: 30 },
+            { scenario: "Food festival tomorrow!", target: 35 },
+            { scenario: "Restaurant chain stocking up.", target: 10 },
+            { scenario: "Sports stadium bulk order.", target: 25 },
+            { scenario: "Late night rush!", target: 38 },
+            { scenario: "Corporate event catering.", target: 28 },
+            { scenario: "Birthday party for 50 kids!", target: 12 },
+            { scenario: "Hospital cafeteria needs supplies.", target: 22 },
+            { scenario: "Food truck festival competition!", target: 32 },
+            { scenario: "College dorm late-night special.", target: 18 },
+        ];
+        
+        function initBidding() {
+            bidState = { round: 1, score: 0, target: 0, answer: 0, submitted: false };
+            document.getElementById('bidding-gameover').classList.remove('show');
+            document.getElementById('bidding-gameover').style.display = 'none';
+            document.querySelector('#bidding-tab .main-grid').style.display = 'grid';
+            setBidQuestion();
+        }
+        
+        function setBidQuestion() {
+            const q = bidQuestions[bidState.round - 1];
+            bidState.target = q.target;
+            bidState.answer = maxTacos(q.target);
+            bidState.submitted = false;
+            
+            document.getElementById('bid-round').textContent = bidState.round;
+            document.getElementById('bid-score').textContent = bidState.score;
+            document.getElementById('bid-scenario').textContent = q.scenario;
+            document.getElementById('bid-question').innerHTML = 'If you make <span class="highlight">' + q.target + ' pizzas</span>, how many <span class="highlight">tacos</span> can you still produce?';
+            document.getElementById('bid-input').value = '';
+            document.getElementById('bid-input').disabled = false;
+            document.getElementById('bid-submit').disabled = false;
+            document.getElementById('bid-submit').style.display = 'block';
+            document.getElementById('bid-result').className = 'bid-result';
+            document.getElementById('bid-next').style.display = 'none';
+            
+            const c = document.getElementById('biddingCanvas');
+            drawPPF(c, bidState.target, maxTacos(bidState.target), 'efficient', { highlightX: bidState.target });
+        }
+        
+        function submitBid() {
+            if (bidState.submitted) return;
+            const input = parseInt(document.getElementById('bid-input').value);
+            if (isNaN(input) || input < 0) return alert('Enter a number!');
+            
+            bidState.submitted = true;
+            document.getElementById('bid-input').disabled = true;
+            document.getElementById('bid-submit').style.display = 'none';
+            
+            const diff = Math.abs(input - bidState.answer);
+            let points = 0, cls = '', msg = '';
+            
+            if (diff <= 2) {
+                points = 100; cls = 'perfect'; msg = '🎯 PERFECT! The answer was ' + bidState.answer + ' tacos.' + (diff > 0 ? ' You were off by just ' + diff + '!' : '');
+                playSound('success');
+            } else if (diff <= 5) {
+                points = 75; cls = 'close'; msg = '👍 Close! The answer was ' + bidState.answer + ' tacos. You were off by ' + diff + '.';
+                playSound('coin');
+            } else if (diff <= 12) {
+                points = 40; cls = 'close'; msg = '😐 Not bad. The answer was ' + bidState.answer + ' tacos. You were off by ' + diff + '.';
+                playSound('click');
+            } else {
+                points = 10; cls = 'off'; msg = '❌ Way off. The answer was ' + bidState.answer + ' tacos.';
+                playSound('fail');
+            }
+            
+            bidState.score += points;
+            document.getElementById('bid-score').textContent = bidState.score;
+            document.getElementById('bid-points').textContent = '+' + points;
+            document.getElementById('bid-explanation').textContent = msg;
+            document.getElementById('bid-result').className = 'bid-result show ' + cls;
+            document.getElementById('bid-next').style.display = 'block';
+        }
+        
+        function nextBidRound() {
+            bidState.round++;
+            if (bidState.round > 12) {
+                biddingCompleted = true;
+                var tycoonBtn = document.getElementById('tycoon-tab-btn');
+                tycoonBtn.textContent = '🏭 Factory Tycoon';
+                tycoonBtn.classList.remove('locked');
+                document.querySelector('#bidding-tab .main-grid').style.display = 'none';
+                document.getElementById('bidding-gameover').style.display = 'block';
+                document.getElementById('bidding-gameover').classList.add('show');
+                document.getElementById('final-bid-score').textContent = bidState.score;
+            } else {
+                setBidQuestion();
+            }
+        }
+        
+        // FACTORY TYCOON
+        let tyState = { week: 1, cash: 500, rep: 50, pizza: null, taco: null, pizzaPrice: 10, tacoPrice: 5, orders: [], acceptedOrders: [], upgrades: [], ppfBonus: 0, priceBonus: 0, event: null };
+        
+        const upgrades = [
+            { id: 'oven', name: '🔥 Better Ovens', desc: '+5 max pizza capacity', cost: 200, effect: function() { tyState.ppfBonus += 5; } },
+            { id: 'grill', name: '🌶️ Turbo Grill', desc: '+10 max taco capacity', cost: 200, effect: function() { tyState.ppfBonus += 3; } },
+            { id: 'marketing', name: '📢 Marketing Boost', desc: '+10% sale prices', cost: 300, effect: function() { tyState.priceBonus += 0.1; } },
+            { id: 'training', name: '👨‍🍳 Staff Training', desc: '+5 reputation', cost: 150, effect: function() { tyState.rep = Math.min(100, tyState.rep + 5); } },
+            { id: 'expansion', name: '🏗️ Expansion', desc: '+8 max capacity', cost: 400, effect: function() { tyState.ppfBonus += 8; } },
+        ];
+        
+        const crises = [
+            { title: '🚚 Delivery Truck Broke!', desc: 'Only 75% capacity this week.', effect: 'capacity75' },
+            { title: '🧀 Cheese Shortage!', desc: 'Pizza prices dropped by $3.', effect: 'pizzaDrop' },
+            { title: '🌶️ Salsa Recall!', desc: 'Taco prices dropped by $2.', effect: 'tacoDrop' },
+            { title: '💪 Workers Strike!', desc: 'Production at 60% this week.', effect: 'capacity60' },
+            { title: '🔥 Kitchen Fire!', desc: 'Lost $100. Production at 80%.', effect: 'fire' },
+        ];
+        
+        function initTycoon() {
+            tyState = { week: 1, cash: 500, rep: 50, pizza: null, taco: null, pizzaPrice: 10, tacoPrice: 5, orders: [], acceptedOrders: [], upgrades: [], ppfBonus: 0, priceBonus: 0, event: null };
+            document.getElementById('tycoon-gameover').style.display = 'none';
+            document.getElementById('tycoon-gameover').classList.remove('show');
+            document.getElementById('tycoon-game').style.display = 'block';
+            setupWeek();
+        }
+        
+        function tyMaxTacos(p) {
+            let base = Math.max(0, 100 + tyState.ppfBonus - 0.0625 * p * p);
+            if (tyState.event && tyState.event.effect === 'capacity75') return Math.round(base * 0.75);
+            if (tyState.event && tyState.event.effect === 'capacity60') return Math.round(base * 0.6);
+            if (tyState.event && tyState.event.effect === 'fire') return Math.round(base * 0.8);
+            return Math.round(base);
+        }
+        
+        function tyMaxPizza() {
+            let base = 40 + Math.floor(tyState.ppfBonus / 2);
+            if (tyState.event && tyState.event.effect === 'capacity75') return Math.floor(base * 0.75);
+            if (tyState.event && tyState.event.effect === 'capacity60') return Math.floor(base * 0.6);
+            if (tyState.event && tyState.event.effect === 'fire') return Math.floor(base * 0.8);
+            return base;
+        }
+        
+        function setupWeek() {
+            tyState.pizza = null;
+            tyState.taco = null;
+            tyState.acceptedOrders = [];
+            
+            tyState.event = null;
+            if (tyState.week > 2 && Math.random() < 0.3) {
+                tyState.event = crises[Math.floor(Math.random() * crises.length)];
+                if (tyState.event.effect === 'fire') tyState.cash = Math.max(0, tyState.cash - 100);
+            }
+            
+            if (tyState.week > 1) {
+                tyState.pizzaPrice = Math.max(5, Math.min(20, tyState.pizzaPrice + Math.floor(Math.random() * 7) - 3));
+                tyState.tacoPrice = Math.max(3, Math.min(12, tyState.tacoPrice + Math.floor(Math.random() * 5) - 2));
+            }
+            
+            if (tyState.event && tyState.event.effect === 'pizzaDrop') tyState.pizzaPrice = Math.max(5, tyState.pizzaPrice - 3);
+            if (tyState.event && tyState.event.effect === 'tacoDrop') tyState.tacoPrice = Math.max(3, tyState.tacoPrice - 2);
+            
+            document.getElementById('comp1-strategy').textContent = 'Making ' + (tyState.pizzaPrice > 12 ? 35 : tyState.pizzaPrice < 8 ? 15 : 25) + ' pizzas';
+            document.getElementById('comp2-strategy').textContent = 'Making ' + (tyState.tacoPrice > 7 ? 85 : 60) + ' tacos';
+            
+            generateOrders();
+            updateTycoonUI();
+            drawTycoon();
+            
+            var c = document.getElementById('tycoonCanvas');
+            c.onclick = function(e) {
+                var r = c.getBoundingClientRect();
+                var scaleX = 500 / r.width;
+                var x = (e.clientX - r.left) * scaleX;
+                
+                var pad = 50, gw = 400;
+                var p = Math.round(((x - pad) / gw) * tyMaxPizza());
+                p = Math.max(0, Math.min(tyMaxPizza(), p));
+                tyState.pizza = p;
+                tyState.taco = tyMaxTacos(p);
+                
+                playSound('click');
+                updateTycoonUI();
+                drawTycoon();
+            };
+        }
+        
+        function generateOrders() {
+            tyState.orders = [];
+            const num = 2 + Math.floor(Math.random() * 2);
+            for (let i = 0; i < num; i++) {
+                const isPizza = Math.random() > 0.5;
+                const qty = isPizza ? 10 + Math.floor(Math.random() * 20) : 20 + Math.floor(Math.random() * 40);
+                tyState.orders.push({ id: i, type: isPizza ? 'pizza' : 'taco', qty: qty, bonus: Math.floor(qty * (isPizza ? 3 : 1.5)), accepted: false });
+            }
+        }
+        
+        function updateTycoonUI() {
+            document.getElementById('ty-week').textContent = tyState.week;
+            document.getElementById('ty-cash').textContent = tyState.cash;
+            document.getElementById('ty-rep').textContent = tyState.rep;
+            document.getElementById('ty-pizza-price').textContent = tyState.pizzaPrice;
+            document.getElementById('ty-taco-price').textContent = tyState.tacoPrice;
+            
+            const eb = document.getElementById('ty-event');
+            if (tyState.event) {
+                eb.classList.add('show');
+                document.getElementById('ty-event-title').textContent = tyState.event.title;
+                document.getElementById('ty-event-desc').textContent = tyState.event.desc;
+            } else {
+                eb.classList.remove('show');
+            }
+            
+            const ol = document.getElementById('orders-list');
+            ol.innerHTML = '';
+            tyState.orders.forEach(function(o, i) {
+                const div = document.createElement('div');
+                div.className = 'order-card';
+                div.innerHTML = '<div class="order-info"><div class="order-req">' + o.qty + ' ' + (o.type === 'pizza' ? '🍕' : '🌮') + ' ' + o.type + 's</div><div class="order-bonus">+$' + o.bonus + ' bonus</div></div><div class="order-actions"><button class="order-btn accept" onclick="acceptOrder(' + i + ')" ' + (o.accepted ? 'disabled' : '') + '>' + (o.accepted ? '✓' : 'Accept') + '</button>' + (!o.accepted ? '<button class="order-btn reject" onclick="rejectOrder(' + i + ')">✗</button>' : '') + '</div>';
+                ol.appendChild(div);
+            });
+            
+            document.getElementById('ty-pizza').textContent = tyState.pizza !== null ? tyState.pizza : '--';
+            document.getElementById('ty-taco').textContent = tyState.taco !== null ? tyState.taco : '--';
+            
+            if (tyState.pizza !== null) {
+                const mult = 1 + tyState.priceBonus;
+                const profit = Math.floor(tyState.pizza * tyState.pizzaPrice * mult) + Math.floor(tyState.taco * tyState.tacoPrice * mult);
+                document.getElementById('ty-projected').textContent = profit;
+            } else {
+                document.getElementById('ty-projected').textContent = '0';
+            }
+            
+            document.getElementById('ty-confirm').disabled = tyState.pizza === null;
+        }
+        
+        function acceptOrder(i) { tyState.orders[i].accepted = true; tyState.acceptedOrders.push(tyState.orders[i]); playSound('coin'); updateTycoonUI(); }
+        function rejectOrder(i) { tyState.orders.splice(i, 1); tyState.rep = Math.max(0, tyState.rep - 2); playSound('click'); updateTycoonUI(); }
+        
+        function drawTycoon() {
+            const c = document.getElementById('tycoonCanvas');
+            drawPPF(c, tyState.pizza, tyState.taco, 'efficient', { maxP: tyMaxPizza(), maxTFunc: tyMaxTacos });
+        }
+        
+        function confirmWeek() {
+            const mult = 1 + tyState.priceBonus;
+            let baseProfit = Math.floor(tyState.pizza * tyState.pizzaPrice * mult) + Math.floor(tyState.taco * tyState.tacoPrice * mult);
+            let orderBonus = 0, fulfilled = 0, failed = 0;
+            
+            tyState.acceptedOrders.forEach(function(o) {
+                const have = o.type === 'pizza' ? tyState.pizza : tyState.taco;
+                if (have >= o.qty) { orderBonus += o.bonus; fulfilled++; tyState.rep = Math.min(100, tyState.rep + 3); }
+                else { failed++; tyState.rep = Math.max(0, tyState.rep - 8); }
+            });
+            
+            tyState.cash += baseProfit + orderBonus;
+            showSummary(baseProfit, orderBonus, fulfilled, failed);
+        }
+        
+        function showSummary(base, bonus, fulfilled, failed) {
+            document.getElementById('summary-title').textContent = 'Week ' + tyState.week + ' Results';
+            document.getElementById('summary-content').innerHTML = '<div style="text-align:center;padding:20px 0;"><div style="font-size:2rem;font-weight:800;color:var(--green);">+$' + (base + bonus) + '</div><div style="font-size:0.9rem;opacity:0.8;margin-top:8px;">Sales: $' + base + (bonus > 0 ? ' | Orders: +$' + bonus : '') + '</div>' + (fulfilled > 0 ? '<div style="color:var(--green);margin-top:8px;">✓ ' + fulfilled + ' order(s) fulfilled</div>' : '') + (failed > 0 ? '<div style="color:var(--red);margin-top:8px;">✗ ' + failed + ' order(s) failed</div>' : '') + '<div style="margin-top:16px;font-size:0.9rem;">Total: <strong>$' + tyState.cash + '</strong> | Rep: <strong>' + tyState.rep + '</strong></div></div>';
+            document.getElementById('summary-modal').classList.add('show');
+            playSound('success');
+        }
+        
+        function closeSummary() {
+            document.getElementById('summary-modal').classList.remove('show');
+            tyState.week++;
+            if (tyState.week > 8) endTycoon();
+            else if (tyState.week % 2 === 0) showUpgradeShop();
+            else setupWeek();
+        }
+        
+        function showUpgradeShop() {
+            const list = document.getElementById('upgrade-list');
+            list.innerHTML = '';
+            upgrades.forEach(function(u) {
+                const owned = tyState.upgrades.indexOf(u.id) >= 0;
+                const afford = tyState.cash >= u.cost;
+                const div = document.createElement('div');
+                div.className = 'upgrade-option' + (owned ? ' owned' : '');
+                div.innerHTML = '<div class="upgrade-name">' + u.name + '</div><div class="upgrade-desc">' + u.desc + '</div><div class="upgrade-cost">' + (owned ? 'OWNED' : '$' + u.cost) + '</div>';
+                if (!owned && afford) {
+                    div.onclick = function() {
+                        document.querySelectorAll('.upgrade-option').forEach(function(o) { o.classList.remove('selected'); });
+                        div.classList.add('selected');
+                        div.dataset.upgradeId = u.id;
+                    };
+                }
+                list.appendChild(div);
+            });
+            document.getElementById('upgrade-modal').classList.add('show');
+        }
+        
+        function buyUpgrade() {
+            const sel = document.querySelector('.upgrade-option.selected');
+            if (!sel) return alert('Select an upgrade first!');
+            const u = upgrades.find(function(up) { return up.id === sel.dataset.upgradeId; });
+            if (!u || tyState.cash < u.cost) return;
+            tyState.cash -= u.cost;
+            tyState.upgrades.push(u.id);
+            u.effect();
+            playSound('coin');
+            document.getElementById('upgrade-modal').classList.remove('show');
+            setupWeek();
+        }
+        
+        function skipUpgrade() { document.getElementById('upgrade-modal').classList.remove('show'); setupWeek(); }
+        
+        function endTycoon() {
+            document.getElementById('tycoon-game').style.display = 'none';
+            document.getElementById('tycoon-gameover').style.display = 'block';
+            document.getElementById('tycoon-gameover').classList.add('show');
+            document.getElementById('final-ty-cash').textContent = '$' + tyState.cash;
+            document.getElementById('final-ty-rep').textContent = '⭐ ' + tyState.rep + ' reputation';
+            let v = tyState.cash >= 2000 && tyState.rep >= 70 ? '🏆 Factory Mogul!' : tyState.cash >= 2000 ? '💰 Money Machine!' : tyState.rep >= 70 ? '⭐ Customer Favorite!' : tyState.cash >= 1000 ? '📊 Solid Business.' : '📉 Rough season.';
+            document.getElementById('ty-verdict').textContent = v;
+        }
+        
+        // DRAW PPF
+        function drawPPF(canvas, px, tx, zone, opts) {
+            opts = opts || {};
+            const ctx = canvas.getContext('2d');
+            const w = 500, h = 450;
+            const pad = 50, gw = 400, gh = 350;
+            const maxP = opts.maxP || 40;
+            const maxTFunc = opts.maxTFunc || maxTacos;
+            
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#1a1b2e';
+            ctx.fillRect(0, 0, w, h);
+            
+            // Grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 8; i++) {
+                ctx.beginPath();
+                ctx.moveTo(pad + (gw / 8) * i, pad);
+                ctx.lineTo(pad + (gw / 8) * i, h - pad);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(pad, pad + (gh / 8) * i);
+                ctx.lineTo(w - pad, pad + (gh / 8) * i);
+                ctx.stroke();
+            }
+            
+            // Axes
+            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(pad, pad);
+            ctx.lineTo(pad, h - pad);
+            ctx.lineTo(w - pad, h - pad);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.font = 'bold 12px system-ui';
+            ctx.textAlign = 'center';
+            ctx.fillText('PIZZAS 🍕', w / 2, h - 10);
+            ctx.save();
+            ctx.translate(14, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('TACOS 🌮', 0, 0);
+            ctx.restore();
+            
+            // Numbers
+            ctx.font = '11px system-ui';
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            for (let i = 0; i <= 4; i++) {
+                ctx.fillText(Math.round((maxP / 4) * i).toString(), pad + (gw / 4) * i, h - pad + 18);
+                ctx.fillText(Math.round((maxTFunc(0) / 4) * i).toString(), pad - 22, h - pad - (gh / 4) * i + 4);
+            }
+            
+            // Shaded inside
+            ctx.fillStyle = 'rgba(20, 184, 166, 0.08)';
+            ctx.beginPath();
+            ctx.moveTo(pad, h - pad);
+            for (let p = 0; p <= maxP; p++) {
+                const t = maxTFunc(p);
+                const x = pad + (p / maxP) * gw;
+                const y = h - pad - (t / maxTFunc(0)) * gh;
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(w - pad, h - pad);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Shaded outside (impossible)
+            ctx.fillStyle = 'rgba(91, 94, 166, 0.08)';
+            ctx.beginPath();
+            ctx.moveTo(pad, pad);
+            for (let p = 0; p <= maxP; p++) {
+                const t = maxTFunc(p);
+                const x = pad + (p / maxP) * gw;
+                const y = h - pad - (t / maxTFunc(0)) * gh;
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(w - pad, pad);
+            ctx.closePath();
+            ctx.fill();
+            
+            // PPF Curve
+            ctx.strokeStyle = '#E8505B';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            for (let p = 0; p <= maxP; p++) {
+                const t = maxTFunc(p);
+                const x = pad + (p / maxP) * gw;
+                const y = h - pad - (t / maxTFunc(0)) * gh;
+                if (p === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            
+            // Highlight line
+            if (opts.highlightX !== undefined) {
+                const hx = pad + (opts.highlightX / maxP) * gw;
+                ctx.strokeStyle = 'rgba(245, 158, 11, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(hx, pad);
+                ctx.lineTo(hx, h - pad);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+            
+            // Point
+            if (px !== null && tx !== null) {
+                const pxPos = pad + (px / maxP) * gw;
+                const pyPos = h - pad - (tx / maxTFunc(0)) * gh;
+                
+                // Dashed lines
+                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath();
+                ctx.moveTo(pxPos, pyPos);
+                ctx.lineTo(pxPos, h - pad);
+                ctx.moveTo(pxPos, pyPos);
+                ctx.lineTo(pad, pyPos);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Dot
+                let color = '#14B8A6';
+                if (zone === 'inefficient') color = '#E8505B';
+                if (zone === 'impossible') color = '#5B5EA6';
+                
+                ctx.beginPath();
+                ctx.arc(pxPos, pyPos, 12, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+        }
+        
+        // Init
+        window.onload = function() { initExplore(); maybeShowInstructions('explore'); };
+    </script>
+</body>
+</html>
