@@ -479,7 +479,91 @@ function setupLessonInteraction(type) {
     const canvas = document.getElementById('lesson-canvas');
     if (!canvas) return;
     
-    if (type === 'demand-shift') {
+    if (type === 'demand' || type === 'supply') {
+        // Add click handler for price points
+        canvas.style.cursor = 'pointer';
+        canvas.onclick = function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            const margin = { top: 30, bottom: 50 };
+            const h = 350 - margin.top - margin.bottom;
+            const pricePercent = (y - margin.top) / h;
+            
+            if (pricePercent >= 0 && pricePercent <= 1) {
+                // Highlight the clicked price point
+                drawLessonVisual(type);
+                const ctx = canvas.getContext('2d');
+                
+                // Draw highlight at clicked price
+                ctx.fillStyle = 'rgba(244, 114, 182, 0.3)';
+                ctx.fillRect(0, y - 5, canvas.width, 10);
+                
+                // Show price indicator
+                ctx.fillStyle = '#2B2D42';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText(`Price: $${Math.round((1-pricePercent) * 100)}`, 250, y + 5);
+            }
+        };
+    } else if (type === 'equilibrium') {
+        // Make equilibrium point more visible
+        canvas.style.cursor = 'default';
+        const ctx = canvas.getContext('2d');
+        const margin = { left: 50, right: 30, top: 30, bottom: 50 };
+        const w = 400 - margin.left - margin.right;
+        const h = 350 - margin.top - margin.bottom;
+        
+        // Draw pulsing effect on equilibrium
+        let pulse = 0;
+        const pulseInterval = setInterval(() => {
+            drawLessonVisual('equilibrium');
+            const eqX = margin.left + w * 0.5;
+            const eqY = margin.top + h * 0.5;
+            
+            ctx.strokeStyle = `rgba(244, 114, 182, ${0.5 + Math.sin(pulse) * 0.3})`;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(eqX, eqY, 15 + Math.sin(pulse) * 5, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            pulse += 0.1;
+            if (pulse > Math.PI * 4) clearInterval(pulseInterval);
+        }, 50);
+    } else if (type === 'shortage' || type === 'surplus') {
+        // Add drag handler for price line
+        canvas.style.cursor = 'ns-resize';
+        let isDragging = false;
+        
+        canvas.onmousedown = function() { isDragging = true; };
+        canvas.onmouseup = function() { isDragging = false; };
+        canvas.onmouseleave = function() { isDragging = false; };
+        
+        canvas.onmousemove = function(e) {
+            if (!isDragging) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            const margin = { top: 30, bottom: 50 };
+            const h = 350 - margin.top - margin.bottom;
+            let pricePercent = (y - margin.top) / h;
+            
+            // Clamp between 0 and 1
+            pricePercent = Math.max(0, Math.min(1, pricePercent));
+            
+            // Redraw with new price line
+            const ctx = canvas.getContext('2d');
+            drawLessonVisual(type);
+            const w = 400 - margin.left - 50;
+            
+            ctx.strokeStyle = '#F59E0B';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(margin.left, margin.top + h * pricePercent);
+            ctx.lineTo(margin.left + w, margin.top + h * pricePercent);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        };
+    } else if (type === 'demand-shift') {
         const container = document.querySelector('.lesson-content');
         const btnRow = document.createElement('div');
         btnRow.className = 'btn-row';
