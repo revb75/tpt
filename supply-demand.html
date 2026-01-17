@@ -109,6 +109,211 @@
         
         /* Graph area label styles */
         .zone-label { font-size: 0.9rem; padding: 4px 8px; border-radius: 4px; }
+        
+        /* MOBILE RESPONSIVE STYLES */
+        @media (max-width: 768px) {
+            /* Header adjustments */
+            .header { 
+                flex-direction: column; 
+                gap: 15px; 
+                padding: 15px; 
+                text-align: center; 
+            }
+            .header h1 { font-size: 1.2rem; }
+            .progress-bar { 
+                justify-content: center; 
+                flex-wrap: wrap; 
+                gap: 5px; 
+            }
+            .progress-label { font-size: 0.7rem; }
+            
+            /* Container */
+            .container { padding: 10px; }
+            
+            /* Tabs - make them scrollable */
+            .tabs { 
+                overflow-x: auto; 
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+            .tabs::-webkit-scrollbar { display: none; }
+            .tab { 
+                padding: 10px 16px; 
+                font-size: 0.9rem; 
+                white-space: nowrap; 
+                min-width: 100px;
+                flex-shrink: 0;
+            }
+            
+            /* Panels */
+            .panel { 
+                padding: 15px; 
+                min-height: auto; 
+                border-radius: 8px; 
+            }
+            
+            /* Lesson layout - stack vertically */
+            .lesson-container { 
+                flex-direction: column; 
+                gap: 20px; 
+            }
+            .lesson-content { order: 1; }
+            .lesson-visual { 
+                order: 2; 
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            /* Text sizes */
+            .lesson-title { font-size: 1.4rem; }
+            .lesson-text { font-size: 1rem; line-height: 1.6; }
+            .interactive-prompt { 
+                font-size: 0.9rem; 
+                padding: 12px 15px; 
+            }
+            
+            /* Canvas - make responsive */
+            canvas { 
+                max-width: 100% !important; 
+                height: auto !important; 
+                touch-action: none;
+                width: 100% !important;
+            }
+            
+            /* Buttons - make touch-friendly (44px min) */
+            .btn { 
+                padding: 14px 24px; 
+                font-size: 1rem; 
+                min-height: 44px;
+                width: 100%;
+                max-width: 300px;
+            }
+            .btn-small { 
+                padding: 10px 14px; 
+                min-height: 44px; 
+                font-size: 0.9rem;
+                flex: 1;
+                min-width: 100px;
+            }
+            .btn-row { 
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            /* Lesson navigation */
+            .lesson-nav { 
+                flex-direction: column; 
+                gap: 12px; 
+                align-items: stretch;
+            }
+            .lesson-nav .btn { 
+                width: 100%;
+                max-width: none;
+            }
+            .lesson-progress { 
+                order: -1; 
+                margin-bottom: 10px;
+                text-align: center;
+            }
+            
+            /* Quiz */
+            .quiz-question { padding: 15px; }
+            .quiz-option { 
+                padding: 14px 16px; 
+                font-size: 0.95rem; 
+                min-height: 44px;
+            }
+            
+            /* Score screen */
+            .score-big { font-size: 3.5rem; }
+            .score-label { font-size: 1.2rem; }
+            .score-details { 
+                padding: 15px;
+                margin: 15px 10px;
+            }
+            .print-section { 
+                padding: 15px;
+                margin: 20px 0;
+            }
+            .print-section input { 
+                width: 100%; 
+                max-width: 250px;
+                margin: 5px 0;
+            }
+            
+            /* Market Mogul */
+            .sim-header { 
+                flex-wrap: wrap; 
+                padding: 12px;
+                gap: 10px;
+            }
+            .sim-stat { 
+                flex: 1 1 45%; 
+                margin: 5px;
+                min-width: 120px;
+            }
+            .sim-stat-value { font-size: 1.3rem; }
+            .news-ticker { font-size: 0.9rem; padding: 10px 12px; }
+            .market-graph { padding: 15px; }
+            .price-slider { margin: 15px 0; }
+            
+            /* Footer */
+            .footer { font-size: 0.8rem; padding: 15px 10px; }
+        }
+        
+        @media (max-width: 480px) {
+            /* Extra small screens */
+            .header h1 { font-size: 1rem; }
+            .tab { 
+                padding: 8px 12px; 
+                font-size: 0.85rem; 
+                min-width: 85px; 
+            }
+            .lesson-title { font-size: 1.3rem; }
+            .lesson-text { font-size: 0.95rem; }
+            .btn { 
+                padding: 12px 20px; 
+                font-size: 0.95rem; 
+            }
+            .btn-small { 
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+            .score-big { font-size: 2.8rem; }
+            .score-label { font-size: 1rem; }
+            .sim-stat { 
+                flex: 1 1 100%;
+                margin: 3px 0;
+            }
+            .sim-stat-value { font-size: 1.2rem; }
+            .quiz-option { font-size: 0.9rem; padding: 12px; }
+        }
+        
+        /* Touch device improvements */
+        @media (hover: none) and (pointer: coarse) {
+            /* Increase all touch targets to 44px minimum */
+            .tab, .btn, .quiz-option, .btn-small { min-height: 44px; }
+            
+            /* Remove hover effects on touch devices */
+            .tab:hover:not(:disabled),
+            .btn-secondary:hover, 
+            .btn-small:hover, 
+            .quiz-option:hover { 
+                transform: none;
+                background: inherit;
+                border-color: inherit;
+            }
+            .btn-primary:hover { 
+                transform: none; 
+                background: #14B8A6;
+            }
+            
+            /* Add active states for touch feedback */
+            .tab:active:not(:disabled) { background: #3B3D52; }
+            .btn-primary:active { background: #0D9488; }
+            .btn-small:active { border-color: #14B8A6; background: #F0FDF4; }
+        }
     </style>
 </head>
 <body>
@@ -479,15 +684,23 @@ function setupLessonInteraction(type) {
     const canvas = document.getElementById('lesson-canvas');
     if (!canvas) return;
     
+    // Helper function to get coordinates from both mouse and touch events
+    function getEventCoords(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { y: clientY - rect.top };
+    }
+    
     if (type === 'demand' || type === 'supply') {
-        // Add click handler for price points
+        // Add click/touch handler for price points
         canvas.style.cursor = 'pointer';
-        canvas.onclick = function(e) {
-            const rect = canvas.getBoundingClientRect();
-            const y = e.clientY - rect.top;
+        
+        const handleInteraction = function(e) {
+            e.preventDefault();
+            const coords = getEventCoords(e);
             const margin = { top: 30, bottom: 50 };
             const h = 350 - margin.top - margin.bottom;
-            const pricePercent = (y - margin.top) / h;
+            const pricePercent = (coords.y - margin.top) / h;
             
             if (pricePercent >= 0 && pricePercent <= 1) {
                 // Highlight the clicked price point
@@ -496,14 +709,17 @@ function setupLessonInteraction(type) {
                 
                 // Draw highlight at clicked price
                 ctx.fillStyle = 'rgba(244, 114, 182, 0.3)';
-                ctx.fillRect(0, y - 5, canvas.width, 10);
+                ctx.fillRect(0, coords.y - 5, canvas.width, 10);
                 
                 // Show price indicator
                 ctx.fillStyle = '#2B2D42';
                 ctx.font = 'bold 16px Arial';
-                ctx.fillText(`Price: $${Math.round((1-pricePercent) * 100)}`, 250, y + 5);
+                ctx.fillText(`Price: $${Math.round((1-pricePercent) * 100)}`, 250, coords.y + 5);
             }
         };
+        
+        canvas.onclick = handleInteraction;
+        canvas.ontouchstart = handleInteraction;
     } else if (type === 'equilibrium') {
         // Make equilibrium point more visible
         canvas.style.cursor = 'default';
@@ -529,22 +745,21 @@ function setupLessonInteraction(type) {
             if (pulse > Math.PI * 4) clearInterval(pulseInterval);
         }, 50);
     } else if (type === 'shortage' || type === 'surplus') {
-        // Add drag handler for price line
+        // Add drag handler for price line - support both mouse and touch
         canvas.style.cursor = 'ns-resize';
         let isDragging = false;
         
-        canvas.onmousedown = function() { isDragging = true; };
-        canvas.onmouseup = function() { isDragging = false; };
-        canvas.onmouseleave = function() { isDragging = false; };
+        const startDrag = function() { isDragging = true; };
+        const endDrag = function() { isDragging = false; };
         
-        canvas.onmousemove = function(e) {
+        const handleDrag = function(e) {
             if (!isDragging) return;
+            e.preventDefault();
             
-            const rect = canvas.getBoundingClientRect();
-            const y = e.clientY - rect.top;
-            const margin = { top: 30, bottom: 50 };
+            const coords = getEventCoords(e);
+            const margin = { top: 30, bottom: 50, left: 50 };
             const h = 350 - margin.top - margin.bottom;
-            let pricePercent = (y - margin.top) / h;
+            let pricePercent = (coords.y - margin.top) / h;
             
             // Clamp between 0 and 1
             pricePercent = Math.max(0, Math.min(1, pricePercent));
@@ -563,6 +778,20 @@ function setupLessonInteraction(type) {
             ctx.stroke();
             ctx.setLineDash([]);
         };
+        
+        // Mouse events
+        canvas.onmousedown = startDrag;
+        canvas.onmouseup = endDrag;
+        canvas.onmouseleave = endDrag;
+        canvas.onmousemove = handleDrag;
+        
+        // Touch events
+        canvas.ontouchstart = function(e) {
+            e.preventDefault();
+            startDrag();
+        };
+        canvas.ontouchend = endDrag;
+        canvas.ontouchmove = handleDrag;
     } else if (type === 'demand-shift') {
         const container = document.querySelector('.lesson-content');
         const btnRow = document.createElement('div');
