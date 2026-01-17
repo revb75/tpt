@@ -126,13 +126,18 @@
             padding: 15px; 
             margin-bottom: 10px; 
             border-radius: 8px; 
-            cursor: grab; 
+            cursor: pointer; 
             font-weight: bold;
             transition: all 0.2s;
             user-select: none;
+            border: 3px solid transparent;
         }
         .flashcard-term:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .flashcard-term.dragging { opacity: 0.5; cursor: grabbing; }
+        .flashcard-term.selected { 
+            border: 3px solid #F59E0B; 
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+            transform: scale(1.05);
+        }
         .flashcard-def { 
             background: #F8F8F8; 
             padding: 15px; 
@@ -141,16 +146,17 @@
             border: 2px dashed #ddd;
             min-height: 60px;
             transition: all 0.2s;
+            cursor: pointer;
         }
-        .flashcard-def.drag-over { 
-            background: #D1FAE5; 
-            border-color: #14B8A6; 
-            border-style: solid;
+        .flashcard-def:hover { 
+            background: #E8F8F5; 
+            border-color: #14B8A6;
         }
         .flashcard-def.matched { 
             background: #D1FAE5; 
             border-color: #10B981; 
             border-style: solid;
+            cursor: default;
         }
         .flashcard-def.wrong { 
             background: #FEE2E2; 
@@ -311,12 +317,25 @@
                 min-height: 44px;
                 display: flex;
                 align-items: center;
+                justify-content: center;
+                text-align: center;
+            }
+            .flashcard-term.selected {
+                animation: pulse 1s infinite;
+            }
+            @keyframes pulse {
+                0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); }
+                50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.9); }
             }
             .flashcard-def { 
                 padding: 12px; 
                 font-size: 0.9rem; 
                 margin-bottom: 8px;
                 min-height: 55px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
             }
             .flashcard-stats { 
                 flex-wrap: wrap; 
@@ -1054,7 +1073,7 @@ let flashcardState = {
     matches: [],
     attempts: 0,
     startTime: null,
-    draggedTerm: null
+    selectedTerm: null
 };
 
 function initFlashcards() {
@@ -1076,7 +1095,7 @@ function renderFlashcards() {
     container.innerHTML = `
         <div class="animate-in">
             <h2 style="color: #2B2D42; margin-bottom: 10px;">🎴 Vocabulary Matching Game</h2>
-            <p style="color: #666; margin-bottom: 20px;">Drag each term to its correct definition!</p>
+            <p style="color: #666; margin-bottom: 20px;">Tap a term, then tap its matching definition!</p>
             
             <div class="flashcard-stats">
                 <div>
@@ -1095,11 +1114,11 @@ function renderFlashcards() {
             
             <div class="flashcard-game">
                 <div class="flashcard-column">
-                    <h3 style="color: #14B8A6; margin-bottom: 15px;">📝 Terms</h3>
+                    <h3 style="color: #14B8A6; margin-bottom: 15px;">📝 Terms (Tap to select)</h3>
                     <div id="terms-container"></div>
                 </div>
                 <div class="flashcard-column">
-                    <h3 style="color: #2B2D42; margin-bottom: 15px;">📖 Definitions</h3>
+                    <h3 style="color: #2B2D42; margin-bottom: 15px;">📖 Definitions (Tap to match)</h3>
                     <div id="defs-container"></div>
                 </div>
             </div>
@@ -1112,16 +1131,17 @@ function renderFlashcards() {
         if (!flashcardState.matches.find(m => m.term === item.term)) {
             const div = document.createElement('div');
             div.className = 'flashcard-term';
+            if (flashcardState.selectedTerm === item.term) {
+                div.classList.add('selected');
+            }
             div.textContent = item.term;
-            div.draggable = true;
             div.dataset.term = item.term;
-            div.ondragstart = handleDragStart;
-            div.ondragend = handleDragEnd;
+            div.onclick = handleTermClick;
             termsContainer.appendChild(div);
         }
     });
     
-    // Render definitions with drop zones
+    // Render definitions
     const defsContainer = document.getElementById('defs-container');
     flashcardState.shuffledDefs.forEach((item, idx) => {
         const div = document.createElement('div');
@@ -1137,9 +1157,7 @@ function renderFlashcards() {
             div.className = 'flashcard-def';
             div.textContent = item.def;
             div.dataset.term = item.term;
-            div.ondragover = handleDragOver;
-            div.ondragleave = handleDragLeave;
-            div.ondrop = handleDrop;
+            div.onclick = handleDefClick;
         }
         
         defsContainer.appendChild(div);
@@ -1151,41 +1169,36 @@ function renderFlashcards() {
     }
 }
 
-function handleDragStart(e) {
-    flashcardState.draggedTerm = e.target.dataset.term;
-    e.target.classList.add('dragging');
+function handleTermClick(e) {
+    const term = e.currentTarget.dataset.term;
+    flashcardState.selectedTerm = term;
+    renderFlashcards();
 }
 
-function handleDragEnd(e) {
-    e.target.classList.remove('dragging');
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    e.currentTarget.classList.add('drag-over');
-}
-
-function handleDragLeave(e) {
-    e.currentTarget.classList.remove('drag-over');
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
+function handleDefClick(e) {
+    if (!flashcardState.selectedTerm) {
+        // No term selected yet
+        e.currentTarget.classList.add('wrong');
+        setTimeout(() => {
+            e.currentTarget.classList.remove('wrong');
+        }, 500);
+        return;
+    }
     
     flashcardState.attempts++;
     const defTerm = e.currentTarget.dataset.term;
-    const draggedTerm = flashcardState.draggedTerm;
+    const selectedTerm = flashcardState.selectedTerm;
     
-    if (defTerm === draggedTerm) {
+    if (defTerm === selectedTerm) {
         // Correct match!
-        flashcardState.matches.push({ term: draggedTerm });
+        flashcardState.matches.push({ term: selectedTerm });
+        flashcardState.selectedTerm = null;
         renderFlashcards();
     } else {
         // Wrong match
         e.currentTarget.classList.add('wrong');
         setTimeout(() => {
-            renderFlashcards();
+            e.currentTarget.classList.remove('wrong');
         }, 500);
     }
 }
