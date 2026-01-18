@@ -17,6 +17,21 @@
         
         /* Header */
         .header { background: #2B2D42; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Teacher Preview Banner */
+        .preview-banner { 
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); 
+            color: white; 
+            padding: 12px 30px; 
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: none;
+        }
+        .preview-banner.active { display: block; }
+        .preview-banner::before { content: "🎓 "; }
+        
         .header h1 { font-size: 1.5rem; }
         .header span { color: #14B8A6; }
         .progress-bar { display: flex; gap: 8px; align-items: center; }
@@ -65,7 +80,12 @@
         .interactive-prompt strong { color: #14B8A6; }
         
         /* Canvas for graphs */
-        canvas { border-radius: 8px; background: #FAFAFA; }
+        canvas { 
+            border-radius: 8px; 
+            background: white; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid #E5E7EB;
+        }
         
         /* Buttons row */
         .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0; }
@@ -480,6 +500,11 @@
     </style>
 </head>
 <body>
+    <!-- Teacher Preview Mode Banner -->
+    <div class="preview-banner" id="preview-banner">
+        TEACHER PREVIEW MODE - All sections unlocked. Do not share this URL with students.
+    </div>
+    
     <div class="header">
         <h1><span>ClassClick</span> | Supply & Demand Lab</h1>
         <div class="progress-bar">
@@ -503,6 +528,7 @@
             <button class="tab locked" id="tab-practice" onclick="showSection('practice')" disabled>🎯 Practice</button>
             <button class="tab locked" id="tab-simulate" onclick="showSection('simulate')" disabled>🏪 Market Mogul</button>
             <button class="tab locked" id="tab-quiz" onclick="showSection('quiz')" disabled>📝 Quiz</button>
+            <button class="tab locked" id="tab-game" onclick="showSection('game')" disabled>⚔️ Bonus: Trader Game</button>
         </div>
         
         <!-- LEARN SECTION -->
@@ -529,6 +555,30 @@
         <div class="panel" id="panel-quiz">
             <div id="quiz-container"></div>
         </div>
+        
+        <!-- BONUS GAME SECTION -->
+        <div class="panel" id="panel-game">
+            <div style="text-align:center; margin-bottom:20px;">
+                <h2 style="color:#2B2D42; font-size:2rem; margin-bottom:10px;">🎮 Bonus Challenge: Dungeon Trader!</h2>
+                <p style="color:#666; font-size:1.1rem; max-width:800px; margin:0 auto; margin-bottom:15px;">
+                    <strong>Congratulations on completing the quiz!</strong> 🎉<br><br>
+                    You've mastered supply and demand theory — now test your skills in a real trading adventure! 
+                    Explore the dungeon, find 5 merchants with different prices, and use what you learned to maximize your profits!
+                </p>
+                <div style="background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 8px; padding: 15px; max-width: 700px; margin: 0 auto; margin-bottom: 20px;">
+                    <strong style="color: #92400E;">📚 Apply Your Knowledge:</strong>
+                    <ul style="text-align: left; color: #78350F; margin-top: 10px; margin-left: 40px;">
+                        <li>Buy low where supply is abundant (cheap prices)</li>
+                        <li>Sell high where demand is strong (expensive prices)</li>
+                        <li>Earn 500 gold to buy the escape key and win!</li>
+                        <li>Watch out for the bat — it steals items!</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="display:flex; justify-content: center;">
+                <iframe id="game-frame" style="border: 4px solid #2B2D42; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);" width="850" height="900" frameborder="0"></iframe>
+            </div>
+        </div>
     </div>
     
     <div class="footer">
@@ -538,6 +588,14 @@
     </div>
 
 <script>
+// ==================== TEACHER PREVIEW MODE ====================
+const urlParams = new URLSearchParams(window.location.search);
+const isTeacherPreview = urlParams.get('preview') === 'true' || urlParams.get('teacher') === 'true';
+
+if (isTeacherPreview) {
+    console.log('🎓 TEACHER PREVIEW MODE ACTIVATED');
+}
+
 // ==================== STATE ====================
 const state = {
     currentLesson: 0,
@@ -699,26 +757,51 @@ function drawLessonVisual(type) {
     const canvas = document.getElementById('lesson-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, 400, 350);
+    
+    // Clear and set white background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 400, 350);
     
     const margin = { left: 50, right: 30, top: 30, bottom: 50 };
     const w = 400 - margin.left - margin.right;
     const h = 350 - margin.top - margin.bottom;
     
-    // Draw axes
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 2;
+    // Draw subtle grid lines for easier reading
+    ctx.strokeStyle = '#E5E7EB';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+        // Horizontal grid lines
+        const y = margin.top + (i/5) * h;
+        ctx.beginPath();
+        ctx.moveTo(margin.left, y);
+        ctx.lineTo(margin.left + w, y);
+        ctx.stroke();
+        
+        // Vertical grid lines
+        const x = margin.left + (i/5) * w;
+        ctx.beginPath();
+        ctx.moveTo(x, margin.top);
+        ctx.lineTo(x, margin.top + h);
+        ctx.stroke();
+    }
+    
+    // Draw axes - thicker and darker
+    ctx.strokeStyle = '#1F2937';
+    ctx.lineWidth = 3;
     ctx.beginPath();
+    // Y axis
     ctx.moveTo(margin.left, margin.top);
     ctx.lineTo(margin.left, margin.top + h);
+    // X axis
     ctx.lineTo(margin.left + w, margin.top + h);
     ctx.stroke();
     
-    // Labels
-    ctx.fillStyle = '#666';
-    ctx.font = '14px Arial';
+    // Axis labels - larger and clearer
+    ctx.fillStyle = '#374151';
+    ctx.font = 'bold 15px Arial';
     ctx.textAlign = 'center';
     ctx.fillText('Quantity', margin.left + w/2, 340);
+    
     ctx.save();
     ctx.translate(15, margin.top + h/2);
     ctx.rotate(-Math.PI/2);
@@ -752,39 +835,92 @@ function drawLessonVisual(type) {
 }
 
 function drawDemandCurve(ctx, margin, w, h, shift) {
-    ctx.strokeStyle = '#E8505B';
-    ctx.lineWidth = 3;
+    // Demand curve - downward sloping (high price = low quantity)
+    ctx.strokeStyle = '#DC2626'; // Bright red, easy to see
+    ctx.lineWidth = 4; // Thicker for visibility
     ctx.beginPath();
+    
+    // Draw curve from top-left to bottom-right, STAYING WITHIN BOUNDS
     for (let i = 0; i <= 100; i++) {
         const x = margin.left + (i/100) * w + shift * 50;
         const y = margin.top + (i/100) * h;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+        
+        // Only draw if within canvas bounds
+        if (x >= margin.left && x <= margin.left + w) {
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
     }
     ctx.stroke();
     
-    // Label
-    ctx.fillStyle = '#E8505B';
-    ctx.font = 'bold 14px Arial';
-    ctx.fillText('D', margin.left + w - 20 + shift * 50, margin.top + h - 20);
+    // Label with background for readability
+    const labelX = margin.left + w - 10 + shift * 50;
+    const labelY = margin.top + h - 10;
+    
+    // White background circle
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(labelX, labelY, 18, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Red border
+    ctx.strokeStyle = '#DC2626';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(labelX, labelY, 18, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Label text
+    ctx.fillStyle = '#DC2626';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('D', labelX, labelY);
 }
 
 function drawSupplyCurve(ctx, margin, w, h, shift) {
-    ctx.strokeStyle = '#14B8A6';
-    ctx.lineWidth = 3;
+    // Supply curve - upward sloping (high price = high quantity)
+    ctx.strokeStyle = '#2563EB'; // Bright blue, easy to see
+    ctx.lineWidth = 4; // Thicker for visibility
     ctx.beginPath();
+    
+    // Draw curve from bottom-left to top-right, STAYING WITHIN BOUNDS
     for (let i = 0; i <= 100; i++) {
-        const x = margin.left + (i/100) * w - shift * 50;
+        const x = margin.left + (i/100) * w + shift * 50; // FIXED: + not -
         const y = margin.top + h - (i/100) * h;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+        
+        // Only draw if within canvas bounds
+        if (x >= margin.left && x <= margin.left + w && 
+            y >= margin.top && y <= margin.top + h) {
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
     }
     ctx.stroke();
     
-    // Label
-    ctx.fillStyle = '#14B8A6';
-    ctx.font = 'bold 14px Arial';
-    ctx.fillText('S', margin.left + w - 20 - shift * 50, margin.top + 30);
+    // Label with background for readability
+    const labelX = margin.left + w - 10 + shift * 50; // FIXED: + not -
+    const labelY = margin.top + 15;
+    
+    // White background circle
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(labelX, labelY, 18, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Blue border
+    ctx.strokeStyle = '#2563EB';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(labelX, labelY, 18, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Label text
+    ctx.fillStyle = '#2563EB';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('S', labelX, labelY);
 }
 
 function drawBothCurves(ctx, margin, w, h, demandShift, supplyShift) {
@@ -794,29 +930,57 @@ function drawBothCurves(ctx, margin, w, h, demandShift, supplyShift) {
 
 function drawEquilibriumPoint(ctx, margin, w, h, demandShift, supplyShift) {
     // Calculate equilibrium (where lines cross)
-    const eqX = margin.left + w/2 + (demandShift - supplyShift) * 25;
+    // Quantity: Both demand and supply shifts increase quantity (both add)
+    const eqX = margin.left + w/2 + (demandShift + supplyShift) * 25;
+    // Price: Demand shifts increase price, supply shifts decrease price
     const eqY = margin.top + h/2 + (supplyShift - demandShift) * 25;
     
-    // Dotted lines
-    ctx.strokeStyle = '#888';
-    ctx.lineWidth = 1;
+    // Dotted lines to axes
+    ctx.strokeStyle = '#999';
+    ctx.lineWidth = 1.5;
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
+    // Vertical line to quantity axis
     ctx.moveTo(eqX, eqY);
     ctx.lineTo(eqX, margin.top + h);
+    // Horizontal line to price axis
     ctx.moveTo(eqX, eqY);
     ctx.lineTo(margin.left, eqY);
     ctx.stroke();
     ctx.setLineDash([]);
     
-    // Point
+    // Equilibrium point - larger and more visible
     ctx.fillStyle = '#F59E0B';
     ctx.beginPath();
-    ctx.arc(eqX, eqY, 8, 0, Math.PI * 2);
+    ctx.arc(eqX, eqY, 10, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#333';
-    ctx.font = 'bold 12px Arial';
-    ctx.fillText('E', eqX + 15, eqY - 10);
+    
+    // White border around point
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(eqX, eqY, 10, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Label with background
+    const labelX = eqX + 25;
+    const labelY = eqY - 5;
+    
+    // White background for label
+    ctx.fillStyle = 'white';
+    ctx.fillRect(labelX - 5, labelY - 14, 20, 20);
+    
+    // Border for label
+    ctx.strokeStyle = '#F59E0B';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(labelX - 5, labelY - 14, 20, 20);
+    
+    // Label text
+    ctx.fillStyle = '#F59E0B';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('E', labelX + 5, labelY - 4);
 }
 
 function drawPriceLine(ctx, margin, w, h, priceLevel, type) {
@@ -1032,6 +1196,8 @@ function showSection(section) {
         initSimulate();
     } else if (section === 'quiz' && !document.getElementById('quiz-container').innerHTML) {
         initQuiz();
+    } else if (section === 'game') {
+        initGame();
     }
     
     updateProgress();
@@ -2291,6 +2457,9 @@ function showQuizResults() {
     state.quizLocked = true;
     updateProgress();
     
+    // Unlock the bonus game!
+    unlockSection('game');
+    
     const container = document.getElementById('quiz-container');
     container.innerHTML = `
         <div class="score-screen animate-in">
@@ -2303,6 +2472,20 @@ function showQuizResults() {
             </div>
             
             <button class="btn btn-primary" style="margin-top: 20px;" onclick="showCertificate()">🎓 Get Your Certificate</button>
+            
+            <div style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #A7F3D0 0%, #6EE7B7 100%); border-radius: 12px; border: 3px solid #10B981;">
+                <h3 style="color: #065F46; margin-bottom: 10px;">🎮 BONUS UNLOCKED!</h3>
+                <p style="color: #047857; font-size: 1.1rem; margin-bottom: 15px;">
+                    <strong>Dungeon Trader</strong> - A trading adventure game is now available!
+                </p>
+                <p style="color: #047857; margin-bottom: 15px;">
+                    Test your supply & demand skills in a dungeon full of merchants with different prices. 
+                    Buy low, sell high, and earn 500 gold to escape!
+                </p>
+                <button class="btn btn-primary" style="background: #10B981; padding: 15px 30px;" onclick="showSection('game')">
+                    ⚔️ Play Dungeon Trader →
+                </button>
+            </div>
             
             <div class="print-section">
                 <h3 style="margin-bottom: 15px;">🖨️ Print Your Score</h3>
@@ -2503,6 +2686,39 @@ function printCertificate() {
 
 // ==================== INITIALIZE ====================
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize teacher preview mode
+    if (isTeacherPreview) {
+        // Show preview banner
+        document.getElementById('preview-banner').classList.add('active');
+        
+        // Unlock all tabs
+        unlockSection('flashcards');
+        unlockSection('practice');
+        unlockSection('simulate');
+        unlockSection('quiz');
+        unlockSection('game');
+        
+        // Mark all sections as complete (for visual feedback)
+        state.learnComplete = true;
+        state.flashcardsComplete = true;
+        state.practiceComplete = true;
+        state.simulateComplete = true;
+        updateProgress();
+        
+        console.log('🎓 All sections unlocked for teacher preview');
+    }
+    
+    // ==================== BONUS GAME ====================
+    function initGame() {
+        const iframe = document.getElementById('game-frame');
+        if (!iframe || iframe.src) return; // Already loaded
+        
+        // Load the game HTML file - assuming it's in the same directory
+        iframe.src = 'dungeon-trader-final.html';
+        
+        console.log('🎮 Dungeon Trader game loaded!');
+    }
+    
     renderLesson();
 });
 </script>
