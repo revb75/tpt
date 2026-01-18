@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparative Advantage Lab | ClassClick</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+            min-height: 100vh; 
+            color: #333;
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+        
+        /* Header */
+        .header { background: #2B2D42; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.5rem; }
+        .header span { color: #F59E0B; }
+        .progress-bar { display: flex; gap: 8px; align-items: center; }
+        .progress-dot { width: 12px; height: 12px; border-radius: 50%; background: #555; transition: all 0.3s; }
+        .progress-dot.complete { background: #F59E0B; }
+        .progress-dot.active { background: #14B8A6; box-shadow: 0 0 8px #14B8A6; }
+        .progress-label { font-size: 0.75rem; color: #aaa; margin-left: 5px; }
+        
+        /* Main container */
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
+        .tab { padding: 12px 24px; background: #2B2D42; color: #888; border: none; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
+        .tab:hover:not(:disabled) { background: #3B3D52; }
+        .tab.active { background: white; color: #2B2D42; font-weight: bold; }
+        .tab:disabled { cursor: not-allowed; opacity: 0.5; }
+        .tab.locked::before { content: "🔒 "; }
+        
+        /* Panels */
+        .panel { display: none; background: white; border-radius: 0 12px 12px 12px; padding: 30px; min-height: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .panel.active { display: block; }
+        
+        /* Lessons */
+        .lesson-title { font-size: 1.8rem; color: #2B2D42; margin-bottom: 15px; }
+        .lesson-text { font-size: 1.1rem; line-height: 1.7; color: #444; margin-bottom: 20px; }
+        .highlight { background: #FEF3C7; padding: 2px 6px; border-radius: 4px; }
+        .term { font-weight: bold; color: #F59E0B; }
+        
+        /* Navigation */
+        .lesson-nav { display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+        .lesson-progress { color: #888; font-size: 0.9rem; }
+        .btn { padding: 12px 28px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #F59E0B; color: white; }
+        .btn-primary:hover { background: #D97706; transform: translateY(-2px); }
+        .btn-secondary { background: #eee; color: #666; }
+        .btn-secondary:hover { background: #ddd; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        /* Interactive prompts */
+        .interactive-prompt { background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        
+        /* Tables */
+        .production-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .production-table th, .production-table td { padding: 12px; text-align: center; border: 2px solid #ddd; }
+        .production-table th { background: #2B2D42; color: white; }
+        .production-table td { background: #F8F8F8; }
+        
+        /* Flashcards */
+        .flashcard-game { display: flex; gap: 30px; margin-top: 20px; }
+        .flashcard-column { flex: 1; }
+        .flashcard-term { 
+            background: #F59E0B; 
+            color: white; 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: all 0.2s;
+            user-select: none;
+            border: 3px solid transparent;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .flashcard-term:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .flashcard-term.selected { 
+            border: 3px solid #14B8A6; 
+            box-shadow: 0 0 20px rgba(20, 184, 166, 0.6);
+            transform: scale(1.05);
+        }
+        .flashcard-def { 
+            background: #F8F8F8; 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            border-radius: 8px; 
+            border: 2px dashed #ddd;
+            min-height: 60px;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .flashcard-def:hover { background: #FEF3C7; border-color: #F59E0B; }
+        .flashcard-def.matched { background: #FEF3C7; border-color: #F59E0B; border-style: solid; cursor: default; }
+        .flashcard-def.wrong { background: #FEE2E2; border-color: #EF4444; animation: shake 0.5s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .flashcard-placed { background: #F59E0B; color: white; padding: 10px; border-radius: 6px; font-weight: bold; margin-bottom: 5px; }
+        .flashcard-stats { display: flex; justify-content: space-around; background: #2B2D42; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .flashcard-stat-value { font-size: 2rem; font-weight: bold; color: #F59E0B; }
+        .flashcard-stat-label { font-size: 0.8rem; color: #aaa; }
+        
+        /* Practice */
+        .practice-scenario { background: #F8F8F8; padding: 25px; border-radius: 12px; margin-bottom: 20px; }
+        .input-group { margin: 15px 0; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .input-group input { padding: 10px; font-size: 1rem; border: 2px solid #ddd; border-radius: 6px; width: 150px; }
+        
+        /* Quiz */
+        .quiz-question { background: #F8F8F8; padding: 25px; border-radius: 12px; margin-bottom: 20px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-option { padding: 15px 20px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s; min-height: 44px; }
+        .quiz-option:hover { border-color: #F59E0B; background: #FEF3C7; }
+        .quiz-option.selected { border-color: #F59E0B; background: #FEF3C7; }
+        .quiz-option.correct { border-color: #10B981; background: #D1FAE5; }
+        .quiz-option.incorrect { border-color: #EF4444; background: #FEE2E2; }
+        
+        /* Simulator */
+        .country-card { background: #F8F8F8; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .slider-container { margin: 15px 0; }
+        .slider-container label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .slider-container input[type="range"] { width: 100%; }
+        
+        /* Feedback */
+        .feedback { padding: 15px 20px; border-radius: 8px; margin: 15px 0; font-weight: 500; }
+        .feedback.correct { background: #D1FAE5; color: #065F46; }
+        .feedback.incorrect { background: #FEE2E2; color: #991B1B; }
+        .feedback.info { background: #FEF3C7; color: #92400E; }
+        
+        /* Score/Certificate */
+        .score-screen { text-align: center; padding: 40px; }
+        .score-big { font-size: 5rem; font-weight: bold; color: #F59E0B; }
+        .score-label { font-size: 1.5rem; color: #666; margin-bottom: 30px; }
+        .score-details { background: #F8F8F8; padding: 20px; border-radius: 12px; margin: 20px auto; max-width: 400px; }
+        
+        .certificate { background: white; border: 10px solid #2B2D42; padding: 40px; text-align: center; max-width: 800px; margin: 20px auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .certificate-border { border: 3px solid #F59E0B; padding: 30px; }
+        .certificate h1 { font-size: 2.5rem; color: #2B2D42; margin-bottom: 20px; font-family: Georgia, serif; }
+        .certificate-text { font-size: 1.2rem; color: #666; line-height: 1.8; margin: 20px 0; }
+        .certificate-signature { display: flex; justify-content: space-around; margin-top: 50px; }
+        .certificate-sig-line { border-top: 2px solid #333; padding-top: 10px; width: 200px; font-size: 0.9rem; }
+        
+        /* Footer */
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 0.85rem; margin-top: 30px; }
+        
+        /* Animations */
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: slideIn 0.4s ease-out; }
+        
+        /* Buttons */
+        .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0; }
+        .btn-small { padding: 8px 16px; font-size: 0.9rem; border-radius: 6px; border: 2px solid #ddd; background: white; cursor: pointer; transition: all 0.2s; min-height: 44px; }
+        .btn-small:hover { border-color: #F59E0B; background: #FEF3C7; }
+        .btn-small.active { border-color: #F59E0B; background: #F59E0B; color: white; }
+        
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 15px; padding: 15px; text-align: center; }
+            .header h1 { font-size: 1.2rem; }
+            .progress-bar { justify-content: center; flex-wrap: wrap; gap: 5px; }
+            .container { padding: 10px; max-width: 100%; width: 100%; }
+            .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 3px; }
+            .tabs::-webkit-scrollbar { display: none; }
+            .tab { padding: 10px 12px; font-size: 0.85rem; white-space: nowrap; min-width: 90px; flex-shrink: 0; }
+            .panel { padding: 15px; min-height: auto; border-radius: 8px; }
+            .lesson-title { font-size: 1.4rem; }
+            .lesson-text { font-size: 1rem; }
+            .btn { padding: 14px 24px; font-size: 1rem; min-height: 44px; width: 100%; max-width: 100%; }
+            .btn-small { padding: 10px 12px; min-height: 44px; font-size: 0.85rem; flex: 1; }
+            .lesson-nav { flex-direction: column; gap: 12px; align-items: stretch; }
+            .lesson-nav .btn { width: 100%; }
+            .lesson-progress { order: -1; text-align: center; margin-bottom: 10px; }
+            .flashcard-game { flex-direction: column; gap: 20px; }
+            .flashcard-column { width: 100%; }
+            .flashcard-term.selected { animation: pulse 1s infinite; }
+            @keyframes pulse { 0%, 100% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.6); } 50% { box-shadow: 0 0 30px rgba(20, 184, 166, 0.9); } }
+            .score-big { font-size: 3rem; }
+            .certificate { padding: 20px; border: 5px solid #2B2D42; margin: 10px; }
+            .certificate h1 { font-size: 1.8rem; }
+            .certificate input[type="text"] { font-size: 1rem !important; width: 95% !important; }
+            .production-table { font-size: 0.9rem; }
+            .production-table th, .production-table td { padding: 8px; }
+        }
+        @media (max-width: 480px) {
+            .header h1 { font-size: 0.95rem; }
+            .tab { padding: 8px 10px; font-size: 0.8rem; min-width: 75px; }
+            .lesson-title { font-size: 1.2rem; }
+            .score-big { font-size: 2.5rem; }
+        }
+        @media (hover: none) and (pointer: coarse) {
+            .tab, .btn, .quiz-option, .btn-small, .flashcard-term { min-height: 44px; }
+            .tab:hover:not(:disabled), .btn-secondary:hover, .btn-small:hover, .quiz-option:hover, .flashcard-term:hover { transform: none; }
+            .btn-primary:hover { transform: none; background: #F59E0B; }
+        }
+        @media print {
+            .btn, .tabs, .header, .footer { display: none; }
+            .certificate { border: 10px solid #2B2D42; page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><span>ClassClick</span> | Comparative Advantage Lab</h1>
+        <div class="progress-bar">
+            <div class="progress-dot active" id="dot-learn"></div>
+            <span class="progress-label">Learn</span>
+            <div class="progress-dot" id="dot-flashcards"></div>
+            <span class="progress-label">Vocab</span>
+            <div class="progress-dot" id="dot-practice"></div>
+            <span class="progress-label">Practice</span>
+            <div class="progress-dot" id="dot-quiz"></div>
+            <span class="progress-label">Quiz</span>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" id="tab-learn" onclick="showSection('learn')">📚 Learn</button>
+            <button class="tab locked" id="tab-flashcards" onclick="showSection('flashcards')" disabled>🎴 Flashcards</button>
+            <button class="tab locked" id="tab-practice" onclick="showSection('practice')" disabled>🎯 Practice</button>
+            <button class="tab locked" id="tab-quiz" onclick="showSection('quiz')" disabled>📝 Quiz</button>
+        </div>
+        
+        <!-- LEARN SECTION -->
+        <div class="panel active" id="panel-learn">
+            <div id="lesson-container"></div>
+        </div>
+        
+        <!-- FLASHCARDS SECTION -->
+        <div class="panel" id="panel-flashcards">
+            <div id="flashcards-container"></div>
+        </div>
+        
+        <!-- PRACTICE SECTION -->
+        <div class="panel" id="panel-practice">
+            <div id="practice-container"></div>
+        </div>
+        
+        <!-- QUIZ SECTION -->
+        <div class="panel" id="panel-quiz">
+            <div id="quiz-container"></div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        ClassClick by Robert Jones<br>
+        © 2026 All rights reserved. | <span style="color:#bbb;font-size:10px;">SKELKEYTEC</span><br>
+        Best on Chromebook, laptop, or desktop
+    </div>
+
+<script>
+// ==================== STATE ====================
+const state = {
+    currentLesson: 0,
+    learnComplete: false,
+    flashcardsComplete: false,
+    practiceComplete: false,
+    quizComplete: false,
+    quizScore: 0,
+    practiceRound: 0,
+    practiceScore: 0
+};
+
+// ==================== LESSONS ====================
+const lessons = [
+    {
+        title: "Welcome to Trade Master!",
+        content: `<p class="lesson-text">You're about to discover one of the most powerful ideas in economics: <span class="term">Comparative Advantage</span>.</p>
+        <p class="lesson-text">This concept explains why countries trade with each other—and how trade makes EVERYONE richer.</p>
+        <p class="lesson-text">By the end of this lab, you'll understand why even the "best" at everything should still specialize and trade!</p>`
+    },
+    {
+        title: "Absolute Advantage: The Obvious Winner",
+        content: `<p class="lesson-text">Let's start with something simple: <span class="term">Absolute Advantage</span>.</p>
+        <p class="lesson-text">You have absolute advantage when you can produce MORE of something using the SAME resources.</p>
+        <div class="interactive-prompt"><strong>Example:</strong> If LeBron can make 100 baskets per hour and you can make 10, LeBron has absolute advantage in basketball.</div>
+        <p class="lesson-text">Easy enough, right? Now here's where it gets interesting...</p>`
+    },
+    {
+        title: "The Problem: Should LeBron Mow His Own Lawn?",
+        content: `<p class="lesson-text">LeBron James is better at basketball than anyone. But he's also probably better at mowing lawns than most people (he's strong, fast, and focused).</p>
+        <p class="lesson-text"><span class="highlight">Question: Should LeBron mow his own lawn?</span></p>
+        <p class="lesson-text">Most people say NO—but why? He has absolute advantage in BOTH basketball and lawn mowing!</p>
+        <p class="lesson-text">The answer lies in <span class="term">Opportunity Cost</span>...</p>`
+    },
+    {
+        title: "Opportunity Cost: What You Give Up",
+        content: `<p class="lesson-text"><span class="term">Opportunity Cost</span> = What you give up when you choose one thing over another.</p>
+        <div class="interactive-prompt">
+            <strong>LeBron's Choices:</strong><br>
+            • Mow lawn (2 hours) = Give up 2 hours of basketball practice<br>
+            • OR: Play basketball (2 hours) = Give up mowing the lawn<br><br>
+            <strong>Which is more valuable?</strong> Those 2 hours of practice are worth MILLIONS to LeBron!
+        </div>
+        <p class="lesson-text">The opportunity cost of LeBron mowing his lawn is too high. He should pay someone else to do it!</p>`
+    },
+    {
+        title: "Comparative Advantage: The BIG Reveal",
+        content: `<p class="lesson-text">Here's the magic: <span class="term">Comparative Advantage</span> means you can produce something at a LOWER OPPORTUNITY COST than others.</p>
+        <p class="lesson-text">You don't have to be the BEST at something—you just have to give up LESS to do it!</p>
+        <div class="interactive-prompt">
+            <strong>Key Insight:</strong> Even if you're worse at everything, you still have comparative advantage in SOMETHING because your opportunity costs are different!
+        </div>
+        <p class="lesson-text">This is why countries trade—and why BOTH sides win!</p>`
+    },
+    {
+        title: "Example: USA vs. Japan",
+        content: `<p class="lesson-text">Let's look at a real example with production tables.</p>
+        <table class="production-table">
+            <tr>
+                <th>Country</th>
+                <th>Cars (per worker)</th>
+                <th>Computers (per worker)</th>
+            </tr>
+            <tr>
+                <td><strong>USA</strong></td>
+                <td>10</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td><strong>Japan</strong></td>
+                <td>6</td>
+                <td>8</td>
+            </tr>
+        </table>
+        <p class="lesson-text">USA has <span class="term">absolute advantage</span> in cars! Japan has it in computers!</p>
+        <p class="lesson-text">But who should specialize in what? Let's calculate opportunity costs...</p>`
+    },
+    {
+        title: "Calculating Opportunity Costs",
+        content: `<p class="lesson-text">To find comparative advantage, calculate opportunity costs:</p>
+        <div class="interactive-prompt">
+            <strong>USA's Opportunity Costs:</strong><br>
+            • 1 car costs 0.5 computers (give up 5/10)<br>
+            • 1 computer costs 2 cars (give up 10/5)<br><br>
+            <strong>Japan's Opportunity Costs:</strong><br>
+            • 1 car costs 1.33 computers (give up 8/6)<br>
+            • 1 computer costs 0.75 cars (give up 6/8)
+        </div>
+        <p class="lesson-text"><strong>USA</strong> has comparative advantage in <strong>CARS</strong> (0.5 < 1.33)</p>
+        <p class="lesson-text"><strong>Japan</strong> has comparative advantage in <strong>COMPUTERS</strong> (0.75 < 2)</p>`
+    },
+    {
+        title: "The Power of Specialization",
+        content: `<p class="lesson-text">When they specialize based on comparative advantage:</p>
+        <table class="production-table">
+            <tr>
+                <th>Country</th>
+                <th>Specializes In</th>
+                <th>Production</th>
+            </tr>
+            <tr>
+                <td>USA</td>
+                <td>ALL CARS (10 workers)</td>
+                <td><strong>100 cars</strong></td>
+            </tr>
+            <tr>
+                <td>Japan</td>
+                <td>ALL COMPUTERS (10 workers)</td>
+                <td><strong>80 computers</strong></td>
+            </tr>
+        </table>
+        <p class="lesson-text"><span class="highlight">Total world production increases! Both countries can consume more through trade!</span></p>
+        <p class="lesson-text">This is the power of comparative advantage!</p>`
+    }
+];
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    renderLesson();
+});
+
+function renderLesson() {
+    const lesson = lessons[state.currentLesson];
+    const container = document.getElementById('lesson-container');
+    
+    container.innerHTML = `
+        <div class="animate-in">
+            <h2 class="lesson-title">${lesson.title}</h2>
+            ${lesson.content}
+            
+            <div class="lesson-nav">
+                <button class="btn btn-secondary" onclick="prevLesson()" ${state.currentLesson === 0 ? 'disabled' : ''}>← Back</button>
+                <div class="lesson-progress">Lesson ${state.currentLesson + 1} of ${lessons.length}</div>
+                <button class="btn btn-primary" onclick="nextLesson()">
+                    ${state.currentLesson === lessons.length - 1 ? 'Continue to Flashcards →' : 'Next →'}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function nextLesson() {
+    if (state.currentLesson < lessons.length - 1) {
+        state.currentLesson++;
+        renderLesson();
+    } else {
+        state.learnComplete = true;
+        unlockSection('flashcards');
+        showSection('flashcards');
+    }
+}
+
+function prevLesson() {
+    if (state.currentLesson > 0) {
+        state.currentLesson--;
+        renderLesson();
+    }
+}
+
+// ==================== SECTION MANAGEMENT ====================
+function showSection(section) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    
+    document.getElementById('panel-' + section).classList.add('active');
+    document.getElementById('tab-' + section).classList.add('active');
+    
+    if (section === 'flashcards' && !document.getElementById('flashcards-container').innerHTML) {
+        initFlashcards();
+    } else if (section === 'practice' && !document.getElementById('practice-container').innerHTML) {
+        initPractice();
+    } else if (section === 'quiz' && !document.getElementById('quiz-container').innerHTML) {
+        initQuiz();
+    }
+    
+    updateProgress();
+}
+
+function unlockSection(section) {
+    const tab = document.getElementById('tab-' + section);
+    tab.disabled = false;
+    tab.classList.remove('locked');
+}
+
+function updateProgress() {
+    document.getElementById('dot-learn').classList.toggle('complete', state.learnComplete);
+    document.getElementById('dot-flashcards').classList.toggle('complete', state.flashcardsComplete);
+    document.getElementById('dot-practice').classList.toggle('complete', state.practiceComplete);
+    document.getElementById('dot-quiz').classList.toggle('complete', state.quizComplete);
+}
+
+// ==================== FLASHCARDS ====================
+const flashcardTerms = [
+    { term: "Absolute Advantage", def: "Ability to produce more output using the same inputs than another producer" },
+    { term: "Comparative Advantage", def: "Ability to produce at a lower opportunity cost than another producer" },
+    { term: "Opportunity Cost", def: "The value of the next best alternative you give up when making a choice" },
+    { term: "Specialization", def: "Focusing production on goods where you have comparative advantage" },
+    { term: "Terms of Trade", def: "The rate at which goods are exchanged between trading partners" },
+    { term: "Gains from Trade", def: "Benefits both parties receive when specializing and trading" },
+    { term: "Production Possibilities", def: "Different combinations of goods a country can produce with available resources" },
+    { term: "Mutually Beneficial Trade", def: "When both trading partners benefit from specialization and exchange" },
+    { term: "Autarky", def: "Economic self-sufficiency; producing without trade" },
+    { term: "Trade-off", def: "Giving up one thing to get another" }
+];
+
+let flashcardState = {
+    shuffledTerms: [],
+    shuffledDefs: [],
+    matches: [],
+    attempts: 0,
+    startTime: null,
+    selectedTerm: null
+};
+
+function initFlashcards() {
+    flashcardState.shuffledTerms = [...flashcardTerms].sort(() => Math.random() - 0.5);
+    flashcardState.shuffledDefs = [...flashcardTerms].sort(() => Math.random() - 0.5);
+    flashcardState.matches = [];
+    flashcardState.attempts = 0;
+    flashcardState.startTime = Date.now();
+    flashcardState.selectedTerm = null;
+    
+    renderFlashcards();
+}
+
+function renderFlashcards() {
+    const container = document.getElementById('flashcards-container');
+    const matched = flashcardState.matches.length;
+    const total = flashcardTerms.length;
+    
+    container.innerHTML = `
+        <div class="animate-in">
+            <h2 style="color: #2B2D42; margin-bottom: 10px;">🎴 Vocabulary Matching Game</h2>
+            <p style="color: #666; margin-bottom: 20px;">Tap a term, then tap its matching definition!</p>
+            
+            <div class="flashcard-stats">
+                <div>
+                    <div class="flashcard-stat-value">${matched}/${total}</div>
+                    <div class="flashcard-stat-label">Matched</div>
+                </div>
+                <div>
+                    <div class="flashcard-stat-value">${flashcardState.attempts}</div>
+                    <div class="flashcard-stat-label">Attempts</div>
+                </div>
+                <div>
+                    <div class="flashcard-stat-value">${Math.round((Date.now() - flashcardState.startTime) / 1000)}s</div>
+                    <div class="flashcard-stat-label">Time</div>
+                </div>
+            </div>
+            
+            <div class="flashcard-game">
+                <div class="flashcard-column">
+                    <h3 style="color: #F59E0B; margin-bottom: 15px;">📝 Terms (Tap to select)</h3>
+                    <div id="terms-container"></div>
+                </div>
+                <div class="flashcard-column">
+                    <h3 style="color: #2B2D42; margin-bottom: 15px;">📖 Definitions (Tap to match)</h3>
+                    <div id="defs-container"></div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const termsContainer = document.getElementById('terms-container');
+    flashcardState.shuffledTerms.forEach((item) => {
+        if (!flashcardState.matches.find(m => m.term === item.term)) {
+            const div = document.createElement('div');
+            div.className = 'flashcard-term';
+            if (flashcardState.selectedTerm === item.term) {
+                div.classList.add('selected');
+            }
+            div.textContent = item.term;
+            div.dataset.term = item.term;
+            div.onclick = handleTermClick;
+            termsContainer.appendChild(div);
+        }
+    });
+    
+    const defsContainer = document.getElementById('defs-container');
+    flashcardState.shuffledDefs.forEach((item) => {
+        const div = document.createElement('div');
+        const matched = flashcardState.matches.find(m => m.term === item.term);
+        
+        if (matched) {
+            div.className = 'flashcard-def matched';
+            div.innerHTML = `
+                <div class="flashcard-placed">${item.term}</div>
+                <div>${item.def}</div>
+            `;
+        } else {
+            div.className = 'flashcard-def';
+            div.textContent = item.def;
+            div.dataset.term = item.term;
+            div.onclick = handleDefClick;
+        }
+        
+        defsContainer.appendChild(div);
+    });
+    
+    if (flashcardState.matches.length === flashcardTerms.length) {
+        setTimeout(showFlashcardsComplete, 500);
+    }
+}
+
+function handleTermClick(e) {
+    flashcardState.selectedTerm = e.currentTarget.dataset.term;
+    renderFlashcards();
+}
+
+function handleDefClick(e) {
+    if (!flashcardState.selectedTerm) {
+        e.currentTarget.classList.add('wrong');
+        setTimeout(() => {
+            e.currentTarget.classList.remove('wrong');
+        }, 500);
+        return;
+    }
+    
+    flashcardState.attempts++;
+    const defTerm = e.currentTarget.dataset.term;
+    const selectedTerm = flashcardState.selectedTerm;
+    
+    if (defTerm === selectedTerm) {
+        flashcardState.matches.push({ term: selectedTerm });
+        flashcardState.selectedTerm = null;
+        renderFlashcards();
+    } else {
+        e.currentTarget.classList.add('wrong');
+        setTimeout(() => {
+            e.currentTarget.classList.remove('wrong');
+        }, 500);
+    }
+}
+
+function showFlashcardsComplete() {
+    const elapsedTime = Math.round((Date.now() - flashcardState.startTime) / 1000);
+    const accuracy = Math.round((flashcardTerms.length / flashcardState.attempts) * 100);
+    
+    const container = document.getElementById('flashcards-container');
+    container.innerHTML = `
+        <div class="score-screen animate-in">
+            <h2 style="color: #2B2D42;">🎉 Vocabulary Master!</h2>
+            <div class="score-big">${accuracy}%</div>
+            <div class="score-label">Accuracy</div>
+            
+            <div class="score-details">
+                <p><strong>Time:</strong> ${elapsedTime} seconds</p>
+                <p><strong>Attempts:</strong> ${flashcardState.attempts}</p>
+            </div>
+            
+            <button class="btn btn-primary" onclick="completeFlashcards()">Continue to Practice →</button>
+            <button class="btn btn-secondary" style="margin-left: 10px;" onclick="initFlashcards()">Play Again</button>
+        </div>
+    `;
+}
+
+function completeFlashcards() {
+    state.flashcardsComplete = true;
+    unlockSection('practice');
+    showSection('practice');
+}
+
+// ==================== PRACTICE MODE ====================
+const practiceScenarios = [
+    {
+        question: "Country A can produce 20 cars OR 10 computers per day. What is the opportunity cost of 1 car?",
+        answer: "0.5",
+        unit: "computers",
+        explanation: "To produce 1 car, Country A gives up 10/20 = 0.5 computers"
+    },
+    {
+        question: "Country B can produce 15 shirts OR 30 pants per day. What is the opportunity cost of 1 shirt?",
+        answer: "2",
+        unit: "pants",
+        explanation: "To produce 1 shirt, Country B gives up 30/15 = 2 pants"
+    },
+    {
+        question: "USA: 100 wheat OR 50 cloth. China: 80 wheat OR 40 cloth. Who has comparative advantage in wheat?",
+        choices: ["USA", "China", "Both", "Neither"],
+        answer: "Both",
+        explanation: "Both have the same opportunity cost (2:1 ratio), so neither has comparative advantage"
+    },
+    {
+        question: "Country A: 10 cars (cost: 0.5 computers). Country B: 10 cars (cost: 2 computers). Who should specialize in cars?",
+        choices: ["Country A", "Country B", "Both", "Neither"],
+        answer: "Country A",
+        explanation: "Country A has lower opportunity cost (0.5 < 2), so it has comparative advantage in cars"
+    },
+    {
+        question: "If USA can produce 100 tons of wheat OR 200 yards of cloth, what is the opportunity cost of 1 ton of wheat?",
+        answer: "2",
+        unit: "yards of cloth",
+        explanation: "1 wheat = 200/100 = 2 yards of cloth given up"
+    }
+];
+
+function initPractice() {
+    state.practiceRound = 0;
+    state.practiceScore = 0;
+    renderPractice();
+}
+
+function renderPractice() {
+    if (state.practiceRound >= practiceScenarios.length) {
+        showPracticeComplete();
+        return;
+    }
+    
+    const scenario = practiceScenarios[state.practiceRound];
+    const container = document.getElementById('practice-container');
+    
+    if (scenario.choices) {
+        container.innerHTML = `
+            <div class="animate-in">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <span style="font-size: 1.2rem; font-weight: bold;">Question ${state.practiceRound + 1} of ${practiceScenarios.length}</span>
+                    <span style="font-size: 1.2rem; font-weight: bold; color: #F59E0B;">Score: ${state.practiceScore}</span>
+                </div>
+                
+                <div class="practice-scenario">
+                    <h3>${scenario.question}</h3>
+                    <div class="btn-row" style="margin-top: 20px;">
+                        ${scenario.choices.map(choice => 
+                            `<button class="btn-small" onclick="submitPractice('${choice}')">${choice}</button>`
+                        ).join('')}
+                    </div>
+                </div>
+                <div id="practice-feedback"></div>
+            </div>
+        `;
+    } else {
+        container.innerHTML = `
+            <div class="animate-in">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <span style="font-size: 1.2rem; font-weight: bold;">Question ${state.practiceRound + 1} of ${practiceScenarios.length}</span>
+                    <span style="font-size: 1.2rem; font-weight: bold; color: #F59E0B;">Score: ${state.practiceScore}</span>
+                </div>
+                
+                <div class="practice-scenario">
+                    <h3>${scenario.question}</h3>
+                    <div class="input-group">
+                        <label>Answer:</label>
+                        <input type="text" id="practice-answer" placeholder="Enter number">
+                        <span style="margin-left: 10px;">${scenario.unit || ''}</span>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: 15px;" onclick="submitPracticeInput()">Submit</button>
+                </div>
+                <div id="practice-feedback"></div>
+            </div>
+        `;
+    }
+}
+
+function submitPractice(answer) {
+    const scenario = practiceScenarios[state.practiceRound];
+    const correct = answer === scenario.answer;
+    
+    if (correct) state.practiceScore += 20;
+    
+    document.getElementById('practice-feedback').innerHTML = `
+        <div class="feedback ${correct ? 'correct' : 'incorrect'}">
+            ${correct ? '✅ Correct!' : '❌ Incorrect.'} ${scenario.explanation}
+        </div>
+        <button class="btn btn-primary" style="margin-top: 15px;" onclick="nextPractice()">Next Question →</button>
+    `;
+    
+    document.querySelectorAll('.btn-small').forEach(b => b.disabled = true);
+}
+
+function submitPracticeInput() {
+    const scenario = practiceScenarios[state.practiceRound];
+    const answer = document.getElementById('practice-answer').value.trim();
+    const correct = answer === scenario.answer;
+    
+    if (correct) state.practiceScore += 20;
+    
+    document.getElementById('practice-feedback').innerHTML = `
+        <div class="feedback ${correct ? 'correct' : 'incorrect'}">
+            ${correct ? '✅ Correct!' : `❌ Incorrect. The answer is ${scenario.answer}.`} ${scenario.explanation}
+        </div>
+        <button class="btn btn-primary" style="margin-top: 15px;" onclick="nextPractice()">Next Question →</button>
+    `;
+    
+    document.getElementById('practice-answer').disabled = true;
+    document.querySelector('.practice-scenario button').disabled = true;
+}
+
+function nextPractice() {
+    state.practiceRound++;
+    renderPractice();
+}
+
+function showPracticeComplete() {
+    const container = document.getElementById('practice-container');
+    const percent = Math.round((state.practiceScore / (practiceScenarios.length * 20)) * 100);
+    
+    container.innerHTML = `
+        <div class="score-screen animate-in">
+            <h2 style="color: #2B2D42;">🏆 Practice Complete!</h2>
+            <div class="score-big">${state.practiceScore}</div>
+            <div class="score-label">out of ${practiceScenarios.length * 20} points (${percent}%)</div>
+            
+            <button class="btn btn-primary" onclick="completePractice()">Continue to Quiz →</button>
+            <button class="btn btn-secondary" style="margin-left: 10px;" onclick="initPractice()">Try Again</button>
+        </div>
+    `;
+}
+
+function completePractice() {
+    state.practiceComplete = true;
+    unlockSection('quiz');
+    showSection('quiz');
+}
+
+// ==================== QUIZ ====================
+const quizQuestions = [
+    {
+        question: "What is absolute advantage?",
+        options: [
+            "Producing at a lower opportunity cost",
+            "Producing more output with the same inputs",
+            "Having the most workers",
+            "Trading with other countries"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is comparative advantage?",
+        options: [
+            "Being the best at everything",
+            "Producing more than others",
+            "Producing at a lower opportunity cost",
+            "Having more resources"
+        ],
+        correct: 2
+    },
+    {
+        question: "Country A: 10 cars OR 20 computers. What is the opportunity cost of 1 car?",
+        options: [
+            "2 computers",
+            "0.5 computers",
+            "10 computers",
+            "20 computers"
+        ],
+        correct: 0
+    },
+    {
+        question: "If you're better at everything than your neighbor, should you still trade?",
+        options: [
+            "No, you don't need to trade",
+            "Yes, if you have different opportunity costs",
+            "Only if you have extra resources",
+            "Never"
+        ],
+        correct: 1
+    },
+    {
+        question: "When countries specialize based on comparative advantage:",
+        options: [
+            "Only the richer country benefits",
+            "Only the poorer country benefits",
+            "Both countries can benefit",
+            "Neither country benefits"
+        ],
+        correct: 2
+    },
+    {
+        question: "USA: 1 car = 2 computers. Japan: 1 car = 0.5 computers. Who should specialize in cars?",
+        options: [
+            "USA",
+            "Japan",
+            "Both",
+            "Neither"
+        ],
+        correct: 1
+    },
+    {
+        question: "The opportunity cost of a choice is:",
+        options: [
+            "The dollar cost",
+            "The time it takes",
+            "The next best alternative given up",
+            "Always zero"
+        ],
+        correct: 2
+    },
+    {
+        question: "Specialization means:",
+        options: [
+            "Producing everything yourself",
+            "Focusing on what you're best at",
+            "Never trading with others",
+            "Producing only one type of good based on comparative advantage"
+        ],
+        correct: 3
+    },
+    {
+        question: "Can a country have comparative advantage in both goods?",
+        options: [
+            "Yes, always",
+            "No, never",
+            "Only if it's a large country",
+            "Only if it has absolute advantage"
+        ],
+        correct: 1
+    },
+    {
+        question: "Autarky means:",
+        options: [
+            "Free trade",
+            "Economic self-sufficiency without trade",
+            "High tariffs",
+            "International cooperation"
+        ],
+        correct: 1
+    }
+];
+
+let quizAnswers = [];
+
+function initQuiz() {
+    quizAnswers = [];
+    renderQuiz();
+}
+
+function renderQuiz() {
+    const container = document.getElementById('quiz-container');
+    
+    container.innerHTML = `
+        <div class="animate-in">
+            <h2 style="color: #2B2D42; margin-bottom: 10px;">📝 Comparative Advantage Quiz</h2>
+            <p style="color: #666; margin-bottom: 20px;">Test your understanding!</p>
+            
+            <div id="quiz-questions"></div>
+            
+            <button class="btn btn-primary" style="margin-top: 20px; width: 100%;" onclick="submitQuiz()" id="submit-quiz-btn">Submit Quiz</button>
+        </div>
+    `;
+    
+    const questionsContainer = document.getElementById('quiz-questions');
+    quizQuestions.forEach((q, i) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'quiz-question';
+        questionDiv.innerHTML = `
+            <h3>Question ${i + 1}</h3>
+            <p>${q.question}</p>
+            <div class="quiz-options">
+                ${q.options.map((opt, j) => `
+                    <div class="quiz-option" onclick="selectQuizAnswer(${i}, ${j})" data-question="${i}" data-option="${j}">
+                        ${opt}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        questionsContainer.appendChild(questionDiv);
+    });
+}
+
+function selectQuizAnswer(questionIndex, optionIndex) {
+    const options = document.querySelectorAll(`[data-question="${questionIndex}"]`);
+    options.forEach(opt => opt.classList.remove('selected'));
+    options[optionIndex].classList.add('selected');
+    
+    quizAnswers[questionIndex] = optionIndex;
+}
+
+function submitQuiz() {
+    if (quizAnswers.length < quizQuestions.length) {
+        alert('Please answer all questions!');
+        return;
+    }
+    
+    quizQuestions.forEach((q, i) => {
+        const options = document.querySelectorAll(`[data-question="${i}"]`);
+        options.forEach((opt, j) => {
+            if (j === q.correct) {
+                opt.classList.add('correct');
+            } else if (j === quizAnswers[i] && j !== q.correct) {
+                opt.classList.add('incorrect');
+            }
+            opt.onclick = null;
+        });
+    });
+    
+    document.getElementById('submit-quiz-btn').disabled = true;
+    
+    setTimeout(showQuizResults, 1000);
+}
+
+function showQuizResults() {
+    const correct = quizAnswers.filter((ans, i) => ans === quizQuestions[i].correct).length;
+    const percent = Math.round((correct / quizQuestions.length) * 100);
+    state.quizScore = correct;
+    state.quizComplete = true;
+    updateProgress();
+    
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = `
+        <div class="score-screen animate-in">
+            <h2 style="color: #2B2D42;">📝 Quiz Complete!</h2>
+            <div class="score-big">${correct}/${quizQuestions.length}</div>
+            <div class="score-label">${percent}%</div>
+            
+            <button class="btn btn-primary" onclick="showCertificate()">🎓 Get Your Certificate</button>
+        </div>
+    `;
+}
+
+function showCertificate() {
+    const correct = state.quizScore;
+    const percent = Math.round((correct / quizQuestions.length) * 100);
+    const date = new Date().toLocaleDateString();
+    
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = `
+        <div class="animate-in">
+            <div class="certificate">
+                <div class="certificate-border">
+                    <h1>🎓 Certificate of Completion</h1>
+                    
+                    <div class="certificate-text">This certifies that</div>
+                    
+                    <div style="margin: 20px 0;">
+                        <input type="text" id="cert-name" placeholder="Enter Your Name" 
+                               style="font-size: 2rem; padding: 15px; text-align: center; width: 80%; max-width: 500px; border: 2px solid #F59E0B; border-radius: 8px;">
+                    </div>
+                    
+                    <div class="certificate-text">
+                        has successfully completed the<br>
+                        <strong style="color: #F59E0B; font-size: 1.5rem;">Comparative Advantage Interactive Lab</strong>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-around; margin: 40px 0; padding: 20px; background: #F8F8F8; border-radius: 8px;">
+                        <div>
+                            <div style="font-size: 2rem; font-weight: bold; color: #F59E0B;">${correct}/${quizQuestions.length}</div>
+                            <div style="color: #666;">Quiz Score</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; font-weight: bold; color: #F59E0B;">${percent}%</div>
+                            <div style="color: #666;">Accuracy</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #F59E0B;">${date}</div>
+                            <div style="color: #666;">Date</div>
+                        </div>
+                    </div>
+                    
+                    <div class="certificate-text" style="margin-top: 30px;">
+                        Demonstrating mastery of comparative advantage,<br>
+                        opportunity cost, and international trade principles
+                    </div>
+                    
+                    <div class="certificate-signature">
+                        <div class="certificate-sig-line">
+                            Robert Jones<br>
+                            <small>ClassClick Economics</small>
+                        </div>
+                        <div class="certificate-sig-line">
+                            ${date}<br>
+                            <small>Date</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn btn-primary" onclick="printCertificate()">🖨️ Print Certificate</button>
+            </div>
+        </div>
+    `;
+}
+
+function printCertificate() {
+    const name = document.getElementById('cert-name').value || 'Student Name';
+    const correct = state.quizScore;
+    const percent = Math.round((correct / quizQuestions.length) * 100);
+    const date = new Date().toLocaleDateString();
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Certificate of Completion</title>
+            <style>
+                body { font-family: Georgia, serif; padding: 40px; }
+                .certificate { border: 10px solid #2B2D42; padding: 40px; text-align: center; max-width: 800px; margin: 0 auto; }
+                .certificate-border { border: 3px solid #F59E0B; padding: 30px; }
+                h1 { font-size: 2.5rem; color: #2B2D42; margin-bottom: 20px; }
+                .cert-name { font-size: 3rem; color: #F59E0B; font-weight: bold; margin: 30px 0; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+                .cert-text { font-size: 1.2rem; color: #666; line-height: 1.8; margin: 20px 0; }
+                .scores { display: flex; justify-content: space-around; margin: 40px 0; }
+                .score-value { font-size: 2rem; font-weight: bold; color: #F59E0B; }
+                .signatures { display: flex; justify-content: space-around; margin-top: 50px; }
+                .sig-line { border-top: 2px solid #333; padding-top: 10px; width: 200px; }
+            </style>
+        </head>
+        <body>
+            <div class="certificate">
+                <div class="certificate-border">
+                    <h1>🎓 Certificate of Completion</h1>
+                    <div class="cert-text">This certifies that</div>
+                    <div class="cert-name">${name}</div>
+                    <div class="cert-text">
+                        has successfully completed the<br>
+                        <strong style="color: #F59E0B; font-size: 1.5rem;">Comparative Advantage Interactive Lab</strong>
+                    </div>
+                    <div class="scores">
+                        <div><div class="score-value">${correct}/${quizQuestions.length}</div><div>Quiz Score</div></div>
+                        <div><div class="score-value">${percent}%</div><div>Accuracy</div></div>
+                        <div><div class="score-value">${date}</div><div>Date</div></div>
+                    </div>
+                    <div class="cert-text">
+                        Demonstrating mastery of comparative advantage,<br>
+                        opportunity cost, and international trade principles
+                    </div>
+                    <div class="signatures">
+                        <div class="sig-line">Robert Jones<br><small>ClassClick Economics</small></div>
+                        <div class="sig-line">${date}<br><small>Date</small></div>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+</script>
+</body>
+</html>
