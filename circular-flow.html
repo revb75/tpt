@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circular Flow Model Lab | ClassClick</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+            min-height: 100vh; 
+            color: #333;
+        }
+        
+        .header { background: #2B2D42; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .header h1 { font-size: 1.5rem; }
+        .header span { color: #F59E0B; }
+        .progress-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .progress-dot { width: 12px; height: 12px; border-radius: 50%; background: #555; transition: all 0.3s; }
+        .progress-dot.complete { background: #F59E0B; }
+        .progress-dot.active { background: #14B8A6; box-shadow: 0 0 8px #14B8A6; }
+        .progress-label { font-size: 0.75rem; color: #aaa; margin-left: 5px; }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; overflow-x: auto; }
+        .tab { padding: 12px 24px; background: #2B2D42; color: #888; border: none; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 1rem; transition: all 0.3s; white-space: nowrap; }
+        .tab:hover:not(:disabled) { background: #3B3D52; }
+        .tab.active { background: white; color: #2B2D42; font-weight: bold; }
+        .tab:disabled { cursor: not-allowed; opacity: 0.5; }
+        .tab.locked::before { content: "🔒 "; }
+        
+        .panel { display: none; background: white; border-radius: 0 12px 12px 12px; padding: 30px; min-height: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .panel.active { display: block; }
+        
+        .lesson-title { font-size: 1.8rem; color: #2B2D42; margin-bottom: 15px; }
+        .lesson-text { font-size: 1.1rem; line-height: 1.7; color: #444; margin-bottom: 20px; }
+        .term { font-weight: bold; color: #F59E0B; }
+        
+        .diagram-container { background: #F8F8F8; padding: 20px; border-radius: 12px; margin: 25px 0; border: 2px solid #E5E7EB; text-align: center; }
+        .diagram-img { max-width: 100%; height: auto; border-radius: 8px; }
+        
+        .interactive-prompt { background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        
+        .lesson-nav { display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; gap: 10px; flex-wrap: wrap; }
+        .lesson-progress { color: #888; font-size: 0.9rem; }
+        .btn { padding: 12px 28px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: all 0.2s; min-height: 44px; }
+        .btn-primary { background: #F59E0B; color: white; }
+        .btn-primary:hover { background: #D97706; }
+        .btn-secondary { background: #eee; color: #666; }
+        .btn-secondary:hover { background: #ddd; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .practice-scenario { background: #F8F8F8; padding: 25px; border-radius: 12px; margin-bottom: 20px; }
+        .scenario-question { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: #2B2D42; }
+        .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0; }
+        .btn-small { padding: 10px 20px; font-size: 0.9rem; border-radius: 6px; border: 2px solid #ddd; background: white; cursor: pointer; transition: all 0.2s; min-height: 44px; }
+        .btn-small:hover { border-color: #F59E0B; background: #FEF3C7; }
+        .btn-small.selected { border-color: #F59E0B; background: #F59E0B; color: white; }
+        
+        .quiz-question { background: #F8F8F8; padding: 25px; border-radius: 12px; margin-bottom: 20px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-option { padding: 15px 20px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s; min-height: 44px; }
+        .quiz-option:hover { border-color: #F59E0B; background: #FEF3C7; }
+        .quiz-option.selected { border-color: #F59E0B; background: #FEF3C7; }
+        .quiz-option.correct { border-color: #10B981; background: #D1FAE5; }
+        .quiz-option.incorrect { border-color: #EF4444; background: #FEE2E2; }
+        
+        .feedback { padding: 15px 20px; border-radius: 8px; margin: 15px 0; font-weight: 500; }
+        .feedback.correct { background: #D1FAE5; color: #065F46; }
+        .feedback.incorrect { background: #FEE2E2; color: #991B1B; }
+        
+        .score-screen { text-align: center; padding: 40px; }
+        .score-big { font-size: 5rem; font-weight: bold; color: #F59E0B; }
+        .score-label { font-size: 1.5rem; color: #666; margin-bottom: 30px; }
+        
+        .certificate { background: white; border: 10px solid #2B2D42; padding: 40px; text-align: center; max-width: 800px; margin: 20px auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .certificate-border { border: 3px solid #F59E0B; padding: 30px; }
+        .certificate h1 { font-size: 2.5rem; color: #2B2D42; margin-bottom: 20px; font-family: Georgia, serif; }
+        .certificate-text { font-size: 1.2rem; color: #666; line-height: 1.8; margin: 20px 0; }
+        .certificate-signature { display: flex; justify-content: space-around; margin-top: 50px; }
+        .certificate-sig-line { border-top: 2px solid #333; padding-top: 10px; width: 200px; font-size: 0.9rem; }
+        
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: slideIn 0.4s ease-out; }
+        
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 10px; text-align: center; padding: 15px; }
+            .header h1 { font-size: 1.2rem; }
+            .container { padding: 10px; }
+            .panel { padding: 15px; }
+            .lesson-title { font-size: 1.4rem; }
+            .lesson-text { font-size: 1rem; }
+            .btn { width: 100%; }
+            .lesson-nav { flex-direction: column; }
+            .lesson-progress { order: -1; text-align: center; }
+            .score-big { font-size: 3rem; }
+            .certificate { padding: 20px; border: 5px solid #2B2D42; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><span>ClassClick</span> | Circular Flow Model Lab</h1>
+        <div class="progress-bar">
+            <div class="progress-dot active" id="dot-learn"></div>
+            <span class="progress-label">Learn</span>
+            <div class="progress-dot" id="dot-practice"></div>
+            <span class="progress-label">Practice</span>
+            <div class="progress-dot" id="dot-quiz"></div>
+            <span class="progress-label">Quiz</span>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" id="tab-learn" onclick="showSection('learn')">📚 Learn</button>
+            <button class="tab locked" id="tab-practice" onclick="showSection('practice')" disabled>🎯 Practice</button>
+            <button class="tab locked" id="tab-quiz" onclick="showSection('quiz')" disabled>📝 Quiz</button>
+        </div>
+        
+        <div class="panel active" id="panel-learn">
+            <div id="lesson-container"></div>
+        </div>
+        
+        <div class="panel" id="panel-practice">
+            <div id="practice-container"></div>
+        </div>
+        
+        <div class="panel" id="panel-quiz">
+            <div id="quiz-container"></div>
+        </div>
+    </div>
+    
+    <div style="text-align: center; padding: 20px; color: #666; font-size: 0.85rem;">
+        ClassClick by Robert Jones | © 2026 | <span style="color:#bbb;font-size:10px;">SKELKEYTEC</span>
+    </div>
+
+<script>
+const state = {
+    currentLesson: 0,
+    learnComplete: false,
+    practiceComplete: false,
+    quizComplete: false,
+    quizScore: 0,
+    practiceRound: 0,
+    practiceScore: 0
+};
+
+const urlParams = new URLSearchParams(window.location.search);
+const isTeacherPreview = urlParams.get('preview') === 'true' || urlParams.get('teacher') === 'true';
+
+if (isTeacherPreview) {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:#EF4444;color:white;padding:10px;text-align:center;font-weight:bold;position:sticky;top:0;z-index:1000;';
+    banner.innerHTML = '🔓 TEACHER PREVIEW MODE - All sections unlocked';
+    document.body.insertBefore(banner, document.body.firstChild);
+    state.learnComplete = true;
+    state.practiceComplete = true;
+}
+
+const lessons = [
+    {
+        title: "Welcome to the Circular Flow!",
+        content: `<p class="lesson-text">Ever wonder how money moves through the economy? The <span class="term">Circular Flow Model</span> shows how households and businesses interact in a continuous cycle.</p>
+        <div class="diagram-container">
+            <img src="circular-flow-diagram.png" alt="Circular Flow Diagram" class="diagram-img">
+        </div>
+        <p class="lesson-text">This diagram shows the continuous flow of money and resources between households and firms. Let's break it down step by step!</p>`
+    },
+    {
+        title: "The Two Key Players",
+        content: `<p class="lesson-text">The circular flow starts with two main players:</p>
+        <div class="diagram-container">
+            <img src="circular-flow-diagram.png" alt="Circular Flow Diagram" class="diagram-img">
+        </div>
+        <div class="interactive-prompt">
+        <p><strong>HOUSEHOLDS (Left):</strong> That's you and your family! Households own resources (labor, land, capital) and buy goods and services. They earn income from working.</p>
+        </div>
+        <div class="interactive-prompt">
+        <p><strong>FIRMS (Right):</strong> Businesses like Walmart, McDonald's, Apple. Firms hire workers, produce goods and services, and earn revenue from sales.</p>
+        </div>`
+    },
+    {
+        title: "Consumer Spending (Red Arrow Top)",
+        content: `<p class="lesson-text">Look at the <span class="term">RED arrow at the top</span> - "Consumer expenditure"</p>
+        <div class="diagram-container">
+            <img src="circular-flow-diagram.png" alt="Circular Flow Diagram" class="diagram-img">
+        </div>
+        <div class="interactive-prompt">
+        <p><strong>This is YOUR spending!</strong> When you buy a pizza, download a song, or buy clothes - that's consumer expenditure. Money flows FROM households TO firms.</p>
+        </div>
+        <p class="lesson-text"><strong>Examples:</strong> Buying groceries at Target • Paying for Netflix • Getting a haircut • Buying gas</p>`
+    },
+    {
+        title: "Wages and Income (Red Arrow Bottom)",
+        content: `<p class="lesson-text">Look at the <span class="term">RED arrow at the bottom</span> - "Wages, rent, dividends"</p>
+        <div class="diagram-container">
+            <img src="circular-flow-diagram.png" alt="Circular Flow Diagram" class="diagram-img">
+        </div>
+        <div class="interactive-prompt">
+        <p><strong>This is YOUR income!</strong> When businesses pay you for working, that's wages. Money flows FROM firms TO households.</p>
+        </div>
+        <p class="lesson-text"><strong>Types of income:</strong> Wages (from working) • Rent (from owning property) • Dividends (from owning stock) • Interest (from savings)</p>`
+    },
+    {
+        title: "Goods and Services (Black Arrow Top)",
+        content: `<p class="lesson-text">Look at the <span class="term">BLACK arrow at the top</span> - "Goods and services"</p>
+        <div class="diagram-container">
+            <img src="circular-flow-diagram.png" alt="Circular Flow Diagram" class="diagram-img">
+        </div>
+        <div class="interactive-prompt">
+        <p><strong>Physical stuff flows opposite to money!</strong> When you buy a pizza, money goes TO the firm, but the pizza comes TO you. Goods and services flow FROM firms TO households.</p>
+        </div>
+        <p class="lesson-text">Notice: Money and goods flow in OPPOSITE directions at the top!</p>`
+    },
+    {
+        title: "Factors of Production (Black Arrow Bottom)",
+        content: `<p class="lesson-text">Look at the <span class="term">BLACK arrow at the bottom</span> - "Factors for production"</p>
+        <div class="diagram-container">
+            <img src="circular-flow-diagram.png" alt="Circular Flow Diagram" class="diagram-img">
+        </div>
+        <div class="interactive-prompt">
+        <p><strong>This is YOU going to work!</strong> Households provide labor, land, and capital to businesses. These resources flow FROM households TO firms.</p>
+        </div>
+        <p class="lesson-text"><strong>The 3 Factors:</strong> Labor (your work) • Land (natural resources, property) • Capital (tools, machines, buildings)</p>`
+    },
+    {
+        title: "Money Flows in a Circle",
+        content: `<p class="lesson-text">Now see the complete picture - <span class="term">money flows in a continuous circle!</span></p>
+        <div class="diagram-container">
+            <img src="circular-flow-diagram.png" alt="Circular Flow Diagram" class="diagram-img">
+        </div>
+        <div class="interactive-prompt">
+        <p><strong>Follow the RED arrows:</strong><br>
+        1. You spend money at stores (top red arrow) → Firms earn revenue<br>
+        2. Firms pay you wages for working (bottom red arrow) → You earn income<br>
+        3. You spend that income at stores → The circle continues!</p>
+        </div>
+        <p class="lesson-text">Money never stops flowing - it goes round and round through the economy!</p>`
+    },
+    {
+        title: "Goods Flow Opposite to Money",
+        content: `<p class="lesson-text">Here's the key insight: <span class="term">Physical goods and resources flow OPPOSITE to money!</span></p>
+        <div class="diagram-container">
+            <img src="circular-flow-diagram.png" alt="Circular Flow Diagram" class="diagram-img">
+        </div>
+        <div class="interactive-prompt">
+        <p><strong>Follow the BLACK arrows (opposite direction from red):</strong><br>
+        1. Firms produce goods → Goods go TO you (top black arrow)<br>
+        2. You provide labor → Your work goes TO firms (bottom black arrow)<br>
+        3. Firms use your labor to make more goods → The circle continues!</p>
+        </div>
+        <p class="lesson-text"><strong>Red arrows = Money clockwise</strong><br><strong>Black arrows = Goods/labor counter-clockwise</strong></p>
+        <p class="lesson-text">You've mastered the circular flow! Let's practice identifying the flows.</p>`
+    }
+];
+
+const practiceScenarios = [
+    {
+        question: "You buy a burger from McDonald's for $5. Which arrow represents this transaction?",
+        choices: ["Top red arrow (consumer expenditure)", "Bottom red arrow (wages)", "Top black arrow (goods)", "Bottom black arrow (factors)"],
+        answer: "Top red arrow (consumer expenditure)",
+        explanation: "When you spend money at a business, that's consumer expenditure - the top red arrow!"
+    },
+    {
+        question: "McDonald's pays you $15/hour to work. Which arrow represents this?",
+        choices: ["Top red arrow (consumer expenditure)", "Bottom red arrow (wages)", "Top black arrow (goods)", "Bottom black arrow (factors)"],
+        answer: "Bottom red arrow (wages)",
+        explanation: "When a business pays you for working, that's wages - the bottom red arrow!"
+    },
+    {
+        question: "McDonald's gives you the burger you paid for. Which arrow represents this?",
+        choices: ["Top red arrow (consumer expenditure)", "Bottom red arrow (wages)", "Top black arrow (goods)", "Bottom black arrow (factors)"],
+        answer: "Top black arrow (goods)",
+        explanation: "When a business gives you the product, that's goods flowing to you - the top black arrow!"
+    },
+    {
+        question: "You show up for your shift at McDonald's. Which arrow represents this?",
+        choices: ["Top red arrow (consumer expenditure)", "Bottom red arrow (wages)", "Top black arrow (goods)", "Bottom black arrow (factors)"],
+        answer: "Bottom black arrow (factors)",
+        explanation: "When you provide your labor to a business, that's factors of production - the bottom black arrow!"
+    },
+    {
+        question: "Which arrows show MONEY flowing?",
+        choices: ["Red arrows only", "Black arrows only", "Both red and black", "Neither"],
+        answer: "Red arrows only",
+        explanation: "RED arrows show money flowing. BLACK arrows show goods and resources flowing."
+    },
+    {
+        question: "Do money and goods flow in the same direction or opposite directions?",
+        choices: ["Same direction", "Opposite directions"],
+        answer: "Opposite directions",
+        explanation: "Money (red) flows clockwise, while goods/resources (black) flow counter-clockwise - opposite directions!"
+    }
+];
+
+const quizQuestions = [
+    {
+        question: "What are the two main players in the circular flow model?",
+        options: ["Households and Government", "Households and Firms", "Firms and Banks", "Consumers and Producers"],
+        correct: 1
+    },
+    {
+        question: "What do the RED arrows represent?",
+        options: ["Goods and services", "Money flows", "Resources", "Labor"],
+        correct: 1
+    },
+    {
+        question: "What do the BLACK arrows represent?",
+        options: ["Money flows", "Taxes", "Goods and resources", "Government spending"],
+        correct: 2
+    },
+    {
+        question: "When you buy a shirt from Target, which arrow is that?",
+        options: ["Top red arrow", "Bottom red arrow", "Top black arrow", "Bottom black arrow"],
+        correct: 0
+    },
+    {
+        question: "When Target pays an employee $12/hour, which arrow is that?",
+        options: ["Top red arrow", "Bottom red arrow", "Top black arrow", "Bottom black arrow"],
+        correct: 1
+    },
+    {
+        question: "When Target gives you the shirt you bought, which arrow is that?",
+        options: ["Top red arrow", "Bottom red arrow", "Top black arrow", "Bottom black arrow"],
+        correct: 2
+    },
+    {
+        question: "When you go to work at Target, which arrow is that?",
+        options: ["Top red arrow", "Bottom red arrow", "Top black arrow", "Bottom black arrow"],
+        correct: 3
+    },
+    {
+        question: "Money flows in which direction?",
+        options: ["Only clockwise (red arrows)", "Only counter-clockwise (black arrows)", "Both directions", "It doesn't flow"],
+        correct: 0
+    },
+    {
+        question: "Goods and labor flow in which direction?",
+        options: ["Only clockwise (red arrows)", "Only counter-clockwise (black arrows)", "Same as money", "They don't flow"],
+        correct: 1
+    },
+    {
+        question: "What is 'consumer expenditure'?",
+        options: ["Money households spend on goods", "Money firms pay workers", "Goods firms produce", "Labor households provide"],
+        correct: 0
+    }
+];
+
+let quizAnswers = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderLesson();
+    if (isTeacherPreview) {
+        unlockSection('practice');
+        unlockSection('quiz');
+        updateProgress();
+    }
+});
+
+function renderLesson() {
+    const lesson = lessons[state.currentLesson];
+    document.getElementById('lesson-container').innerHTML = `
+        <div class="animate-in">
+            <h2 class="lesson-title">${lesson.title}</h2>
+            ${lesson.content}
+            <div class="lesson-nav">
+                <button class="btn btn-secondary" onclick="prevLesson()" ${state.currentLesson === 0 ? 'disabled' : ''}>← Back</button>
+                <div class="lesson-progress">Lesson ${state.currentLesson + 1} of ${lessons.length}</div>
+                <button class="btn btn-primary" onclick="nextLesson()">
+                    ${state.currentLesson === lessons.length - 1 ? 'Continue to Practice →' : 'Next →'}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function nextLesson() {
+    if (state.currentLesson < lessons.length - 1) {
+        state.currentLesson++;
+        renderLesson();
+    } else {
+        state.learnComplete = true;
+        unlockSection('practice');
+        showSection('practice');
+    }
+}
+
+function prevLesson() {
+    if (state.currentLesson > 0) {
+        state.currentLesson--;
+        renderLesson();
+    }
+}
+
+function showSection(section) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    
+    document.getElementById('panel-' + section).classList.add('active');
+    document.getElementById('tab-' + section).classList.add('active');
+    
+    if (section === 'practice' && !document.getElementById('practice-container').innerHTML) {
+        initPractice();
+    } else if (section === 'quiz' && !document.getElementById('quiz-container').innerHTML) {
+        initQuiz();
+    }
+    
+    updateProgress();
+}
+
+function unlockSection(section) {
+    const tab = document.getElementById('tab-' + section);
+    tab.disabled = false;
+    tab.classList.remove('locked');
+}
+
+function updateProgress() {
+    document.getElementById('dot-learn').classList.toggle('complete', state.learnComplete);
+    document.getElementById('dot-practice').classList.toggle('complete', state.practiceComplete);
+    document.getElementById('dot-quiz').classList.toggle('complete', state.quizComplete);
+}
+
+function initPractice() {
+    state.practiceRound = 0;
+    state.practiceScore = 0;
+    renderPractice();
+}
+
+function renderPractice() {
+    if (state.practiceRound >= practiceScenarios.length) {
+        showPracticeComplete();
+        return;
+    }
+    
+    const scenario = practiceScenarios[state.practiceRound];
+    const container = document.getElementById('practice-container');
+    
+    container.innerHTML = `
+        <div class="animate-in">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                <span style="font-size: 1.2rem; font-weight: bold;">Question ${state.practiceRound + 1} of ${practiceScenarios.length}</span>
+                <span style="font-size: 1.2rem; font-weight: bold; color: #F59E0B;">Score: ${state.practiceScore}</span>
+            </div>
+            
+            <div class="practice-scenario">
+                <h3>${scenario.question}</h3>
+                <div class="btn-row" style="margin-top: 20px;">
+                    ${scenario.choices.map(choice => 
+                        `<button class="btn-small" onclick="submitPractice(\`${choice}\`)">${choice}</button>`
+                    ).join('')}
+                </div>
+            </div>
+            <div id="practice-feedback"></div>
+        </div>
+    `;
+}
+
+function submitPractice(answer) {
+    const scenario = practiceScenarios[state.practiceRound];
+    const correct = answer === scenario.answer;
+    
+    if (correct) state.practiceScore += 20;
+    
+    document.getElementById('practice-feedback').innerHTML = `
+        <div class="feedback ${correct ? 'correct' : 'incorrect'}">
+            ${correct ? '✅ Correct!' : '❌ Incorrect.'} ${scenario.explanation}
+        </div>
+        <button class="btn btn-primary" style="margin-top: 15px;" onclick="nextPractice()">Next Question →</button>
+    `;
+    
+    document.querySelectorAll('.btn-small').forEach(b => b.disabled = true);
+}
+
+function nextPractice() {
+    state.practiceRound++;
+    renderPractice();
+}
+
+function showPracticeComplete() {
+    const container = document.getElementById('practice-container');
+    const percent = Math.round((state.practiceScore / (practiceScenarios.length * 20)) * 100);
+    
+    container.innerHTML = `
+        <div class="score-screen animate-in">
+            <h2 style="color: #2B2D42;">🏆 Practice Complete!</h2>
+            <div class="score-big">${state.practiceScore}</div>
+            <div class="score-label">out of ${practiceScenarios.length * 20} points (${percent}%)</div>
+            
+            <button class="btn btn-primary" onclick="completePractice()">Continue to Quiz →</button>
+            <button class="btn btn-secondary" style="margin-left: 10px; margin-top: 10px;" onclick="initPractice()">Try Again</button>
+        </div>
+    `;
+}
+
+function completePractice() {
+    state.practiceComplete = true;
+    unlockSection('quiz');
+    showSection('quiz');
+}
+
+function initQuiz() {
+    quizAnswers = [];
+    renderQuiz();
+}
+
+function renderQuiz() {
+    const container = document.getElementById('quiz-container');
+    
+    container.innerHTML = `
+        <div class="animate-in">
+            <h2 style="color: #2B2D42; margin-bottom: 10px;">📝 Circular Flow Quiz</h2>
+            <p style="color: #666; margin-bottom: 20px;">Test your understanding!</p>
+            
+            <div id="quiz-questions"></div>
+            
+            <button class="btn btn-primary" style="margin-top: 20px; width: 100%;" onclick="submitQuiz()" id="submit-quiz-btn">Submit Quiz</button>
+        </div>
+    `;
+    
+    const questionsContainer = document.getElementById('quiz-questions');
+    quizQuestions.forEach((q, i) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'quiz-question';
+        questionDiv.innerHTML = `
+            <h3>Question ${i + 1}</h3>
+            <p>${q.question}</p>
+            <div class="quiz-options">
+                ${q.options.map((opt, j) => `
+                    <div class="quiz-option" onclick="selectQuizAnswer(${i}, ${j})" data-question="${i}" data-option="${j}">
+                        ${opt}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        questionsContainer.appendChild(questionDiv);
+    });
+}
+
+function selectQuizAnswer(questionIndex, optionIndex) {
+    const options = document.querySelectorAll(`[data-question="${questionIndex}"]`);
+    options.forEach(opt => opt.classList.remove('selected'));
+    options[optionIndex].classList.add('selected');
+    
+    quizAnswers[questionIndex] = optionIndex;
+}
+
+function submitQuiz() {
+    if (quizAnswers.length < quizQuestions.length) {
+        alert('Please answer all questions!');
+        return;
+    }
+    
+    quizQuestions.forEach((q, i) => {
+        const options = document.querySelectorAll(`[data-question="${i}"]`);
+        options.forEach((opt, j) => {
+            if (j === q.correct) {
+                opt.classList.add('correct');
+            } else if (j === quizAnswers[i] && j !== q.correct) {
+                opt.classList.add('incorrect');
+            }
+            opt.onclick = null;
+        });
+    });
+    
+    document.getElementById('submit-quiz-btn').disabled = true;
+    
+    setTimeout(showQuizResults, 1000);
+}
+
+function showQuizResults() {
+    const correct = quizAnswers.filter((ans, i) => ans === quizQuestions[i].correct).length;
+    const percent = Math.round((correct / quizQuestions.length) * 100);
+    state.quizScore = correct;
+    state.quizComplete = true;
+    updateProgress();
+    
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = `
+        <div class="score-screen animate-in">
+            <h2 style="color: #2B2D42;">📝 Quiz Complete!</h2>
+            <div class="score-big">${correct}/${quizQuestions.length}</div>
+            <div class="score-label">${percent}%</div>
+            
+            <button class="btn btn-primary" onclick="showCertificate()">🎓 Get Your Certificate</button>
+        </div>
+    `;
+}
+
+function showCertificate() {
+    const correct = state.quizScore;
+    const percent = Math.round((correct / quizQuestions.length) * 100);
+    const date = new Date().toLocaleDateString();
+    
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = `
+        <div class="animate-in">
+            <div class="certificate">
+                <div class="certificate-border">
+                    <h1>🎓 Certificate of Completion</h1>
+                    
+                    <div class="certificate-text">This certifies that</div>
+                    
+                    <div style="margin: 20px 0;">
+                        <input type="text" id="cert-name" placeholder="Enter Your Name" 
+                               style="font-size: 2rem; padding: 15px; text-align: center; width: 80%; max-width: 500px; border: 2px solid #F59E0B; border-radius: 8px;">
+                    </div>
+                    
+                    <div class="certificate-text">
+                        has successfully completed the<br>
+                        <strong style="color: #F59E0B; font-size: 1.5rem;">Circular Flow Model Interactive Lab</strong>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-around; margin: 40px 0; padding: 20px; background: #F8F8F8; border-radius: 8px; flex-wrap: wrap; gap: 20px;">
+                        <div style="min-width: 120px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #F59E0B;">${correct}/${quizQuestions.length}</div>
+                            <div style="color: #666;">Quiz Score</div>
+                        </div>
+                        <div style="min-width: 120px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #F59E0B;">${percent}%</div>
+                            <div style="color: #666;">Accuracy</div>
+                        </div>
+                        <div style="min-width: 120px; text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #F59E0B;">${date}</div>
+                            <div style="color: #666;">Date</div>
+                        </div>
+                    </div>
+                    
+                    <div class="certificate-text" style="margin-top: 30px;">
+                        Demonstrating mastery of circular flow concepts,<br>
+                        markets, and economic interactions
+                    </div>
+                    
+                    <div class="certificate-signature">
+                        <div class="certificate-sig-line">
+                            Robert Jones<br>
+                            <small>ClassClick Economics</small>
+                        </div>
+                        <div class="certificate-sig-line">
+                            ${date}<br>
+                            <small>Date</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn btn-primary" onclick="printCertificate()">🖨️ Print Certificate</button>
+            </div>
+        </div>
+    `;
+}
+
+function printCertificate() {
+    const name = document.getElementById('cert-name').value || 'Student Name';
+    const correct = state.quizScore;
+    const percent = Math.round((correct / quizQuestions.length) * 100);
+    const date = new Date().toLocaleDateString();
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Certificate of Completion</title>
+            <style>
+                body { font-family: Georgia, serif; padding: 40px; }
+                .certificate { border: 10px solid #2B2D42; padding: 40px; text-align: center; max-width: 800px; margin: 0 auto; }
+                .certificate-border { border: 3px solid #F59E0B; padding: 30px; }
+                h1 { font-size: 2.5rem; color: #2B2D42; margin-bottom: 20px; }
+                .cert-name { font-size: 3rem; color: #F59E0B; font-weight: bold; margin: 30px 0; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+                .cert-text { font-size: 1.2rem; color: #666; line-height: 1.8; margin: 20px 0; }
+                .scores { display: flex; justify-content: space-around; margin: 40px 0; }
+                .score-value { font-size: 2rem; font-weight: bold; color: #F59E0B; }
+                .signatures { display: flex; justify-content: space-around; margin-top: 50px; }
+                .sig-line { border-top: 2px solid #333; padding-top: 10px; width: 200px; }
+            </style>
+        </head>
+        <body>
+            <div class="certificate">
+                <div class="certificate-border">
+                    <h1>🎓 Certificate of Completion</h1>
+                    <div class="cert-text">This certifies that</div>
+                    <div class="cert-name">${name}</div>
+                    <div class="cert-text">
+                        has successfully completed the<br>
+                        <strong style="color: #F59E0B; font-size: 1.5rem;">Circular Flow Model Interactive Lab</strong>
+                    </div>
+                    <div class="scores">
+                        <div><div class="score-value">${correct}/${quizQuestions.length}</div><div>Quiz Score</div></div>
+                        <div><div class="score-value">${percent}%</div><div>Accuracy</div></div>
+                        <div><div class="score-value">${date}</div><div>Date</div></div>
+                    </div>
+                    <div class="cert-text">
+                        Demonstrating mastery of circular flow concepts,<br>
+                        markets, and economic interactions
+                    </div>
+                    <div class="signatures">
+                        <div class="sig-line">Robert Jones<br><small>ClassClick Economics</small></div>
+                        <div class="sig-line">${date}<br><small>Date</small></div>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+</script>
+</body>
+</html>
