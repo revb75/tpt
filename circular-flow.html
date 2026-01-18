@@ -75,6 +75,130 @@
         .score-big { font-size: 5rem; font-weight: bold; color: #F59E0B; }
         .score-label { font-size: 1.5rem; color: #666; margin-bottom: 30px; }
         
+        /* Flashcards - Multiple Choice Challenge */
+        .flashcard-header { display: flex; justify-content: space-around; align-items: center; max-width: 700px; margin: 0 auto 20px; flex-wrap: wrap; gap: 15px; background: #F8F8F8; padding: 15px; border-radius: 12px; }
+        .flashcard-stat { text-align: center; }
+        .flashcard-stat-value { font-size: 1.8rem; font-weight: bold; color: #F59E0B; }
+        .flashcard-stat-label { font-size: 0.85rem; color: #666; text-transform: uppercase; }
+        .flashcard-progress-bar { width: 100%; max-width: 700px; height: 12px; background: #E5E7EB; border-radius: 6px; margin: 0 auto 30px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        .flashcard-progress-fill { height: 100%; background: linear-gradient(90deg, #F59E0B 0%, #14B8A6 100%); transition: width 0.3s; }
+        
+        .flashcard-challenge { 
+            max-width: 700px; 
+            margin: 30px auto; 
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .flashcard-term { 
+            font-size: 2rem; 
+            font-weight: bold; 
+            color: #2B2D42; 
+            text-align: center; 
+            padding: 30px;
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 3px solid #F59E0B;
+        }
+        .flashcard-question { 
+            text-align: center; 
+            font-size: 1.2rem; 
+            color: #666; 
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        .flashcard-choices { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+        }
+        .flashcard-choice { 
+            padding: 20px 25px; 
+            border: 3px solid #ddd; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            font-size: 1.1rem;
+            background: white;
+            text-align: left;
+            position: relative;
+        }
+        .flashcard-choice:hover:not(.correct):not(.incorrect):not(:disabled) { 
+            border-color: #F59E0B; 
+            background: #FEF3C7; 
+            transform: translateX(5px);
+        }
+        .flashcard-choice.correct { 
+            border-color: #10B981; 
+            background: #D1FAE5; 
+            animation: pulse 0.5s;
+        }
+        .flashcard-choice.correct::before {
+            content: '✓';
+            position: absolute;
+            right: 20px;
+            font-size: 2rem;
+            color: #10B981;
+            font-weight: bold;
+        }
+        .flashcard-choice.incorrect { 
+            border-color: #EF4444; 
+            background: #FEE2E2; 
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .flashcard-choice.incorrect::before {
+            content: '✗';
+            position: absolute;
+            right: 20px;
+            font-size: 2rem;
+            color: #EF4444;
+            font-weight: bold;
+        }
+        .flashcard-choice:disabled { cursor: not-allowed; }
+        
+        .flashcard-feedback { 
+            margin-top: 20px; 
+            padding: 15px 20px; 
+            border-radius: 8px; 
+            font-weight: 500;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .flashcard-feedback.correct { 
+            background: #D1FAE5; 
+            color: #065F46; 
+            border: 2px solid #10B981;
+        }
+        .flashcard-feedback.incorrect { 
+            background: #FEE2E2; 
+            color: #991B1B; 
+            border: 2px solid #EF4444;
+        }
+        
+        .flashcard-streak { 
+            text-align: center; 
+            margin: 15px 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #F59E0B;
+        }
+        .streak-fire { 
+            display: inline-block; 
+            animation: bounce 0.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
         .certificate { background: white; border: 10px solid #2B2D42; padding: 40px; text-align: center; max-width: 800px; margin: 20px auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
         .certificate-border { border: 3px solid #F59E0B; padding: 30px; }
         .certificate h1 { font-size: 2.5rem; color: #2B2D42; margin-bottom: 20px; font-family: Georgia, serif; }
@@ -97,6 +221,8 @@
             .lesson-progress { order: -1; text-align: center; }
             .score-big { font-size: 3rem; }
             .certificate { padding: 20px; border: 5px solid #2B2D42; }
+            .flashcard-term { font-size: 1.5rem; padding: 20px; }
+            .flashcard-choice { font-size: 1rem; padding: 15px; }
         }
     </style>
 </head>
@@ -106,6 +232,8 @@
         <div class="progress-bar">
             <div class="progress-dot active" id="dot-learn"></div>
             <span class="progress-label">Learn</span>
+            <div class="progress-dot" id="dot-flashcards"></div>
+            <span class="progress-label">Challenge</span>
             <div class="progress-dot" id="dot-practice"></div>
             <span class="progress-label">Practice</span>
             <div class="progress-dot" id="dot-quiz"></div>
@@ -116,12 +244,17 @@
     <div class="container">
         <div class="tabs">
             <button class="tab active" id="tab-learn" onclick="showSection('learn')">📚 Learn</button>
-            <button class="tab locked" id="tab-practice" onclick="showSection('practice')" disabled>🎯 Practice</button>
+            <button class="tab locked" id="tab-flashcards" onclick="showSection('flashcards')" disabled>🎯 Challenge</button>
+            <button class="tab locked" id="tab-practice" onclick="showSection('practice')" disabled>💪 Practice</button>
             <button class="tab locked" id="tab-quiz" onclick="showSection('quiz')" disabled>📝 Quiz</button>
         </div>
         
         <div class="panel active" id="panel-learn">
             <div id="lesson-container"></div>
+        </div>
+        
+        <div class="panel" id="panel-flashcards">
+            <div id="flashcards-container"></div>
         </div>
         
         <div class="panel" id="panel-practice">
@@ -141,11 +274,16 @@
 const state = {
     currentLesson: 0,
     learnComplete: false,
+    flashcardsComplete: false,
     practiceComplete: false,
     quizComplete: false,
     quizScore: 0,
     practiceRound: 0,
-    practiceScore: 0
+    practiceScore: 0,
+    currentFlashcard: 0,
+    flashcardScore: 0,
+    flashcardStreak: 0,
+    flashcardAttempts: 0
 };
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -157,6 +295,7 @@ if (isTeacherPreview) {
     banner.innerHTML = '🔓 TEACHER PREVIEW MODE - All sections unlocked';
     document.body.insertBefore(banner, document.body.firstChild);
     state.learnComplete = true;
+    state.flashcardsComplete = true;
     state.practiceComplete = true;
 }
 
@@ -253,46 +392,133 @@ const lessons = [
         3. Firms use your labor to make more goods → The circle continues!</p>
         </div>
         <p class="lesson-text"><strong>Red arrows = Money clockwise</strong><br><strong>Black arrows = Goods/labor counter-clockwise</strong></p>
-        <p class="lesson-text">You've mastered the circular flow! Let's practice identifying the flows.</p>`
+        <p class="lesson-text">You've mastered the circular flow! Ready for the challenge?</p>`
+    }
+];
+
+const flashcards = [
+    { 
+        term: "Circular Flow Model", 
+        definition: "A diagram showing how money and resources flow between households and firms in a continuous cycle",
+        wrong1: "A chart showing supply and demand curves intersecting",
+        wrong2: "A graph of stock market trends over time",
+        wrong3: "A diagram of how products are manufactured"
+    },
+    { 
+        term: "Households", 
+        definition: "Individuals and families who own resources, buy goods and services, and provide labor",
+        wrong1: "Government agencies that collect taxes",
+        wrong2: "Banks that store money",
+        wrong3: "Buildings where people live"
+    },
+    { 
+        term: "Firms", 
+        definition: "Businesses that hire workers, produce goods and services, and sell to consumers",
+        wrong1: "Law offices that handle legal cases",
+        wrong2: "Government organizations",
+        wrong3: "Banks that lend money"
+    },
+    { 
+        term: "Consumer Expenditure", 
+        definition: "Money that households spend on goods and services (top red arrow)",
+        wrong1: "Money that firms spend on advertising",
+        wrong2: "Taxes paid to the government",
+        wrong3: "Savings accounts at banks"
+    },
+    { 
+        term: "Wages, Rent, Dividends", 
+        definition: "Income that households earn from providing resources to firms (bottom red arrow)",
+        wrong1: "Prices that consumers pay at stores",
+        wrong2: "Taxes collected by government",
+        wrong3: "Loans from banks"
+    },
+    { 
+        term: "Goods and Services", 
+        definition: "Products that firms sell to households (top black arrow)",
+        wrong1: "Money flowing between banks",
+        wrong2: "Taxes paid to government",
+        wrong3: "Workers commuting to jobs"
+    },
+    { 
+        term: "Factors of Production", 
+        definition: "Resources (labor, land, capital) that households provide to firms (bottom black arrow)",
+        wrong1: "Money that firms earn from sales",
+        wrong2: "Products sold in stores",
+        wrong3: "Government regulations on business"
+    },
+    { 
+        term: "Product Market", 
+        definition: "Where households buy goods and services from firms (top of the diagram)",
+        wrong1: "Where firms buy labor from households",
+        wrong2: "Where banks exchange currencies",
+        wrong3: "Where stocks are traded"
+    },
+    { 
+        term: "Resource Market", 
+        definition: "Where firms hire labor and buy resources from households (bottom of the diagram)",
+        wrong1: "Where consumers buy products",
+        wrong2: "Where governments collect taxes",
+        wrong3: "Where companies sell stock"
+    },
+    { 
+        term: "Labor", 
+        definition: "Work that people provide to businesses in exchange for wages",
+        wrong1: "Tools and machines used in factories",
+        wrong2: "Natural resources like oil and minerals",
+        wrong3: "Money invested in businesses"
+    },
+    { 
+        term: "Red Arrows", 
+        definition: "Show money flows - clockwise direction through the economy",
+        wrong1: "Show goods flowing counter-clockwise",
+        wrong2: "Show government intervention",
+        wrong3: "Show international trade"
+    },
+    { 
+        term: "Black Arrows", 
+        definition: "Show goods and resources - counter-clockwise, opposite to money",
+        wrong1: "Show money flowing clockwise",
+        wrong2: "Show government spending",
+        wrong3: "Show bank transactions"
     }
 ];
 
 const practiceScenarios = [
     {
-        question: "You buy a burger from McDonald's for $5. Which arrow represents this transaction?",
-        choices: ["Top red arrow (consumer expenditure)", "Bottom red arrow (wages)", "Top black arrow (goods)", "Bottom black arrow (factors)"],
-        answer: "Top red arrow (consumer expenditure)",
-        explanation: "When you spend money at a business, that's consumer expenditure - the top red arrow!"
+        question: "You buy a burger from McDonald's for $5. What type of flow is this?",
+        choices: ["Consumer expenditure (household spending)", "Wages and income (firm paying household)", "Goods and services (firm to household)", "Factors of production (household to firm)"],
+        answer: "Consumer expenditure (household spending)",
+        explanation: "When you spend money at a business, that's consumer expenditure - money flowing from households to firms!"
     },
     {
-        question: "McDonald's pays you $15/hour to work. Which arrow represents this?",
-        choices: ["Top red arrow (consumer expenditure)", "Bottom red arrow (wages)", "Top black arrow (goods)", "Bottom black arrow (factors)"],
-        answer: "Bottom red arrow (wages)",
-        explanation: "When a business pays you for working, that's wages - the bottom red arrow!"
+        question: "McDonald's pays you $15/hour to work. What type of flow is this?",
+        choices: ["Consumer expenditure (household spending)", "Wages and income (firm paying household)", "Goods and services (firm to household)", "Factors of production (household to firm)"],
+        answer: "Wages and income (firm paying household)",
+        explanation: "When a business pays you for working, that's wages - money flowing from firms to households!"
     },
     {
-        question: "McDonald's gives you the burger you paid for. Which arrow represents this?",
-        choices: ["Top red arrow (consumer expenditure)", "Bottom red arrow (wages)", "Top black arrow (goods)", "Bottom black arrow (factors)"],
-        answer: "Top black arrow (goods)",
-        explanation: "When a business gives you the product, that's goods flowing to you - the top black arrow!"
+        question: "McDonald's gives you the burger you paid for. What type of flow is this?",
+        choices: ["Consumer expenditure (household spending)", "Wages and income (firm paying household)", "Goods and services (firm to household)", "Factors of production (household to firm)"],
+        answer: "Goods and services (firm to household)",
+        explanation: "When a business gives you the product, that's goods flowing from firms to households!"
     },
     {
-        question: "You show up for your shift at McDonald's. Which arrow represents this?",
-        choices: ["Top red arrow (consumer expenditure)", "Bottom red arrow (wages)", "Top black arrow (goods)", "Bottom black arrow (factors)"],
-        answer: "Bottom black arrow (factors)",
-        explanation: "When you provide your labor to a business, that's factors of production - the bottom black arrow!"
+        question: "You show up for your shift at McDonald's. What type of flow is this?",
+        choices: ["Consumer expenditure (household spending)", "Wages and income (firm paying household)", "Goods and services (firm to household)", "Factors of production (household to firm)"],
+        answer: "Factors of production (household to firm)",
+        explanation: "When you provide your labor to a business, that's factors of production flowing from households to firms!"
     },
     {
-        question: "Which arrows show MONEY flowing?",
-        choices: ["Red arrows only", "Black arrows only", "Both red and black", "Neither"],
-        answer: "Red arrows only",
-        explanation: "RED arrows show money flowing. BLACK arrows show goods and resources flowing."
+        question: "In the circular flow model, what flows in the OPPOSITE direction from goods and services?",
+        choices: ["Labor", "Land", "Money", "Capital"],
+        answer: "Money",
+        explanation: "Money flows in the opposite direction from goods! When goods go to you, money goes to the firm."
     },
     {
-        question: "Do money and goods flow in the same direction or opposite directions?",
-        choices: ["Same direction", "Opposite directions"],
-        answer: "Opposite directions",
-        explanation: "Money (red) flows clockwise, while goods/resources (black) flow counter-clockwise - opposite directions!"
+        question: "Which market involves households BUYING things from firms?",
+        choices: ["Resource market", "Product market", "Labor market", "Capital market"],
+        answer: "Product market",
+        explanation: "The product market is where households buy goods and services from firms!"
     }
 ];
 
@@ -303,49 +529,49 @@ const quizQuestions = [
         correct: 1
     },
     {
-        question: "What do the RED arrows represent?",
-        options: ["Goods and services", "Money flows", "Resources", "Labor"],
-        correct: 1
+        question: "What is consumer expenditure?",
+        options: ["Money households spend buying goods", "Money firms pay to workers", "Goods that firms produce", "Labor that households provide"],
+        correct: 0
     },
     {
-        question: "What do the BLACK arrows represent?",
-        options: ["Money flows", "Taxes", "Goods and resources", "Government spending"],
+        question: "When you buy groceries at Walmart, what flows FROM you TO Walmart?",
+        options: ["Goods", "Labor", "Money", "Services"],
         correct: 2
     },
     {
-        question: "When you buy a shirt from Target, which arrow is that?",
-        options: ["Top red arrow", "Bottom red arrow", "Top black arrow", "Bottom black arrow"],
-        correct: 0
-    },
-    {
-        question: "When Target pays an employee $12/hour, which arrow is that?",
-        options: ["Top red arrow", "Bottom red arrow", "Top black arrow", "Bottom black arrow"],
+        question: "When you work at McDonald's, what flows FROM you TO McDonald's?",
+        options: ["Money", "Your labor", "Goods", "Wages"],
         correct: 1
     },
     {
-        question: "When Target gives you the shirt you bought, which arrow is that?",
-        options: ["Top red arrow", "Bottom red arrow", "Top black arrow", "Bottom black arrow"],
+        question: "What do households provide to firms in the resource market?",
+        options: ["Money to buy products", "Labor, land, and capital", "Finished goods", "Customer service"],
+        correct: 1
+    },
+    {
+        question: "What do firms provide to households in the product market?",
+        options: ["Wages and salaries", "Jobs and employment", "Goods and services", "Taxes and fees"],
         correct: 2
     },
     {
-        question: "When you go to work at Target, which arrow is that?",
-        options: ["Top red arrow", "Bottom red arrow", "Top black arrow", "Bottom black arrow"],
-        correct: 3
-    },
-    {
-        question: "Money flows in which direction?",
-        options: ["Only clockwise (red arrows)", "Only counter-clockwise (black arrows)", "Both directions", "It doesn't flow"],
-        correct: 0
-    },
-    {
-        question: "Goods and labor flow in which direction?",
-        options: ["Only clockwise (red arrows)", "Only counter-clockwise (black arrows)", "Same as money", "They don't flow"],
+        question: "When a business pays you a salary, this is an example of:",
+        options: ["Consumer expenditure", "Wages and income", "Goods and services", "Factors of production"],
         correct: 1
     },
     {
-        question: "What is 'consumer expenditure'?",
-        options: ["Money households spend on goods", "Money firms pay workers", "Goods firms produce", "Labor households provide"],
-        correct: 0
+        question: "Money and goods flow in __________ directions through the economy.",
+        options: ["The same", "Opposite", "Random", "No specific"],
+        correct: 1
+    },
+    {
+        question: "The three factors of production are:",
+        options: ["Money, goods, services", "Labor, land, capital", "Wages, rent, profit", "Households, firms, government"],
+        correct: 1
+    },
+    {
+        question: "In the circular flow model, households earn income by:",
+        options: ["Buying products from firms", "Providing resources to firms", "Paying taxes to government", "Saving money in banks"],
+        correct: 1
     }
 ];
 
@@ -354,6 +580,7 @@ let quizAnswers = [];
 document.addEventListener('DOMContentLoaded', function() {
     renderLesson();
     if (isTeacherPreview) {
+        unlockSection('flashcards');
         unlockSection('practice');
         unlockSection('quiz');
         updateProgress();
@@ -370,7 +597,7 @@ function renderLesson() {
                 <button class="btn btn-secondary" onclick="prevLesson()" ${state.currentLesson === 0 ? 'disabled' : ''}>← Back</button>
                 <div class="lesson-progress">Lesson ${state.currentLesson + 1} of ${lessons.length}</div>
                 <button class="btn btn-primary" onclick="nextLesson()">
-                    ${state.currentLesson === lessons.length - 1 ? 'Continue to Practice →' : 'Next →'}
+                    ${state.currentLesson === lessons.length - 1 ? 'Continue to Challenge →' : 'Next →'}
                 </button>
             </div>
         </div>
@@ -383,8 +610,8 @@ function nextLesson() {
         renderLesson();
     } else {
         state.learnComplete = true;
-        unlockSection('practice');
-        showSection('practice');
+        unlockSection('flashcards');
+        showSection('flashcards');
     }
 }
 
@@ -402,7 +629,9 @@ function showSection(section) {
     document.getElementById('panel-' + section).classList.add('active');
     document.getElementById('tab-' + section).classList.add('active');
     
-    if (section === 'practice' && !document.getElementById('practice-container').innerHTML) {
+    if (section === 'flashcards' && !document.getElementById('flashcards-container').innerHTML) {
+        initFlashcards();
+    } else if (section === 'practice' && !document.getElementById('practice-container').innerHTML) {
         initPractice();
     } else if (section === 'quiz' && !document.getElementById('quiz-container').innerHTML) {
         initQuiz();
@@ -419,8 +648,169 @@ function unlockSection(section) {
 
 function updateProgress() {
     document.getElementById('dot-learn').classList.toggle('complete', state.learnComplete);
+    document.getElementById('dot-flashcards').classList.toggle('complete', state.flashcardsComplete);
     document.getElementById('dot-practice').classList.toggle('complete', state.practiceComplete);
     document.getElementById('dot-quiz').classList.toggle('complete', state.quizComplete);
+}
+
+function initFlashcards() {
+    state.currentFlashcard = 0;
+    state.flashcardScore = 0;
+    state.flashcardStreak = 0;
+    state.flashcardAttempts = 0;
+    renderFlashcard();
+}
+
+function renderFlashcard() {
+    if (state.currentFlashcard >= flashcards.length) {
+        showFlashcardComplete();
+        return;
+    }
+    
+    const card = flashcards[state.currentFlashcard];
+    const container = document.getElementById('flashcards-container');
+    
+    // Create shuffled choices
+    const choices = [
+        card.definition,
+        card.wrong1,
+        card.wrong2,
+        card.wrong3
+    ].sort(() => Math.random() - 0.5);
+    
+    const progress = ((state.currentFlashcard / flashcards.length) * 100);
+    
+    container.innerHTML = `
+        <div class="animate-in">
+            <h2 style="text-align: center; color: #2B2D42; margin-bottom: 10px;">🎯 Knowledge Challenge</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Choose the correct definition!</p>
+            
+            <div class="flashcard-header">
+                <div class="flashcard-stat">
+                    <div class="flashcard-stat-value">${state.currentFlashcard + 1}/${flashcards.length}</div>
+                    <div class="flashcard-stat-label">Card</div>
+                </div>
+                <div class="flashcard-stat">
+                    <div class="flashcard-stat-value">${state.flashcardScore}</div>
+                    <div class="flashcard-stat-label">Score</div>
+                </div>
+                <div class="flashcard-stat">
+                    <div class="flashcard-stat-value">${state.flashcardStreak}</div>
+                    <div class="flashcard-stat-label">Streak</div>
+                </div>
+            </div>
+            
+            <div class="flashcard-progress-bar">
+                <div class="flashcard-progress-fill" style="width: ${progress}%"></div>
+            </div>
+            
+            ${state.flashcardStreak >= 3 ? `<div class="flashcard-streak"><span class="streak-fire">🔥</span> ${state.flashcardStreak} in a row! <span class="streak-fire">🔥</span></div>` : ''}
+            
+            <div class="flashcard-challenge">
+                <div class="flashcard-term">${card.term}</div>
+                <div class="flashcard-question">What is this?</div>
+                <div class="flashcard-choices">
+                    ${choices.map(choice => `
+                        <button class="flashcard-choice" onclick="checkFlashcard('${choice.replace(/'/g, "\\'")}', '${card.definition.replace(/'/g, "\\'")}')">${choice}</button>
+                    `).join('')}
+                </div>
+                <div id="flashcard-feedback"></div>
+            </div>
+        </div>
+    `;
+}
+
+function checkFlashcard(selected, correct) {
+    state.flashcardAttempts++;
+    const isCorrect = selected === correct;
+    
+    // Disable all choices
+    document.querySelectorAll('.flashcard-choice').forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === correct) {
+            btn.classList.add('correct');
+        } else if (btn.textContent === selected && !isCorrect) {
+            btn.classList.add('incorrect');
+        }
+    });
+    
+    const feedbackEl = document.getElementById('flashcard-feedback');
+    
+    if (isCorrect) {
+        state.flashcardScore += 10;
+        state.flashcardStreak++;
+        
+        if (state.flashcardStreak >= 3) {
+            state.flashcardScore += 5; // Bonus for streak!
+        }
+        
+        feedbackEl.innerHTML = `
+            <div class="flashcard-feedback correct">
+                ✓ Correct! ${state.flashcardStreak >= 3 ? '+15 points (10 + 5 streak bonus!)' : '+10 points'}
+            </div>
+            <button class="btn btn-primary" style="margin-top: 15px; width: 100%;" onclick="nextFlashcard()">Next Card →</button>
+        `;
+    } else {
+        state.flashcardStreak = 0;
+        feedbackEl.innerHTML = `
+            <div class="flashcard-feedback incorrect">
+                ✗ Not quite. Try again!
+            </div>
+        `;
+        
+        // Re-enable only the correct answer and unselected wrong answers
+        document.querySelectorAll('.flashcard-choice').forEach(btn => {
+            if (!btn.classList.contains('incorrect')) {
+                btn.disabled = false;
+            }
+        });
+    }
+}
+
+function nextFlashcard() {
+    state.currentFlashcard++;
+    renderFlashcard();
+}
+
+function showFlashcardComplete() {
+    const container = document.getElementById('flashcards-container');
+    const accuracy = Math.round((flashcards.length / state.flashcardAttempts) * 100);
+    
+    let rating = '';
+    if (accuracy >= 90) rating = '⭐⭐⭐ PERFECT!';
+    else if (accuracy >= 75) rating = '⭐⭐ GREAT!';
+    else if (accuracy >= 60) rating = '⭐ GOOD!';
+    else rating = 'COMPLETE!';
+    
+    container.innerHTML = `
+        <div class="score-screen animate-in">
+            <h2 style="color: #2B2D42;">🏆 Challenge Complete!</h2>
+            <div class="score-big">${state.flashcardScore}</div>
+            <div class="score-label">Total Points</div>
+            
+            <div style="display: flex; justify-content: center; gap: 40px; margin: 30px 0; flex-wrap: wrap;">
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #14B8A6;">${accuracy}%</div>
+                    <div style="color: #666;">Accuracy</div>
+                </div>
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #F59E0B;">${state.flashcardAttempts}</div>
+                    <div style="color: #666;">Attempts</div>
+                </div>
+            </div>
+            
+            <div style="font-size: 2rem; margin: 20px 0;">${rating}</div>
+            
+            <button class="btn btn-primary" onclick="completeFlashcards()">Continue to Practice →</button>
+            <button class="btn btn-secondary" style="margin-left: 10px; margin-top: 10px;" onclick="initFlashcards()">Try Again</button>
+        </div>
+    `;
+}
+
+function completeFlashcards() {
+    state.flashcardsComplete = true;
+    unlockSection('practice');
+    showSection('practice');
 }
 
 function initPractice() {
@@ -512,7 +902,7 @@ function renderQuiz() {
     container.innerHTML = `
         <div class="animate-in">
             <h2 style="color: #2B2D42; margin-bottom: 10px;">📝 Circular Flow Quiz</h2>
-            <p style="color: #666; margin-bottom: 20px;">Test your understanding!</p>
+            <p style="color: #666; margin-bottom: 20px;">Test your understanding of circular flow concepts!</p>
             
             <div id="quiz-questions"></div>
             
