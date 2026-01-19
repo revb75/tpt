@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dungeon Trader - C64 Style</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0000AA;
+            color: #AAAAFF;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 800px;
+            max-width: 95vw;
+            background: #0000AA;
+            border: 4px solid #AAAAFF;
+            padding: 20px;
+        }
+        .title {
+            text-align: center;
+            color: #FFFFFF;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .game-view {
+            background: #000000;
+            border: 2px solid #AAAAFF;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 400px;
+        }
+        .stats-panel {
+            background: #000055;
+            border: 2px solid #AAAAFF;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .stat-label { color: #FFFF55; }
+        .stat-value { color: #FFFFFF; text-align: right; }
+        .message-box {
+            background: #000000;
+            border: 2px solid #AAAAFF;
+            padding: 15px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            color: #FFFFFF;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #000055;
+            border: 2px solid #AAAAFF;
+            color: #FFFFFF;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .btn:hover { background: #0000FF; color: #FFFF55; }
+        .btn:disabled { background: #000033; color: #555555; cursor: not-allowed; }
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .trading-menu {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #0000AA;
+            border: 4px solid #FFFF55;
+            padding: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+        }
+        .trading-menu.active { display: block; }
+        .trading-header {
+            color: #FFFF55;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #FFFF55;
+        }
+        .item-list { margin-bottom: 15px; }
+        .item-row {
+            background: #000055;
+            border: 2px solid #AAAAFF;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .item-name { color: #FFFF55; font-size: 14px; margin-bottom: 5px; }
+        .item-info { color: #AAAAFF; font-size: 12px; margin-bottom: 8px; }
+        .item-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .victory-screen {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #0000AA;
+            border: 4px solid #FFFF55;
+            padding: 40px;
+            text-align: center;
+            display: none;
+            z-index: 1000;
+        }
+        .victory-screen.active { display: block; }
+        .victory-title { color: #FFFF55; font-size: 32px; margin-bottom: 20px; }
+        .victory-text { color: #FFFFFF; font-size: 16px; margin-bottom: 20px; }
+        .minimap {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 120px;
+            height: 120px;
+            background: rgba(0, 0, 85, 0.8);
+            border: 2px solid #AAAAFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">⚔ DUNGEON TRADER ⚔</div>
+        
+        <div class="game-view">
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+            <canvas id="minimap" class="minimap" width="120" height="120"></canvas>
+        </div>
+
+        <div class="stats-panel">
+            <div class="stat-row">
+                <div><span class="stat-label">GOLD:</span></div>
+                <div class="stat-value" id="goldAmount">50</div>
+            </div>
+            <div class="stat-row">
+                <div><span class="stat-label">BREAD:</span></div>
+                <div class="stat-value" id="breadCount">2</div>
+            </div>
+            <div class="stat-row">
+                <div><span class="stat-label">IRON ORE:</span></div>
+                <div class="stat-value" id="oreCount">0</div>
+            </div>
+            <div class="stat-row">
+                <div><span class="stat-label">GEMS:</span></div>
+                <div class="stat-value" id="gemsCount">0</div>
+            </div>
+            <div class="stat-row">
+                <div><span class="stat-label">HERBS:</span></div>
+                <div class="stat-value" id="herbsCount">0</div>
+            </div>
+            <div class="stat-row">
+                <div><span class="stat-label">ESCAPE KEY:</span></div>
+                <div class="stat-value" id="keyStatus">NO</div>
+            </div>
+        </div>
+
+        <div class="message-box" id="messageBox">
+            *** DUNGEON TRADER ***<br><br>
+            GOAL: EARN 500 GOLD TO BUY THE ESCAPE KEY!<br><br>
+            1. EXPLORE AND FIND 5 MERCHANTS<br>
+            2. BUY ITEMS WHERE CHEAP<br>
+            3. SELL WHERE EXPENSIVE<br>
+            4. BEWARE THE BAT - IT HUNTS YOU!<br><br>
+            ARROW KEYS = MOVE | E = INTERACT
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="turnLeft()">← TURN LEFT</button>
+            <button class="btn" onclick="moveForward()">↑ FORWARD</button>
+            <button class="btn" onclick="turnRight()">TURN RIGHT →</button>
+            <button class="btn" style="visibility: hidden;"></button>
+            <button class="btn" onclick="moveBackward()">↓ BACKWARD</button>
+            <button class="btn" style="visibility: hidden;"></button>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn" onclick="interact()">INTERACT</button>
+            <button class="btn" onclick="rest()">REST</button>
+        </div>
+    </div>
+
+    <div class="trading-menu" id="tradingMenu">
+        <div class="trading-header" id="merchantTitle">MERCHANT</div>
+        <div id="merchantSubtitle" style="color: #AAAAFF; text-align: center; margin-bottom: 15px;"></div>
+        <div class="item-list" id="itemList"></div>
+        <button class="btn" onclick="closeTrade()">CLOSE</button>
+    </div>
+
+    <div class="victory-screen" id="victoryScreen">
+        <div class="victory-title">*** VICTORY ***</div>
+        <div class="victory-text">
+            YOU ESCAPED THE DUNGEON!<br><br>
+            FINAL GOLD: <span id="finalGold"></span><br><br>
+            YOU MASTERED SUPPLY AND DEMAND!<br><br>
+            YOU LEARNED TO:<br>
+            - BUY LOW WHERE GOODS ARE ABUNDANT<br>
+            - SELL HIGH WHERE GOODS ARE SCARCE<br>
+            - MAXIMIZE PROFIT THROUGH SMART TRADING<br><br>
+            CONGRATULATIONS, MASTER TRADER!
+        </div>
+        <button class="btn" onclick="location.reload()">PLAY AGAIN</button>
+    </div>
+
+    <script>
+        const game = {
+            gold: 50,
+            inventory: { bread: 2, ore: 0, gems: 0, herbs: 0 },
+            hasKey: false,
+            gameWon: false,
+            player: { x: 1, z: 1, dir: 0 }
+        };
+
+        const MAP_SIZE = 13;
+        const CELL_ROOM = 0;
+        const CELL_WALL = 1;
+        const CELL_MERCHANT = 2;
+        const CELL_DOOR = 3;
+
+        const map = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,1,0,0,0,0,0,3,1],
+            [1,0,2,0,0,1,0,2,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,1,0,0,0,0,0,0,1],
+            [1,1,1,0,1,1,1,0,1,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,1,0,0,0,0,0,0,1],
+            [1,0,2,0,0,1,0,2,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,0,1,1,1],
+            [1,0,0,2,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ];
+
+        const merchants = [
+            { x: 2, z: 2, room: 0, name: 'GRUFF MINER',
+              prices: {
+                bread: { buy: 25, sell: 20, reason: 'HIGH DEMAND - MINERS NEED FOOD!' },
+                ore: { buy: 8, sell: 5, reason: 'ABUNDANT SUPPLY HERE' },
+                gems: { buy: 80, sell: 60, reason: 'STANDARD PRICE' },
+                herbs: { buy: 45, sell: 35, reason: 'SCARCE IN CAVES' }
+              }
+            },
+            { x: 7, z: 2, room: 1, name: 'HERB GATHERER',
+              prices: {
+                bread: { buy: 12, sell: 8, reason: 'FAIR MARKET VALUE' },
+                ore: { buy: 30, sell: 25, reason: 'HIGH DEMAND - NO MINES!' },
+                gems: { buy: 90, sell: 70, reason: 'RARE IN FOREST' },
+                herbs: { buy: 10, sell: 5, reason: 'PLENTIFUL HERE' }
+              }
+            },
+            { x: 2, z: 8, room: 2, name: 'GEM DEALER',
+              prices: {
+                bread: { buy: 15, sell: 10, reason: 'AVERAGE DEMAND' },
+                ore: { buy: 18, sell: 12, reason: 'AVERAGE DEMAND' },
+                gems: { buy: 50, sell: 40, reason: 'HIGH SUPPLY - GEM CENTRAL!' },
+                herbs: { buy: 60, sell: 50, reason: 'POPULAR WITH WEALTHY' }
+              }
+            },
+            { x: 7, z: 8, room: 3, name: 'DESPERATE TRADER',
+              prices: {
+                bread: { buy: 30, sell: 25, reason: 'CRITICAL NEED!' },
+                ore: { buy: 25, sell: 20, reason: 'NEEDS TOOLS' },
+                gems: { buy: 100, sell: 85, reason: 'WILL PAY PREMIUM!' },
+                herbs: { buy: 55, sell: 45, reason: 'MEDICAL EMERGENCY' }
+              }
+            },
+            { x: 3, z: 11, room: 4, name: 'GATEKEEPER',
+              prices: {
+                bread: { buy: 15, sell: 10, reason: 'STANDARD RATE' },
+                ore: { buy: 20, sell: 15, reason: 'STANDARD RATE' },
+                gems: { buy: 75, sell: 65, reason: 'STANDARD RATE' },
+                herbs: { buy: 40, sell: 30, reason: 'STANDARD RATE' }
+              }
+            }
+        ];
+
+        const bats = [
+            { x: 5, z: 6, dir: 0, moveTimer: 0, attacking: false }
+        ];
+
+        const roomColors = {
+            0: { wall: '#8B4513', floor: '#654321', name: 'MINING CAVERN' },
+            1: { wall: '#228B22', floor: '#1a5c1a', name: 'FOREST OUTPOST' },
+            2: { wall: '#4B0082', floor: '#2d004f', name: 'UNDERGROUND MARKET' },
+            3: { wall: '#8B0000', floor: '#5c0000', name: 'ABANDONED CAMP' },
+            4: { wall: '#FFD700', floor: '#b8860b', name: 'EXIT CHAMBER' }
+        };
+
+        const itemNames = {
+            bread: 'BREAD',
+            ore: 'IRON ORE',
+            gems: 'GEMS',
+            herbs: 'HEALING HERBS'
+        };
+
+        let currentMerchant = null;
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const minimapCanvas = document.getElementById('minimap');
+        const minimapCtx = minimapCanvas.getContext('2d');
+
+        function setMessage(msg) {
+            document.getElementById('messageBox').innerHTML = msg;
+        }
+
+        function updateUI() {
+            document.getElementById('goldAmount').textContent = game.gold;
+            document.getElementById('breadCount').textContent = game.inventory.bread;
+            document.getElementById('oreCount').textContent = game.inventory.ore;
+            document.getElementById('gemsCount').textContent = game.inventory.gems;
+            document.getElementById('herbsCount').textContent = game.inventory.herbs;
+            document.getElementById('keyStatus').textContent = game.hasKey ? 'YES' : 'NO';
+        }
+
+        function getCurrentRoom() {
+            const px = game.player.x;
+            const pz = game.player.z;
+            if (pz <= 4 && px <= 4) return 0;
+            if (pz <= 4 && px >= 6) return 1;
+            if (pz >= 7 && pz <= 9 && px <= 4) return 2;
+            if (pz >= 7 && pz <= 9 && px >= 6) return 3;
+            if (pz >= 11) return 4;
+            return -1;
+        }
+
+        function turnLeft() {
+            game.player.dir = (game.player.dir + 3) % 4;
+            render();
+            setMessage('YOU TURN LEFT.');
+        }
+
+        function turnRight() {
+            game.player.dir = (game.player.dir + 1) % 4;
+            render();
+            setMessage('YOU TURN RIGHT.');
+        }
+
+        function moveForward() {
+            const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+            const [dx, dz] = dirs[game.player.dir];
+            const newX = game.player.x + dx;
+            const newZ = game.player.z + dz;
+
+            if (newZ >= 0 && newZ < MAP_SIZE && newX >= 0 && newX < MAP_SIZE) {
+                if (map[newZ][newX] !== CELL_WALL) {
+                    game.player.x = newX;
+                    game.player.z = newZ;
+                    moveBats();
+                    checkBatEncounter();
+                    render();
+                    
+                    const merchant = merchants.find(m => m.x === newX && m.z === newZ);
+                    if (merchant) {
+                        setMessage(`FOUND ${merchant.name}!<br>PRESS E TO TRADE.`);
+                    } else {
+                        const room = getCurrentRoom();
+                        if (room >= 0) {
+                            setMessage(`ENTERED ${roomColors[room].name}.`);
+                        } else {
+                            setMessage('YOU MOVE FORWARD.');
+                        }
+                    }
+                } else {
+                    setMessage('A WALL BLOCKS YOUR PATH!');
+                }
+            } else {
+                setMessage('YOU CANNOT GO THAT WAY!');
+            }
+        }
+
+        function moveBackward() {
+            const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+            const [dx, dz] = dirs[game.player.dir];
+            const newX = game.player.x - dx;
+            const newZ = game.player.z - dz;
+
+            if (newZ >= 0 && newZ < MAP_SIZE && newX >= 0 && newX < MAP_SIZE) {
+                if (map[newZ][newX] !== CELL_WALL) {
+                    game.player.x = newX;
+                    game.player.z = newZ;
+                    render();
+                    setMessage('YOU MOVE BACKWARD.');
+                } else {
+                    setMessage('A WALL BLOCKS YOUR PATH!');
+                }
+            } else {
+                setMessage('YOU CANNOT GO THAT WAY!');
+            }
+        }
+
+        function checkBatEncounter() {
+            for (let bat of bats) {
+                if (bat.x === game.player.x && bat.z === game.player.z) {
+                    if (bat.attacking) {
+                        // Bat is actively attacking!
+                        const items = ['bread', 'ore', 'gems', 'herbs'];
+                        const availableItems = items.filter(item => game.inventory[item] > 0);
+                        
+                        if (availableItems.length > 0) {
+                            const stolenItem = availableItems[Math.floor(Math.random() * availableItems.length)];
+                            game.inventory[stolenItem]--;
+                            updateUI();
+                            setMessage(`🦇 BAT ATTACK! 🦇<br>THE BAT SWOOPS AND STEALS YOUR ${itemNames[stolenItem].toUpperCase()}!<br>IT FLIES AWAY INTO THE DARKNESS!`);
+                        } else {
+                            setMessage('🦇 BAT ATTACK! 🦇<br>THE BAT SWOOPS AT YOU!<br>YOU HAVE NOTHING FOR IT TO STEAL!');
+                        }
+                        
+                        // Bat flees after attacking
+                        bat.attacking = false;
+                        const fleeDir = Math.floor(Math.random() * 4);
+                        const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+                        const [dx, dz] = dirs[fleeDir];
+                        const newX = bat.x + dx * 2;
+                        const newZ = bat.z + dz * 2;
+                        
+                        if (newZ >= 0 && newZ < MAP_SIZE && newX >= 0 && newX < MAP_SIZE) {
+                            if (map[newZ][newX] !== CELL_WALL) {
+                                bat.x = newX;
+                                bat.z = newZ;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        function moveBats() {
+            const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+            
+            for (let bat of bats) {
+                bat.moveTimer++;
+                
+                // Move every 2 player moves (faster/more aggressive)
+                if (bat.moveTimer >= 2) {
+                    bat.moveTimer = 0;
+                    
+                    // Chase the player! Calculate direction to player
+                    const dx = game.player.x - bat.x;
+                    const dz = game.player.z - bat.z;
+                    const distance = Math.sqrt(dx * dx + dz * dz);
+                    
+                    // If close to player, move toward them
+                    if (distance < 6) {
+                        // Determine best direction to move toward player
+                        if (Math.abs(dx) > Math.abs(dz)) {
+                            bat.dir = dx > 0 ? 1 : 3; // East or West
+                        } else {
+                            bat.dir = dz > 0 ? 2 : 0; // South or North
+                        }
+                    } else {
+                        // Random wandering when far from player
+                        if (Math.random() < 0.4) {
+                            bat.dir = Math.floor(Math.random() * 4);
+                        }
+                    }
+                    
+                    const [bdx, bdz] = dirs[bat.dir];
+                    const newX = bat.x + bdx;
+                    const newZ = bat.z + bdz;
+                    
+                    // Move if valid
+                    if (newZ >= 0 && newZ < MAP_SIZE && newX >= 0 && newX < MAP_SIZE) {
+                        if (map[newZ][newX] !== CELL_WALL) {
+                            bat.x = newX;
+                            bat.z = newZ;
+                            
+                            // Check if bat reached player
+                            if (bat.x === game.player.x && bat.z === game.player.z) {
+                                bat.attacking = true;
+                            }
+                        } else {
+                            // Hit wall, turn around
+                            bat.dir = (bat.dir + 2) % 4;
+                        }
+                    }
+                }
+            }
+        }
+
+        function interact() {
+            for (let m of merchants) {
+                if (m.x === game.player.x && m.z === game.player.z) {
+                    openTrade(m);
+                    return;
+                }
+            }
+
+            if (game.player.x === 11 && game.player.z === 1) {
+                if (game.hasKey) {
+                    game.gameWon = true;
+                    document.getElementById('finalGold').textContent = game.gold;
+                    document.getElementById('victoryScreen').classList.add('active');
+                } else {
+                    setMessage('THE DOOR IS LOCKED!<br>YOU NEED THE ESCAPE KEY.<br>BUY IT FROM ANY MERCHANT FOR 500 GOLD.');
+                }
+                return;
+            }
+
+            setMessage('NOTHING HERE TO INTERACT WITH.');
+        }
+
+        function rest() {
+            setMessage('YOU REST FOR A MOMENT.<br>THE DUNGEON IS QUIET...');
+        }
+
+        function openTrade(merchant) {
+            currentMerchant = merchant;
+            document.getElementById('merchantTitle').textContent = merchant.name;
+            document.getElementById('merchantSubtitle').textContent = roomColors[merchant.room].name;
+            
+            const itemList = document.getElementById('itemList');
+            itemList.innerHTML = '';
+
+            Object.entries(merchant.prices).forEach(([item, data]) => {
+                const div = document.createElement('div');
+                div.className = 'item-row';
+                div.innerHTML = `
+                    <div class="item-name">${itemNames[item]}</div>
+                    <div class="item-info">${data.reason}<br>YOU HAVE: ${game.inventory[item]}</div>
+                    <div class="item-actions">
+                        <button class="btn" onclick="buyItem('${item}')">BUY ${data.buy}G</button>
+                        <button class="btn" onclick="sellItem('${item}')">SELL ${data.sell}G</button>
+                    </div>
+                `;
+                itemList.appendChild(div);
+            });
+
+            const keyDiv = document.createElement('div');
+            keyDiv.className = 'item-row';
+            keyDiv.style.border = '3px solid #FFFF55';
+            keyDiv.innerHTML = `
+                <div class="item-name">★ ESCAPE KEY ★</div>
+                <div class="item-info">UNLOCKS THE EXIT DOOR<br>YOU NEED: 500 GOLD | YOU HAVE: ${game.gold} GOLD</div>
+                <button class="btn" onclick="buyKey()" ${game.hasKey ? 'disabled' : ''} style="grid-column: 1 / -1;">
+                    ${game.hasKey ? 'ALREADY PURCHASED' : 'BUY 500G'}
+                </button>
+            `;
+            itemList.appendChild(keyDiv);
+
+            document.getElementById('tradingMenu').classList.add('active');
+        }
+
+        function closeTrade() {
+            document.getElementById('tradingMenu').classList.remove('active');
+            currentMerchant = null;
+        }
+
+        function buyItem(item) {
+            const price = currentMerchant.prices[item].buy;
+            if (game.gold >= price) {
+                game.gold -= price;
+                game.inventory[item]++;
+                updateUI();
+                setMessage(`PURCHASED ${itemNames[item]} FOR ${price} GOLD.`);
+                openTrade(currentMerchant);
+            } else {
+                setMessage('NOT ENOUGH GOLD!');
+            }
+        }
+
+        function sellItem(item) {
+            if (game.inventory[item] > 0) {
+                const price = currentMerchant.prices[item].sell;
+                game.gold += price;
+                game.inventory[item]--;
+                updateUI();
+                setMessage(`SOLD ${itemNames[item]} FOR ${price} GOLD.`);
+                openTrade(currentMerchant);
+            } else {
+                setMessage(`YOU DON'T HAVE ANY ${itemNames[item]}!`);
+            }
+        }
+
+        function buyKey() {
+            if (game.gold >= 500) {
+                game.gold -= 500;
+                game.hasKey = true;
+                updateUI();
+                setMessage('PURCHASED ESCAPE KEY!<br>HEAD TO THE EXIT CHAMBER!');
+                closeTrade();
+            } else {
+                setMessage(`NOT ENOUGH GOLD!<br>YOU HAVE ${game.gold}. NEED 500.`);
+            }
+        }
+
+        function isWall(x, z) {
+            if (x < 0 || x >= MAP_SIZE || z < 0 || z >= MAP_SIZE) return true;
+            return map[z][x] === CELL_WALL;
+        }
+
+        function isDoor(x, z) {
+            if (x < 0 || x >= MAP_SIZE || z < 0 || z >= MAP_SIZE) return false;
+            return map[z][x] === CELL_DOOR;
+        }
+
+        function isMerchant(x, z) {
+            return merchants.some(m => m.x === x && m.z === z);
+        }
+
+        function isBat(x, z) {
+            return bats.some(b => b.x === x && b.z === z);
+        }
+
+        function adjustBrightness(color, factor) {
+            const hex = color.replace('#', '');
+            const r = Math.floor(parseInt(hex.substr(0, 2), 16) * factor);
+            const g = Math.floor(parseInt(hex.substr(2, 2), 16) * factor);
+            const b = Math.floor(parseInt(hex.substr(4, 2), 16) * factor);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function drawBrickWall(x, y, w, h, color, brightness) {
+            ctx.fillStyle = adjustBrightness(color, brightness);
+            ctx.fillRect(x, y, w, h);
+            
+            ctx.strokeStyle = adjustBrightness('#000000', brightness * 0.5);
+            ctx.lineWidth = 2;
+            
+            const brickW = 40;
+            const brickH = 20;
+            
+            for (let row = 0; row < h / brickH; row++) {
+                for (let col = 0; col < w / brickW; col++) {
+                    const bx = x + col * brickW + (row % 2) * (brickW / 2);
+                    const by = y + row * brickH;
+                    
+                    if (bx < x + w) {
+                        ctx.strokeRect(bx, by, Math.min(brickW, x + w - bx), brickH);
+                    }
+                }
+            }
+            
+            ctx.fillStyle = adjustBrightness(color, brightness * 0.7);
+            for (let i = 0; i < 5; i++) {
+                const bx = x + (Math.floor(Math.random() * (w / brickW)) * brickW);
+                const by = y + (Math.floor(Math.random() * (h / brickH)) * brickH);
+                ctx.fillRect(bx + 2, by + 2, brickW - 4, brickH - 4);
+            }
+        }
+
+        function drawStore(x, y, w, h, wallColor) {
+            // Draw as pixel art style with dithering and shading
+            
+            // Stone wall background with texture
+            ctx.fillStyle = '#8B7355';
+            ctx.fillRect(x, y, w, h);
+            
+            // Add stone texture with dithering
+            ctx.fillStyle = '#6B5345';
+            for (let py = y; py < y + h; py += 4) {
+                for (let px = x; px < x + w; px += 4) {
+                    if ((px + py) % 8 === 0) {
+                        ctx.fillRect(px, py, 2, 2);
+                    }
+                }
+            }
+            
+            // Wooden merchant stall frame
+            ctx.fillStyle = '#4A3520';
+            ctx.fillRect(x + 50, y + 40, 20, h - 80);  // Left post
+            ctx.fillRect(x + w - 70, y + 40, 20, h - 80); // Right post
+            ctx.fillRect(x + 50, y + 40, w - 100, 25); // Top beam
+            
+            // Wood grain
+            ctx.strokeStyle = '#3A2510';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.moveTo(x + 50, y + 45 + i * 4);
+                ctx.lineTo(x + w - 70, y + 45 + i * 4);
+                ctx.stroke();
+            }
+            
+            // Fabric awning - red with shading
+            const awningHeight = 50;
+            for (let i = 0; i < awningHeight; i++) {
+                const shade = 200 - i * 2;
+                ctx.fillStyle = `rgb(${shade}, 0, 0)`;
+                ctx.fillRect(x + 70, y + 10 + i, w - 140, 1);
+            }
+            
+            // Awning support ropes
+            ctx.strokeStyle = '#654321';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x + 70, y + 40);
+            ctx.lineTo(x + 50, y + 40);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x + w - 70, y + 40);
+            ctx.lineTo(x + w - 50, y + 40);
+            ctx.stroke();
+            
+            // Counter with depth and shading
+            const counterTop = y + h - 130;
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(x + 80, counterTop, w - 160, 15);
+            
+            // Counter front with shading
+            for (let i = 0; i < 50; i++) {
+                const shade = 80 - i;
+                ctx.fillStyle = `rgb(${shade}, ${Math.floor(shade * 0.6)}, ${Math.floor(shade * 0.3)})`;
+                ctx.fillRect(x + 80, counterTop + 15 + i, w - 160, 1);
+            }
+            
+            // Goods on counter - pixel art style
+            
+            // Stack of bread loaves
+            for (let i = 0; i < 3; i++) {
+                const breadY = counterTop - 10 - i * 15;
+                // Bread outline
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(x + 120, breadY, 50, 18);
+                // Bread highlight
+                ctx.fillStyle = '#CD853F';
+                ctx.fillRect(x + 125, breadY + 3, 40, 10);
+                // Bread detail
+                ctx.fillStyle = '#8B4513';
+                for (let d = 0; d < 3; d++) {
+                    ctx.fillRect(x + 130 + d * 12, breadY + 6, 8, 2);
+                }
+            }
+            
+            // Gem pile - pixel art crystals
+            const gemX = x + 280;
+            const gemY = counterTop - 15;
+            
+            // Purple gem
+            ctx.fillStyle = '#8B008B';
+            ctx.fillRect(gemX, gemY, 12, 4);
+            ctx.fillRect(gemX + 2, gemY - 4, 8, 4);
+            ctx.fillRect(gemX + 4, gemY - 8, 4, 4);
+            ctx.fillStyle = '#FF00FF';
+            ctx.fillRect(gemX + 5, gemY - 6, 2, 2);
+            
+            // Blue gem  
+            ctx.fillStyle = '#000080';
+            ctx.fillRect(gemX + 15, gemY + 5, 12, 4);
+            ctx.fillRect(gemX + 17, gemY + 1, 8, 4);
+            ctx.fillRect(gemX + 19, gemY - 3, 4, 4);
+            ctx.fillStyle = '#0000FF';
+            ctx.fillRect(gemX + 20, gemY - 1, 2, 2);
+            
+            // Red gem
+            ctx.fillStyle = '#8B0000';
+            ctx.fillRect(gemX + 30, gemY + 2, 12, 4);
+            ctx.fillRect(gemX + 32, gemY - 2, 8, 4);
+            ctx.fillRect(gemX + 34, gemY - 6, 4, 4);
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(gemX + 35, gemY - 4, 2, 2);
+            
+            // Herbs in wooden crate
+            const herbX = x + 380;
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(herbX, counterTop - 25, 45, 30);
+            // Herb sprigs
+            ctx.fillStyle = '#228B22';
+            for (let h = 0; h < 5; h++) {
+                const hx = herbX + 5 + h * 8;
+                ctx.fillRect(hx, counterTop - 30, 3, 12);
+                ctx.fillRect(hx - 2, counterTop - 32, 2, 2);
+                ctx.fillRect(hx + 3, counterTop - 32, 2, 2);
+                ctx.fillRect(hx - 2, counterTop - 28, 2, 2);
+                ctx.fillRect(hx + 3, counterTop - 28, 2, 2);
+            }
+            
+            // Ore chunks - gray with highlights
+            const oreX = x + 470;
+            ctx.fillStyle = '#696969';
+            ctx.fillRect(oreX, counterTop - 20, 30, 25);
+            ctx.fillRect(oreX + 20, counterTop - 28, 25, 20);
+            ctx.fillStyle = '#A9A9A9';
+            ctx.fillRect(oreX + 5, counterTop - 18, 8, 8);
+            ctx.fillRect(oreX + 25, counterTop - 24, 6, 6);
+            ctx.fillStyle = '#DCDCDC';
+            ctx.fillRect(oreX + 7, counterTop - 16, 3, 3);
+            ctx.fillRect(oreX + 27, counterTop - 22, 2, 2);
+            
+            // Merchant sprite - pixel art character
+            const merchX = x + w / 2 - 20;
+            const merchY = counterTop - 100;
+            
+            // Hat
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(merchX - 5, merchY, 50, 8);
+            ctx.fillRect(merchX + 5, merchY - 10, 30, 10);
+            
+            // Head
+            ctx.fillStyle = '#FFDAB9';
+            ctx.fillRect(merchX + 8, merchY + 8, 24, 28);
+            
+            // Eyes
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(merchX + 13, merchY + 16, 4, 4);
+            ctx.fillRect(merchX + 23, merchY + 16, 4, 4);
+            
+            // Nose
+            ctx.fillStyle = '#CD853F';
+            ctx.fillRect(merchX + 18, merchY + 22, 4, 6);
+            
+            // Smile
+            ctx.fillStyle = '#8B0000';
+            ctx.fillRect(merchX + 14, merchY + 30, 12, 2);
+            
+            // Beard
+            ctx.fillStyle = '#696969';
+            ctx.fillRect(merchX + 10, merchY + 32, 20, 8);
+            for (let b = 0; b < 4; b++) {
+                ctx.fillRect(merchX + 12 + b * 4, merchY + 40, 3, 4);
+            }
+            
+            // Body - ONE PIECE brown robe (no separate parts!)
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(merchX - 5, merchY + 40, 50, 50);
+            
+            // Robe shading on right side
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(merchX + 25, merchY + 40, 20, 50);
+            
+            // White apron over robe - covers everything
+            ctx.fillStyle = '#F5F5DC';
+            ctx.fillRect(merchX + 5, merchY + 45, 30, 45);
+            
+            // Apron tie at neck
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(merchX + 15, merchY + 40, 10, 5);
+            
+            // Belt with buckle
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(merchX - 5, merchY + 65, 50, 4);
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(merchX + 16, merchY + 64, 8, 6);
+            
+            // Arms coming out from sides
+            ctx.fillStyle = '#FFDAB9';
+            ctx.fillRect(merchX - 10, merchY + 50, 8, 20);
+            ctx.fillRect(merchX + 42, merchY + 50, 8, 20);
+            
+            // Hands pointing at goods
+            ctx.fillRect(merchX - 14, merchY + 70, 8, 8);
+            ctx.fillRect(merchX + 46, merchY + 70, 8, 8);
+            
+            // Thick border for visibility
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(x + 2, y + 2, w - 4, h - 4);
+            
+            // Text INSIDE the canvas, not below it
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 24px Courier New';
+            ctx.textAlign = 'center';
+            ctx.fillText('MERCHANT', x + w/2 + 2, y + h - 22);
+            
+            ctx.fillStyle = '#FFD700';
+            ctx.fillText('MERCHANT', x + w/2, y + h - 24);
+            
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 18px Courier New';
+            ctx.fillText('PRESS E TO TRADE', x + w/2 + 2, y + h - 3);
+            
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText('PRESS E TO TRADE', x + w/2, y + h - 5);
+        }
+
+        function render() {
+            const p = game.player;
+            const room = getCurrentRoom();
+            
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const roomColor = room >= 0 ? roomColors[room] : { wall: '#555555', floor: '#333333' };
+
+            // Ceiling
+            const ceilingGradient = ctx.createLinearGradient(0, 0, 0, 200);
+            ceilingGradient.addColorStop(0, '#000000');
+            ceilingGradient.addColorStop(1, adjustBrightness(roomColor.wall, 0.3));
+            ctx.fillStyle = ceilingGradient;
+            ctx.fillRect(0, 0, 800, 200);
+
+            // Floor
+            const floorGradient = ctx.createLinearGradient(0, 200, 0, 400);
+            floorGradient.addColorStop(0, adjustBrightness(roomColor.floor, 0.6));
+            floorGradient.addColorStop(1, adjustBrightness(roomColor.floor, 1.0));
+            ctx.fillStyle = floorGradient;
+            ctx.fillRect(0, 200, 800, 200);
+            
+            // Floor grid
+            ctx.strokeStyle = adjustBrightness(roomColor.floor, 0.4);
+            ctx.lineWidth = 1;
+            for (let i = 1; i < 5; i++) {
+                const y = 200 + i * 40;
+                ctx.beginPath();
+                ctx.moveTo(100 - i * 10, y);
+                ctx.lineTo(700 + i * 10, y);
+                ctx.stroke();
+            }
+
+            const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+            const [dx, dz] = dirs[p.dir];
+            
+            const walls = [];
+            for (let depth = 1; depth <= 3; depth++) {
+                const x = p.x + dx * depth;
+                const z = p.z + dz * depth;
+                const leftX = p.x + dirs[(p.dir + 3) % 4][0] * depth + dx * (depth - 1);
+                const leftZ = p.z + dirs[(p.dir + 3) % 4][1] * depth + dz * (depth - 1);
+                const rightX = p.x + dirs[(p.dir + 1) % 4][0] * depth + dx * (depth - 1);
+                const rightZ = p.z + dirs[(p.dir + 1) % 4][1] * depth + dz * (depth - 1);
+                
+                walls.push({
+                    depth: depth,
+                    front: isWall(x, z),
+                    left: isWall(leftX, leftZ),
+                    right: isWall(rightX, rightZ),
+                    door: isDoor(x, z),
+                    merchant: isMerchant(x, z),
+                    bat: isBat(x, z)
+                });
+            }
+            
+            // IMPORTANT: Check if player is standing ON a merchant
+            const playerOnMerchant = isMerchant(p.x, p.z);
+            if (playerOnMerchant) {
+                // Override - show merchant as if they're in front
+                walls[0].front = true;
+                walls[0].merchant = true;
+                walls[0].door = false;
+                walls[0].bat = false;
+            }
+            
+            // Check if player is ON a bat
+            const playerOnBat = isBat(p.x, p.z);
+            if (playerOnBat) {
+                walls[0].front = true;
+                walls[0].bat = true;
+                walls[0].merchant = false;
+                walls[0].door = false;
+            }
+
+            // Depth 3
+            if (walls[2].left) {
+                drawBrickWall(200, 100, 50, 150, roomColor.wall, 0.5);
+            }
+            
+            if (walls[2].right) {
+                drawBrickWall(550, 100, 50, 150, roomColor.wall, 0.5);
+            }
+            
+            if (walls[2].front) {
+                drawBrickWall(250, 100, 300, 100, roomColor.wall, 0.6);
+            }
+
+            // Depth 2
+            if (walls[1].left) {
+                ctx.fillStyle = adjustBrightness(roomColor.wall, 0.7);
+                ctx.beginPath();
+                ctx.moveTo(100, 75);
+                ctx.lineTo(200, 75);
+                ctx.lineTo(200, 250);
+                ctx.lineTo(100, 300);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.strokeStyle = adjustBrightness('#000000', 0.4);
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 8; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(100 + i * 15, 75 + i * 28);
+                    ctx.lineTo(200, 75 + i * 25);
+                    ctx.stroke();
+                }
+            }
+            
+            if (walls[1].right) {
+                ctx.fillStyle = adjustBrightness(roomColor.wall, 0.7);
+                ctx.beginPath();
+                ctx.moveTo(600, 75);
+                ctx.lineTo(700, 75);
+                ctx.lineTo(700, 300);
+                ctx.lineTo(600, 250);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.strokeStyle = adjustBrightness('#000000', 0.4);
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 8; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(600, 75 + i * 25);
+                    ctx.lineTo(700 - i * 15, 75 + i * 28);
+                    ctx.stroke();
+                }
+            }
+            
+            if (walls[1].front) {
+                drawBrickWall(200, 75, 400, 175, roomColor.wall, 0.75);
+            }
+
+            // Depth 1
+            if (walls[0].left) {
+                ctx.fillStyle = adjustBrightness(roomColor.wall, 0.85);
+                ctx.beginPath();
+                ctx.moveTo(0, 50);
+                ctx.lineTo(100, 50);
+                ctx.lineTo(100, 350);
+                ctx.lineTo(0, 400);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.strokeStyle = adjustBrightness('#000000', 0.5);
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 12; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, 50 + i * 30);
+                    ctx.lineTo(100, 50 + i * 25);
+                    ctx.stroke();
+                }
+            }
+            
+            if (walls[0].right) {
+                ctx.fillStyle = adjustBrightness(roomColor.wall, 0.85);
+                ctx.beginPath();
+                ctx.moveTo(700, 50);
+                ctx.lineTo(800, 50);
+                ctx.lineTo(800, 400);
+                ctx.lineTo(700, 350);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.strokeStyle = adjustBrightness('#000000', 0.5);
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 12; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(700, 50 + i * 25);
+                    ctx.lineTo(800, 50 + i * 30);
+                    ctx.stroke();
+                }
+            }
+            
+            if (!walls[0].front) {
+                ctx.fillStyle = adjustBrightness(roomColor.floor, 0.5);
+                ctx.fillRect(100, 50, 600, 300);
+            } else {
+                if (walls[0].bat) {
+                    drawBrickWall(100, 50, 600, 300, roomColor.wall, 0.9);
+                    
+                    // Check if bat is attacking for animation
+                    const attackingBat = bats.find(b => b.x === p.x + dx && b.z === p.z + dz);
+                    const isAttacking = attackingBat && attackingBat.attacking;
+                    
+                    // Red warning aura if attacking
+                    if (isAttacking) {
+                        ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+                        ctx.fillRect(100, 50, 600, 300);
+                    }
+                    
+                    // Bat sprite - PIXEL ART STYLE
+                    const batX = 400;
+                    const batY = 180;
+                    
+                    // Body - dark purple pixelated
+                    ctx.fillStyle = '#4B0082';
+                    ctx.fillRect(batX - 15, batY, 30, 12);
+                    ctx.fillRect(batX - 12, batY - 8, 24, 8);
+                    ctx.fillRect(batX - 8, batY - 12, 16, 4);
+                    
+                    // Ears/horns - pixel style
+                    ctx.fillRect(batX - 10, batY - 16, 4, 4);
+                    ctx.fillRect(batX + 6, batY - 16, 4, 4);
+                    
+                    // Wings - pixelated
+                    ctx.fillStyle = '#8B008B';
+                    
+                    // Left wing
+                    ctx.fillRect(batX - 50, batY + 5, 15, 8);
+                    ctx.fillRect(batX - 40, batY, 15, 10);
+                    ctx.fillRect(batX - 30, batY - 5, 15, 12);
+                    ctx.fillRect(batX - 55, batY + 10, 10, 5);
+                    ctx.fillRect(batX - 45, batY + 13, 10, 3);
+                    
+                    // Wing membrane details
+                    ctx.fillStyle = '#6A0080';
+                    ctx.fillRect(batX - 48, batY + 7, 3, 4);
+                    ctx.fillRect(batX - 38, batY + 3, 3, 5);
+                    ctx.fillRect(batX - 28, batY - 2, 3, 6);
+                    
+                    // Right wing
+                    ctx.fillStyle = '#8B008B';
+                    ctx.fillRect(batX + 35, batY + 5, 15, 8);
+                    ctx.fillRect(batX + 25, batY, 15, 10);
+                    ctx.fillRect(batX + 15, batY - 5, 15, 12);
+                    ctx.fillRect(batX + 45, batY + 10, 10, 5);
+                    ctx.fillRect(batX + 35, batY + 13, 10, 3);
+                    
+                    // Wing membrane details
+                    ctx.fillStyle = '#6A0080';
+                    ctx.fillRect(batX + 45, batY + 7, 3, 4);
+                    ctx.fillRect(batX + 35, batY + 3, 3, 5);
+                    ctx.fillRect(batX + 25, batY - 2, 3, 6);
+                    
+                    // Eyes - glowing red pixels
+                    ctx.fillStyle = '#FF0000';
+                    ctx.shadowColor = '#FF0000';
+                    ctx.shadowBlur = 10;
+                    ctx.fillRect(batX - 8, batY - 6, 4, 6);
+                    ctx.fillRect(batX + 4, batY - 6, 4, 6);
+                    ctx.shadowBlur = 0;
+                    
+                    // Eye gleam
+                    ctx.fillStyle = '#FFFF00';
+                    ctx.fillRect(batX - 7, batY - 5, 2, 2);
+                    ctx.fillRect(batX + 5, batY - 5, 2, 2);
+                    
+                    // Fangs - white pixels
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(batX - 6, batY + 6, 3, 4);
+                    ctx.fillRect(batX + 3, batY + 6, 3, 4);
+                    
+                    // Outline for definition
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(batX - 15, batY, 30, 12);
+                    
+                    // Motion lines if attacking
+                    if (isAttacking) {
+                        ctx.strokeStyle = '#FF0000';
+                        ctx.lineWidth = 3;
+                        for (let i = 0; i < 8; i++) {
+                            const offset = i * 15;
+                            // Left side motion
+                            ctx.beginPath();
+                            ctx.moveTo(batX - 80 - offset, batY - 20 + i * 5);
+                            ctx.lineTo(batX - 60 - offset, batY - 15 + i * 5);
+                            ctx.stroke();
+                            
+                            // Right side motion  
+                            ctx.beginPath();
+                            ctx.moveTo(batX + 80 + offset, batY - 20 + i * 5);
+                            ctx.lineTo(batX + 60 + offset, batY - 15 + i * 5);
+                            ctx.stroke();
+                        }
+                    }
+                    
+                    // Border
+                    ctx.strokeStyle = isAttacking ? '#FF0000' : '#8B008B';
+                    ctx.lineWidth = 6;
+                    ctx.strokeRect(100, 50, 600, 300);
+                    
+                    // Text with pixel font feel
+                    ctx.font = 'bold 32px Courier New';
+                    ctx.fillStyle = '#000000';
+                    ctx.fillText(isAttacking ? '!!! BAT ATTACK !!!' : 'BAT AHEAD!', 
+                                isAttacking ? 272 : 312, 367);
+                    ctx.fillStyle = '#FF0000';
+                    ctx.fillText(isAttacking ? '!!! BAT ATTACK !!!' : 'BAT AHEAD!', 
+                                isAttacking ? 270 : 310, 365);
+                    
+                    ctx.font = 'bold 20px Courier New';
+                    ctx.fillStyle = '#000000';
+                    ctx.fillText('IT\'S HUNTING YOU!', 282, 392);
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillText('IT\'S HUNTING YOU!', 280, 390);
+                    
+                } else if (walls[0].door) {
+                    drawBrickWall(100, 50, 600, 300, roomColor.wall, 0.9);
+                    
+                    const doorColor = game.hasKey ? '#00AA00' : '#AA0000';
+                    ctx.fillStyle = doorColor;
+                    ctx.fillRect(250, 75, 300, 250);
+                    
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 6;
+                    ctx.strokeRect(250, 75, 300, 250);
+                    
+                    ctx.strokeStyle = adjustBrightness(doorColor, 0.6);
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(270, 95, 130, 100);
+                    ctx.strokeRect(420, 95, 110, 100);
+                    ctx.strokeRect(270, 210, 130, 100);
+                    ctx.strokeRect(420, 210, 110, 100);
+                    
+                    ctx.fillStyle = '#FFD700';
+                    ctx.beginPath();
+                    ctx.arc(500, 200, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(495, 210, 10, 20);
+                    
+                    ctx.font = 'bold 24px Courier New';
+                    ctx.fillStyle = game.hasKey ? '#00FF00' : '#FF0000';
+                    ctx.fillText('EXIT DOOR', 320, 360);
+                    if (!game.hasKey) {
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillText('LOCKED - NEED KEY', 260, 385);
+                    }
+                    
+                } else if (walls[0].merchant) {
+                    drawStore(100, 50, 600, 300, roomColor.wall);
+                    
+                } else {
+                    drawBrickWall(100, 50, 600, 300, roomColor.wall, 1.0);
+                }
+            }
+
+            drawMinimap();
+        }
+
+        function drawMinimap() {
+            const ctx = minimapCtx;
+            const cellSize = 9;
+            
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, 120, 120);
+            
+            for (let z = 0; z < MAP_SIZE; z++) {
+                for (let x = 0; x < MAP_SIZE; x++) {
+                    if (map[z][x] === CELL_WALL) {
+                        ctx.fillStyle = '#AAAAFF';
+                    } else if (map[z][x] === CELL_DOOR) {
+                        ctx.fillStyle = game.hasKey ? '#00FF00' : '#FF0000';
+                    } else if (map[z][x] === CELL_MERCHANT) {
+                        ctx.fillStyle = '#FFFF55';
+                    } else {
+                        ctx.fillStyle = '#333333';
+                    }
+                    ctx.fillRect(x * cellSize, z * cellSize, cellSize - 1, cellSize - 1);
+                }
+            }
+            
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(game.player.x * cellSize + 2, game.player.z * cellSize + 2, cellSize - 4, cellSize - 4);
+            
+            ctx.fillStyle = '#8B008B';
+            for (let bat of bats) {
+                ctx.fillRect(bat.x * cellSize + 3, bat.z * cellSize + 3, cellSize - 6, cellSize - 6);
+            }
+            
+            const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+            const [dx, dz] = dirs[game.player.dir];
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(game.player.x * cellSize + 4, game.player.z * cellSize + 4);
+            ctx.lineTo((game.player.x + dx * 0.5) * cellSize + 4, (game.player.z + dz * 0.5) * cellSize + 4);
+            ctx.stroke();
+        }
+
+        window.addEventListener('keydown', (e) => {
+            switch(e.key.toLowerCase()) {
+                case 'w':
+                case 'arrowup':
+                    moveForward();
+                    break;
+                case 's':
+                case 'arrowdown':
+                    moveBackward();
+                    break;
+                case 'a':
+                case 'arrowleft':
+                    turnLeft();
+                    break;
+                case 'd':
+                case 'arrowright':
+                    turnRight();
+                    break;
+                case 'e':
+                case ' ':
+                    interact();
+                    break;
+            }
+        });
+
+        updateUI();
+        render();
+    </script>
+</body>
+</html>
