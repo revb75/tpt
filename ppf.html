@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPF Interactive Lab</title>
+    <title>PPF Interactive Lab - Complete</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -57,11 +57,326 @@
             background: linear-gradient(135deg, var(--purple), var(--teal));
             color: white;
         }
-        .tab-btn.locked { opacity: 0.6; }
+        .tab-btn.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            position: relative;
+        }
+        .tab-btn.locked:hover {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+        }
         
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
+        /* LESSON STYLES */
+        .lesson-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            min-height: 500px;
+            position: relative;
+        }
+        
+        .lesson-slide {
+            display: none;
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        .lesson-slide.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .lesson-slide h2 {
+            font-size: 2.2rem;
+            margin-bottom: 24px;
+            color: var(--teal);
+            text-align: center;
+        }
+        
+        .lesson-slide h3 {
+            font-size: 1.4rem;
+            margin: 24px 0 16px;
+            color: var(--gold);
+        }
+        
+        .lesson-slide p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 16px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .example-box {
+            background: rgba(20, 184, 166, 0.1);
+            border-left: 4px solid var(--teal);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .choice-container {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .choice-box {
+            background: rgba(255,255,255,0.08);
+            border: 3px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .choice-box:hover {
+            border-color: var(--gold);
+            transform: scale(1.05);
+        }
+        
+        .choice-box.selected {
+            border-color: var(--gold);
+            background: rgba(245, 158, 11, 0.2);
+        }
+        
+        .choice-box.faded {
+            opacity: 0.3;
+            transform: scale(0.95);
+        }
+        
+        .choice-box .emoji {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+        
+        .choice-box .label {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--gold);
+        }
+        
+        .vs {
+            font-size: 2rem;
+            color: var(--gold);
+            font-weight: bold;
+        }
+        
+        /* Sliding bars animation */
+        .sliding-bars {
+            margin: 40px 0;
+        }
+        
+        .bar-container {
+            margin: 20px 0;
+        }
+        
+        .bar-label {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .bar {
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            transition: width 0.8s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .bar-fill.pizza {
+            background: linear-gradient(90deg, #F59E0B, #FBBF24);
+        }
+        
+        .bar-fill.taco {
+            background: linear-gradient(90deg, #14B8A6, #2DD4BF);
+        }
+        
+        /* Interactive slider */
+        .slider-demo {
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+        }
+        
+        .slider-demo input[type="range"] {
+            width: 100%;
+            height: 8px;
+            margin: 20px 0;
+        }
+        
+        .slider-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .slider-value {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+        }
+        
+        .slider-value .icon {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+        }
+        
+        .slider-value .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--gold);
+        }
+        
+        /* PPF Curve Animation */
+        .ppf-demo {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin: 30px 0;
+        }
+        
+        .ppf-canvas {
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+        }
+        
+        /* Fill in the blank */
+        .fill-blank {
+            display: inline-block;
+            min-width: 150px;
+            padding: 8px 16px;
+            background: rgba(245, 158, 11, 0.2);
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            font-weight: bold;
+            color: var(--gold);
+            text-align: center;
+        }
+        
+        .fill-blank input {
+            background: transparent;
+            border: none;
+            color: var(--gold);
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+            outline: none;
+        }
+        
+        .fill-blank.correct {
+            border-color: var(--green);
+            background: rgba(16, 185, 129, 0.2);
+        }
+        
+        .fill-blank.incorrect {
+            border-color: var(--red);
+            background: rgba(232, 80, 91, 0.2);
+            animation: shake 0.3s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .check-btn {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, var(--teal), #2DD4BF);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+        
+        .check-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Navigation */
+        .lesson-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .nav-btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--purple), var(--teal));
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            margin: 0 20px;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--teal), var(--purple));
+            transition: width 0.3s;
+        }
+        
+        /* Other activity styles */
         .main-grid { display: grid; grid-template-columns: 1fr 360px; gap: 20px; }
         @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } }
         
@@ -79,244 +394,821 @@
             margin: 0 auto;
             cursor: crosshair; 
             border-radius: 10px;
-            touch-action: none;
         }
         
         .side-panel { display: flex; flex-direction: column; gap: 12px; }
         
         .card {
-            background: rgba(255,255,255,0.08);
-            border-radius: 14px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
             padding: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
         .card-label {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: var(--teal);
-            margin-bottom: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
         }
         
-        .production-row { display: flex; gap: 10px; }
+        .production-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
         
         .prod-box {
-            flex: 1;
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 16px;
             text-align: center;
-            padding: 14px 10px;
-            border-radius: 10px;
         }
         
-        .prod-box.pizza { background: linear-gradient(135deg, var(--purple), #7c7fbb); }
-        .prod-box.taco { background: linear-gradient(135deg, var(--red), #f27a82); }
+        .prod-box .icon { font-size: 2rem; margin-bottom: 8px; }
+        .prod-box .value { font-size: 2rem; font-weight: bold; color: white; }
+        .prod-box .label { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
         
-        .prod-box .icon { font-size: 1.5rem; margin-bottom: 2px; }
-        .prod-box .value { font-size: 1.8rem; font-weight: 800; }
-        .prod-box .label { font-size: 10px; font-weight: 600; letter-spacing: 1px; opacity: 0.9; }
-        
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            cursor: pointer;
-            min-height: 44px;
+        .opp-cost {
+            background: linear-gradient(135deg, var(--purple), var(--teal));
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
         }
         
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-gold { background: linear-gradient(135deg, var(--gold), #d97706); color: white; }
-        .btn-purple { background: linear-gradient(135deg, var(--purple), var(--teal)); color: white; }
-        .btn-teal { background: var(--teal); color: var(--navy); }
+        .opp-cost .label { font-size: 0.75rem; font-weight: 600; margin-bottom: 8px; opacity: 0.9; }
+        .opp-cost .text { font-size: 0.95rem; line-height: 1.4; }
+        .opp-cost .highlight { color: var(--gold); font-weight: bold; }
         
         .status-badge {
+            padding: 12px 16px;
+            border-radius: 50px;
             text-align: center;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 700;
+            font-weight: 600;
             font-size: 0.85rem;
         }
         
-        .status-badge.efficient { background: var(--teal); color: var(--navy); }
-        .status-badge.inefficient { background: var(--red); color: white; }
-        .status-badge.impossible { background: var(--purple); color: white; }
+        .status-badge.efficient { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 2px solid var(--green); }
+        .status-badge.inefficient { background: rgba(232, 80, 91, 0.2); color: var(--red); border: 2px solid var(--red); }
+        .status-badge.impossible { background: rgba(91, 94, 166, 0.2); color: var(--purple); border: 2px solid var(--purple); }
         
-        .opp-cost {
-            background: linear-gradient(135deg, var(--teal), #2dd4bf);
-            border-radius: 10px;
-            padding: 14px;
-            text-align: center;
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            width: 100%;
         }
         
-        .opp-cost .label { font-size: 10px; font-weight: 700; color: rgba(0,0,0,0.5); }
-        .opp-cost .text { color: var(--navy); font-size: 0.95rem; font-weight: 600; margin-top: 4px; }
-        .opp-cost .highlight { font-weight: 800; }
+        .btn:hover { background: rgba(255,255,255,0.15); }
+        .btn-purple { background: linear-gradient(135deg, var(--purple), #7D80C8); }
+        .btn-teal { background: linear-gradient(135deg, var(--teal), #17D4BB); }
+        .btn-gold { background: linear-gradient(135deg, var(--gold), #FBBF24); color: #1a1b2e; }
+        .btn-green { background: linear-gradient(135deg, var(--green), #22C55E); }
+        .btn-red { background: linear-gradient(135deg, var(--red), #EF4444); }
         
         .instructions {
-            text-align: center;
-            padding: 10px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.7);
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
         }
         
-        .instructions strong { color: var(--teal); }
-        
-        /* Bidding */
-        .bid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .score-pill {
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(245, 158, 11, 0.2);
-            padding: 6px 14px; border-radius: 50px;
-            border: 2px solid var(--gold);
-            font-weight: 700; color: var(--gold);
-        }
-        .round-info { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
-        .question-card {
-            background: linear-gradient(135deg, var(--purple), #4a4d8a);
-            border-radius: 14px; padding: 20px;
-            text-align: center; margin-bottom: 12px;
-        }
-        .question-card .scenario { font-size: 0.85rem; opacity: 0.8; margin-bottom: 8px; }
-        .question-card .question { font-size: 1.1rem; font-weight: 700; line-height: 1.4; }
-        .question-card .highlight { color: var(--gold); }
-        .bid-input-area {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px; padding: 16px; text-align: center;
-        }
-        .bid-input-area label { display: block; font-size: 0.85rem; margin-bottom: 10px; opacity: 0.8; }
-        .bid-input {
-            width: 140px; padding: 12px;
-            font-size: 1.8rem; font-weight: 800;
-            text-align: center;
-            border: 3px solid var(--purple);
+        /* Space Shooter */
+        #space-canvas {
+            background: #000;
+            display: block;
+            margin: 20px auto;
+            border: 3px solid var(--teal);
             border-radius: 10px;
+        }
+        
+        .space-hud {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .space-stat {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .space-stat .label { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+        .space-stat .value { font-size: 1.5rem; font-weight: bold; }
+        
+        .space-controls {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+        
+        .space-controls h4 { margin-bottom: 12px; font-size: 0.9rem; }
+        .space-controls p { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin: 4px 0; }
+        
+        .term-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .term-btn {
+            padding: 10px;
             background: rgba(255,255,255,0.1);
-            color: white; outline: none;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .bid-input:focus { border-color: var(--teal); }
-        .bid-result { margin-top: 12px; padding: 16px; border-radius: 12px; text-align: center; display: none; }
-        .bid-result.show { display: block; }
-        .bid-result.perfect { background: rgba(16, 185, 129, 0.2); border: 2px solid var(--green); }
-        .bid-result.close { background: rgba(245, 158, 11, 0.2); border: 2px solid var(--gold); }
-        .bid-result.off { background: rgba(232, 80, 91, 0.2); border: 2px solid var(--red); }
-        .bid-result .points { font-size: 1.5rem; font-weight: 800; }
-        .bid-result .explanation { font-size: 0.85rem; margin-top: 6px; opacity: 0.9; }
         
-        /* Tycoon */
-        .tycoon-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-        .stat-pills { display: flex; gap: 8px; flex-wrap: wrap; }
-        .stat-pill { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 50px; font-size: 0.85rem; font-weight: 700; }
-        .stat-pill.cash { background: rgba(16, 185, 129, 0.2); border: 2px solid var(--green); color: var(--green); }
-        .stat-pill.rep { background: rgba(245, 158, 11, 0.2); border: 2px solid var(--gold); color: var(--gold); }
-        .stat-pill.week { background: rgba(91, 94, 166, 0.3); border: 2px solid var(--purple); color: white; }
-        .event-banner { background: linear-gradient(135deg, var(--red), #c44); border-radius: 12px; padding: 14px; margin-bottom: 12px; display: none; }
-        .event-banner.show { display: block; }
-        .event-banner .event-title { font-weight: 800; font-size: 1rem; }
-        .event-banner .event-desc { font-size: 0.85rem; opacity: 0.9; margin-top: 4px; }
-        .market-section { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-        .market-section h4 { font-size: 0.75rem; letter-spacing: 1px; color: var(--teal); margin-bottom: 10px; }
-        .market-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .market-item { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; text-align: center; }
-        .market-item .price { font-size: 1.2rem; font-weight: 800; }
-        .market-item .item-name { font-size: 0.75rem; opacity: 0.7; }
-        .competitors { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-        .competitors h4 { font-size: 0.75rem; letter-spacing: 1px; color: var(--gold); margin-bottom: 10px; }
-        .competitor { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .competitor:last-child { border-bottom: none; }
-        .competitor .name { font-weight: 600; }
-        .competitor .strategy { font-size: 0.8rem; opacity: 0.7; }
-        .orders-section { background: rgba(245, 158, 11, 0.1); border: 2px solid var(--gold); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-        .orders-section h4 { font-size: 0.75rem; letter-spacing: 1px; color: var(--gold); margin-bottom: 10px; }
-        .order-card { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-        .order-card:last-child { margin-bottom: 0; }
-        .order-info .order-req { font-weight: 700; font-size: 0.95rem; }
-        .order-info .order-bonus { font-size: 0.8rem; color: var(--green); }
-        .order-actions { display: flex; gap: 6px; }
-        .order-btn { padding: 8px 14px; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; min-height: 44px; }
-        .order-btn.accept { background: var(--green); color: white; }
-        .order-btn.reject { background: rgba(255,255,255,0.2); color: white; }
-        .production-select { background: rgba(91, 94, 166, 0.2); border: 2px solid var(--purple); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-        .production-select h4 { font-size: 0.75rem; letter-spacing: 1px; color: white; margin-bottom: 10px; }
-        .projected-profit { background: var(--green); border-radius: 10px; padding: 12px; text-align: center; margin: 12px 0; }
-        .projected-profit .label { font-size: 0.75rem; color: rgba(0,0,0,0.6); }
-        .projected-profit .amount { font-size: 1.5rem; font-weight: 800; color: white; }
-        
-        /* Modals */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-overlay.show { display: flex; }
-        .modal { background: var(--navy); border-radius: 20px; padding: 24px; max-width: 500px; width: 90%; border: 2px solid var(--purple); }
-        .modal h2 { text-align: center; margin-bottom: 16px; color: var(--gold); }
-        .modal p { text-align: center; font-size: 0.9rem; opacity: 0.8; margin-bottom: 16px; }
-        .upgrade-grid { display: flex; flex-direction: column; gap: 10px; }
-        .upgrade-option { background: rgba(255,255,255,0.08); border: 2px solid transparent; border-radius: 12px; padding: 14px; cursor: pointer; }
-        .upgrade-option:hover { border-color: var(--teal); }
-        .upgrade-option.selected { border-color: var(--gold); background: rgba(245, 158, 11, 0.2); }
-        .upgrade-option.owned { opacity: 0.5; cursor: not-allowed; }
-        .upgrade-option .upgrade-name { font-weight: 700; margin-bottom: 4px; }
-        .upgrade-option .upgrade-desc { font-size: 0.85rem; opacity: 0.8; }
-        .upgrade-option .upgrade-cost { font-size: 0.85rem; color: var(--gold); margin-top: 6px; }
-        
-        /* Game over */
-        .game-over { text-align: center; padding: 40px 20px; display: none; }
-        .game-over.show { display: block; }
-        .game-over h2 { font-size: 2rem; color: var(--gold); }
-        .final-score { font-size: 3rem; font-weight: 800; color: var(--gold); margin: 16px 0; }
-        .final-rep { font-size: 1.2rem; color: var(--gold); margin-bottom: 20px; }
-        .restart-btn { padding: 14px 32px; border: none; border-radius: 50px; font-size: 1rem; font-weight: 700; cursor: pointer; background: var(--purple); color: white; }
-        
-        /* Sound toggle */
-        .sound-toggle { position: fixed; bottom: 16px; right: 16px; background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; font-size: 1.3rem; }
-        
-        /* Help button */
-        .help-btn { position: fixed; bottom: 16px; right: 70px; background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; font-size: 1.3rem; color: white; }
-        
-        /* Instruction modals */
-        .instruction-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000;
+        .term-btn:hover { background: rgba(255,255,255,0.15); }
+        .term-btn.selected { 
+            border-color: var(--gold);
+            background: rgba(245, 158, 11, 0.2);
         }
-        .instruction-modal.show { display: flex; }
-        .instruction-content {
-            background: linear-gradient(135deg, var(--navy), #1a1b2e);
-            border-radius: 20px; padding: 30px; max-width: 500px; width: 90%;
-            border: 2px solid var(--teal); max-height: 85vh; overflow-y: auto;
+        
+        /* Escape Room */
+        .escape-container {
+            background: #0a0a0a;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid var(--teal);
+            font-family: 'Courier New', monospace;
         }
-        .instruction-content h2 { text-align: center; margin-bottom: 16px; font-size: 1.5rem; }
-        .instruction-content h2.explore-title { color: var(--teal); }
-        .instruction-content h2.bidding-title { color: var(--gold); }
-        .instruction-content h2.tycoon-title { color: var(--red); }
-        .instruction-content p { margin-bottom: 12px; line-height: 1.5; font-size: 0.95rem; }
-        .instruction-content ul { margin: 12px 0 12px 20px; }
-        .instruction-content li { margin-bottom: 8px; line-height: 1.4; }
-        .instruction-content .zone-list { list-style: none; margin-left: 0; }
-        .instruction-content .zone-list li { padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; }
-        .instruction-content .zone-efficient { background: rgba(20, 184, 166, 0.2); border-left: 3px solid var(--teal); }
-        .instruction-content .zone-inefficient { background: rgba(232, 80, 91, 0.2); border-left: 3px solid var(--red); }
-        .instruction-content .zone-impossible { background: rgba(91, 94, 166, 0.2); border-left: 3px solid var(--purple); }
-        .instruction-content .dont-show { display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 0.85rem; opacity: 0.8; }
-        .instruction-content .close-btn { width: 100%; margin-top: 16px; }
+        
+        #escape-output {
+            height: 400px;
+            overflow-y: auto;
+            background: #000;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #0f0;
+        }
+        
+        #escape-input {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            border: 2px solid var(--teal);
+            border-radius: 8px;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        /* Quiz */
+        .quiz-question {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .quiz-question h3 {
+            color: var(--teal);
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+        }
+        
+        .quiz-question p {
+            margin-bottom: 16px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .quiz-option {
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        
+        .quiz-option:hover { background: rgba(255,255,255,0.1); border-color: var(--teal); }
+        .quiz-option.selected { border-color: var(--gold); background: rgba(245, 158, 11, 0.15); }
+        .quiz-option.correct { border-color: var(--green); background: rgba(16, 185, 129, 0.15); }
+        .quiz-option.incorrect { border-color: var(--red); background: rgba(232, 80, 91, 0.15); }
+        
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .quiz-results {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .quiz-results .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--teal), var(--purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 3rem;
+            font-weight: bold;
+        }
+        
+        .game-over {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .game-over.active { display: block; }
+        .game-over h2 { font-size: 2rem; margin-bottom: 16px; }
+        .game-over .final-score { font-size: 4rem; font-weight: bold; color: var(--gold); margin: 20px 0; }
+        
+        .restart-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--purple), var(--teal));
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .help-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--purple), var(--teal));
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        /* MILLIONAIRE STYLES */
+        .millionaire-container {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 850px) {
+            .millionaire-container {
+                grid-template-columns: 1fr;
+            }
+            .money-ladder {
+                order: 2;
+            }
+        }
+        
+        .money-ladder {
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 16px;
+            border: 2px solid var(--gold);
+        }
+        
+        .money-step {
+            padding: 10px;
+            margin: 4px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        
+        .money-step.current {
+            background: linear-gradient(135deg, var(--gold), #FBBF24);
+            color: #1a1b2e;
+            transform: scale(1.1);
+            border-color: var(--gold);
+        }
+        
+        .money-step.won {
+            background: rgba(16,185,129,0.2);
+            border-color: var(--green);
+            color: var(--green);
+        }
+        
+        .question-area {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 30px;
+            border: 2px solid var(--teal);
+        }
+        
+        .question-number {
+            text-align: center;
+            color: var(--teal);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .question-text {
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+        
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .answer-option {
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            text-align: left;
+        }
+        
+        .answer-option:hover:not(.disabled) {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--gold);
+            transform: scale(1.02);
+        }
+        
+        .answer-option.selected {
+            border-color: var(--gold);
+            background: rgba(245,158,11,0.2);
+        }
+        
+        .answer-option.correct {
+            border-color: var(--green);
+            background: rgba(16,185,129,0.2);
+            animation: correctPulse 0.5s;
+        }
+        
+        .answer-option.incorrect {
+            border-color: var(--red);
+            background: rgba(232,80,91,0.2);
+            animation: shake 0.5s;
+        }
+        
+        .answer-option.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .answer-option .letter {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--gold);
+            color: #1a1b2e;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .lifelines {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .lifeline-btn {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--teal);
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .lifeline-btn:hover:not(:disabled) {
+            background: rgba(20,184,166,0.2);
+            transform: scale(1.05);
+        }
+        
+        .lifeline-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: rgba(255,255,255,0.2);
+        }
+        
+        .lifeline-icon {
+            font-size: 1.5rem;
+        }
+        
+        .lifeline-name {
+            font-size: 0.75rem;
+        }
+        
+        .mill-actions {
+            text-align: center;
+        }
+        
+        .mill-result {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .mill-result h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: var(--teal);
+        }
+        
+        .mill-final-amount {
+            font-size: 5rem;
+            font-weight: bold;
+            color: var(--gold);
+            margin: 30px 0;
+            text-shadow: 0 0 20px rgba(245,158,11,0.5);
+        }
+        
+        .audience-poll {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+        }
+        
+        .poll-bar {
+            text-align: center;
+        }
+        
+        .poll-letter {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .poll-bar-fill {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            height: 100px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+        }
+        
+        .poll-bar-inner {
+            width: 100%;
+            background: linear-gradient(135deg, var(--teal), var(--purple));
+            border-radius: 8px 8px 0 0;
+            transition: height 1s ease-out;
+        }
+        
+        .poll-percent {
+            margin-top: 8px;
+            font-weight: bold;
+            color: var(--teal);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>PPF Interactive Lab</h1>
-            <p class="subtitle">Learn opportunity cost by doing</p>
-            <p style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:4px;">Best on Chromebook, laptop, or desktop</p>
+            <p class="subtitle">Master opportunity cost through interactive learning</p>
         </header>
         
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('explore')">Explore</button>
-            <button class="tab-btn" onclick="switchTab('bidding')">Bidding War</button>
-            <button class="tab-btn locked" id="tycoon-tab-btn" onclick="switchTab('tycoon')">🔒 Factory Tycoon</button>
+            <button class="tab-btn active" onclick="switchTab('learn')">📖 Learn</button>
+            <button class="tab-btn" onclick="switchTab('explore')">🔍 Explore</button>
+            <button class="tab-btn" onclick="switchTab('millionaire')">💰 Millionaire</button>
+            <button class="tab-btn" onclick="switchTab('quiz')">📝 Quiz</button>
+            <button class="tab-btn" onclick="switchTab('escape')">🔐 Escape Room</button>
+            <button class="tab-btn" onclick="switchTab('bonus')">🎮 Bonus Games</button>
+        </div>
+        
+        <!-- LEARN TAB -->
+        <div id="learn-tab" class="tab-content active">
+            <div class="lesson-container">
+                <!-- Slide 1: Opening -->
+                <div class="lesson-slide active" data-slide="1">
+                    <h2>The Friday Night Decision</h2>
+                    
+                    <div class="example-box" style="background: rgba(20,184,166,0.1); border-color: var(--teal);">
+                        <p style="font-size: 1.2rem; line-height: 1.8;">
+                            You saved <strong>$20</strong> from your allowance. It's Friday night.
+                        </p>
+                        <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 16px;">
+                            Your friends are going to a <strong>concert</strong> ($20 ticket).
+                        </p>
+                        <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 16px;">
+                            BUT... there's also that <strong>new pizza place</strong> you've been dying to try ($20).
+                        </p>
+                    </div>
+                    
+                    <p style="text-align: center; font-size: 1.4rem; margin: 40px 0; color: var(--gold); font-weight: bold;">
+                        You can only afford ONE. 💰
+                    </p>
+                    
+                    <div class="example-box" style="background: rgba(245,158,11,0.1); border-color: var(--gold);">
+                        <h3 style="color: var(--gold); margin: 0 0 16px 0;">Here's the Economics:</h3>
+                        <p style="font-size: 1.1rem; margin: 0;">
+                            If you choose the <strong>concert</strong>, your <strong style="color: var(--gold);">opportunity cost</strong> is the pizza you gave up.
+                        </p>
+                        <p style="font-size: 1.1rem; margin: 16px 0 0 0;">
+                            If you choose the <strong>pizza</strong>, your <strong style="color: var(--gold);">opportunity cost</strong> is the concert you gave up.
+                        </p>
+                    </div>
+                    
+                    <p style="text-align: center; font-size: 1.2rem; margin-top: 40px; color: var(--teal);">
+                        <strong>Every choice has a cost — what you give up.</strong>
+                    </p>
+                </div>
+                
+                <!-- Slide 2: Definition -->
+                <div class="lesson-slide" data-slide="2">
+                    <h2>Opportunity Cost</h2>
+                    <div class="example-box">
+                        <p style="font-size: 1.3rem; text-align: center; margin: 20px 0;">
+                            <strong>Opportunity Cost</strong> = The value of the <span class="fill-blank">next best alternative</span> you give up when making a choice.
+                        </p>
+                    </div>
+                    
+                    <p>Every choice has a cost. Not money — but what you could have had instead.</p>
+                    
+                    <h3>Three Types:</h3>
+                    <p><strong>⏰ TIME:</strong> Every hour gaming is an hour you could have spent studying.</p>
+                    <p><strong>💵 MONEY:</strong> Every $50 on sneakers is $50 you can't spend on headphones.</p>
+                    <p><strong>🏭 RESOURCES:</strong> Every car built uses steel that could have built something else.</p>
+                </div>
+                
+                <!-- Slide 3: The Sliding Trade-off -->
+                <div class="lesson-slide" data-slide="3">
+                    <h2>The Sliding Trade-off</h2>
+                    <p>Watch what happens when your factory makes more pizzas:</p>
+                    
+                    <div class="sliding-bars">
+                        <div class="bar-container">
+                            <div class="bar-label">
+                                <span>🍕 PIZZAS</span>
+                                <span id="pizza-count">10</span>
+                            </div>
+                            <div class="bar">
+                                <div class="bar-fill pizza" id="pizza-bar" style="width: 25%;">10</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bar-container">
+                            <div class="bar-label">
+                                <span>🌮 TACOS</span>
+                                <span id="taco-count">70</span>
+                            </div>
+                            <div class="bar">
+                                <div class="bar-fill taco" id="taco-bar" style="width: 70%;">70</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="check-btn" id="animate-btn" onclick="animateBars()">▶️ Watch The Slide</button>
+                    
+                    <p id="slide-message" style="text-align: center; margin-top: 30px; font-size: 1.2rem; color: var(--gold); min-height: 30px;"></p>
+                </div>
+                
+                <!-- Slide 4: Real Examples -->
+                <div class="lesson-slide" data-slide="4">
+                    <h2>Real-World Examples</h2>
+                    
+                    <div class="example-box">
+                        <h3>Example 1: Friday Night</h3>
+                        <p><strong>Option A:</strong> Game Night (play with friends)</p>
+                        <p><strong>Option B:</strong> Study Session (prep for Monday's exam)</p>
+                        <p style="margin-top: 16px;">Choose gaming? Your opportunity cost = <span class="fill-blank">the better grade</span> you gave up.</p>
+                    </div>
+                    
+                    <div class="example-box">
+                        <h3>Example 2: $150 Birthday Money</h3>
+                        <p>You can buy: <strong>Sneakers</strong>, <strong>AirPods</strong>, or put it in <strong>Savings</strong></p>
+                        <p style="margin-top: 16px;">Buy sneakers? Opportunity cost = <span class="fill-blank">AirPods or Savings</span> (whichever you wanted second most).</p>
+                    </div>
+                    
+                    <p style="margin-top: 30px; font-size: 1.1rem;"><strong>Key:</strong> It's ONLY the next best alternative. Not everything you gave up — just the ONE thing you would have picked instead.</p>
+                </div>
+                
+                <!-- Slide 5: PPF Introduction -->
+                <div class="lesson-slide" data-slide="5">
+                    <h2>The PPF Curve</h2>
+                    <p><strong>PPF</strong> = Production Possibilities Frontier</p>
+                    <p>A graph that shows opportunity cost for an entire economy.</p>
+                    
+                    <div class="ppf-demo">
+                        <canvas id="lesson-ppf-canvas" class="ppf-canvas" width="800" height="400"></canvas>
+                    </div>
+                    
+                    <p style="text-align: center; font-size: 1.1rem; margin-top: 20px;">
+                        The curve shows ALL possible combinations of pizzas and tacos your factory can make.
+                    </p>
+                </div>
+                
+                <!-- Slide 6: Interactive Slider -->
+                <div class="lesson-slide" data-slide="6">
+                    <h2>Feel The Slide</h2>
+                    <p>Drag the slider. Watch pizzas and tacos move in opposite directions.</p>
+                    
+                    <div class="slider-demo">
+                        <input type="range" id="pizza-slider" min="0" max="40" value="20" oninput="updateSlider(this.value)">
+                        
+                        <div class="slider-values">
+                            <div class="slider-value">
+                                <div class="icon">🍕</div>
+                                <div class="number" id="slider-pizzas">20</div>
+                                <div>PIZZAS</div>
+                            </div>
+                            <div class="slider-value">
+                                <div class="icon">🌮</div>
+                                <div class="number" id="slider-tacos">75</div>
+                                <div>TACOS</div>
+                            </div>
+                        </div>
+                        
+                        <p style="text-align: center; margin-top: 20px; color: var(--gold);">
+                            <strong>👉 This is the trade-off in action!</strong>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Slide 7: Three Zones + Calculation -->
+                <div class="lesson-slide" data-slide="7">
+                    <h2>Three Zones + How to Calculate</h2>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                        <div>
+                            <h3 style="color: var(--teal); margin-bottom: 16px;">See the Zones:</h3>
+                            <canvas id="zones-canvas" width="400" height="350" style="background: rgba(0,0,0,0.3); border-radius: 12px; width: 100%;"></canvas>
+                        </div>
+                        
+                        <div>
+                            <div class="example-box" style="border-color: var(--green); background: rgba(16, 185, 129, 0.1); margin-bottom: 12px;">
+                                <h3 style="color: var(--green); margin: 0 0 8px 0; font-size: 1.1rem;">🟢 ON = EFFICIENT</h3>
+                                <p style="margin: 0; font-size: 0.95rem;">Using ALL resources</p>
+                            </div>
+                            
+                            <div class="example-box" style="border-color: var(--red); background: rgba(232, 80, 91, 0.1); margin-bottom: 12px;">
+                                <h3 style="color: var(--red); margin: 0 0 8px 0; font-size: 1.1rem;">🔴 INSIDE = WASTED</h3>
+                                <p style="margin: 0; font-size: 0.95rem;">Could make more</p>
+                            </div>
+                            
+                            <div class="example-box" style="border-color: var(--purple); background: rgba(91, 94, 166, 0.1);">
+                                <h3 style="color: var(--purple); margin: 0 0 8px 0; font-size: 1.1rem;">🟣 OUTSIDE = IMPOSSIBLE</h3>
+                                <p style="margin: 0; font-size: 0.95rem;">Need more resources</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="example-box" style="background: rgba(245,158,11,0.1); border-color: var(--gold);">
+                        <h3 style="color: var(--gold); margin: 0 0 16px 0;">📊 How to Calculate Opportunity Cost:</h3>
+                        
+                        <p style="margin: 0 0 12px 0;"><strong>Given:</strong> Max production = 40 pizzas OR 100 tacos</p>
+                        
+                        <p style="margin: 0 0 8px 0;"><strong>Question:</strong> What's the opportunity cost of making 1 pizza?</p>
+                        
+                        <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin: 16px 0;">
+                            <p style="margin: 0 0 12px 0; font-size: 1.05rem;"><strong>Step 1:</strong> What do you GIVE UP? → <span style="color: var(--teal);">100 tacos</span></p>
+                            <p style="margin: 0 0 12px 0; font-size: 1.05rem;"><strong>Step 2:</strong> What do you GAIN? → <span style="color: var(--gold);">40 pizzas</span></p>
+                            <p style="margin: 0 0 12px 0; font-size: 1.05rem;"><strong>Step 3:</strong> Divide to get "PER pizza" → <span style="color: var(--teal);">100</span> ÷ <span style="color: var(--gold);">40</span> = <strong style="color: var(--green);">2.5</strong></p>
+                        </div>
+                        
+                        <p style="margin: 0; font-size: 1.1rem; text-align: center;"><strong>Answer:</strong> Making 1 pizza costs <span style="color: var(--green); font-size: 1.3rem;">2.5 tacos</span></p>
+                        
+                        <p style="margin: 16px 0 0 0; font-size: 0.95rem; color: rgba(255,255,255,0.8);"><strong>Why divide?</strong> We want cost "per unit" — how many tacos you lose for EACH pizza made. That's why 100÷40 = 2.5 tacos per pizza.</p>
+                    </div>
+                </div>
+                
+                <!-- Slide 8: Economic Growth -->
+                <div class="lesson-slide" data-slide="8">
+                    <h2>What Shifts the PPF Outward?</h2>
+                    <p>Economic growth means producing MORE of everything. The PPF curve shifts outward.</p>
+                    
+                    <h3>Four Factors That Cause Growth:</h3>
+                    
+                    <p><strong>🔧 TECHNOLOGY:</strong> Better machines, automation, new processes</p>
+                    <p><strong>👷 LABOR:</strong> Population growth, immigration, more workers</p>
+                    <p><strong>🎓 SKILLS:</strong> Better education, training, human capital</p>
+                    <p><strong>⛏️ RESOURCES:</strong> New resources like oil, land, raw materials</p>
+                    
+                    <div class="example-box">
+                        <p style="text-align: center; font-size: 1.2rem; margin: 20px 0;">
+                            <strong>Economic Growth = PPF shifting outward = more possibilities for everyone</strong>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Slide 9: Practice Question -->
+                <div class="lesson-slide" data-slide="9">
+                    <h2>Check Your Understanding</h2>
+                    
+                    <div class="example-box">
+                        <p style="font-size: 1.2rem; margin-bottom: 20px;">
+                            Your factory can make a maximum of <strong>40 pizzas</strong> OR <strong>100 tacos</strong>.
+                        </p>
+                        <p style="font-size: 1.2rem;">
+                            What is the opportunity cost of making 1 pizza?
+                        </p>
+                        <p style="text-align: center; margin: 30px 0;">
+                            Answer: <span class="fill-blank"><input type="text" id="practice-answer" placeholder="?" style="width: 100px;"></span> tacos
+                        </p>
+                        <button class="check-btn" onclick="checkPractice()">Check Answer</button>
+                        <p id="practice-feedback" style="margin-top: 16px; text-align: center; font-size: 1.1rem;"></p>
+                    </div>
+                    
+                    <p style="margin-top: 30px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">
+                        <strong>Hint:</strong> What you give up (100 tacos) ÷ What you gain (40 pizzas) = ?
+                    </p>
+                </div>
+                
+                <!-- Slide 10: Summary -->
+                <div class="lesson-slide" data-slide="10">
+                    <h2>🎉 Lesson Complete!</h2>
+                    
+                    <h3>Key Takeaways:</h3>
+                    
+                    <p>✅ <strong>Opportunity Cost</strong> = what you give up when you make a choice</p>
+                    <p>✅ It's only the <strong>next best alternative</strong>, not everything</p>
+                    <p>✅ The <strong>PPF</strong> shows all possible production combinations</p>
+                    <p>✅ When one slides UP ↗️, the other slides DOWN ↘️</p>
+                    <p>✅ <strong>On curve</strong> = efficient | <strong>Inside</strong> = wasted | <strong>Outside</strong> = impossible</p>
+                    <p>✅ <strong>Economic growth</strong> shifts the PPF outward</p>
+                    
+                    <div class="example-box" style="margin-top: 40px;">
+                        <p style="text-align: center; font-size: 1.3rem;">
+                            <strong>Ready for hands-on practice?</strong><br>
+                            Click the <strong>Explore</strong> tab to interact with the PPF!
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="lesson-nav">
+                    <button class="nav-btn" onclick="prevSlide()" id="prev-btn" disabled>← Previous</button>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 10%;"></div>
+                    </div>
+                    <button class="nav-btn primary" onclick="nextSlide()" id="next-btn">Next →</button>
+                </div>
+            </div>
         </div>
         
         <!-- EXPLORE TAB -->
-        <div id="explore-tab" class="tab-content active">
+        <div id="explore-tab" class="tab-content">
             <div class="main-grid">
                 <div class="graph-container">
                     <canvas id="exploreCanvas" width="500" height="450"></canvas>
@@ -358,882 +1250,1850 @@
                 </div>
             </div>
         </div>
-        
-        <!-- BIDDING WAR TAB -->
-        <div id="bidding-tab" class="tab-content">
-            <div class="main-grid">
-                <div class="graph-container">
-                    <canvas id="biddingCanvas" width="500" height="450"></canvas>
-                    <div class="instructions">Read the Y-axis at the target point. <strong>How many tacos can you make?</strong></div>
+
+        <!-- MILLIONAIRE TAB -->
+        <div id="millionaire-tab" class="tab-content">
+            <div class="millionaire-container">
+                <div class="money-ladder" id="money-ladder">
+                    <!-- Money values displayed here -->
                 </div>
-                <div class="side-panel">
-                    <div class="bid-header">
-                        <div class="round-info">Round <span id="bid-round">1</span>/12</div>
-                        <div class="score-pill">⭐ <span id="bid-score">0</span></div>
+                
+                <div class="question-area" id="question-area">
+                    <div class="question-number">Question <span id="mill-question-num">1</span> of 10</div>
+                    <div class="question-text" id="mill-question">Loading...</div>
+                    
+                    <div class="answers-grid" id="mill-answers">
+                        <!-- Answer options A B C D -->
                     </div>
                     
-                    <div class="question-card">
-                        <div class="scenario" id="bid-scenario">A customer places an order...</div>
-                        <div class="question" id="bid-question">
-                            If you make <span class="highlight">30 pizzas</span>, how many <span class="highlight">tacos</span> can you still produce?
-                        </div>
+                    <div class="lifelines" id="mill-lifelines">
+                        <button class="lifeline-btn" id="fifty-fifty" onclick="useFiftyFifty()">
+                            <span class="lifeline-icon">5️⃣0️⃣</span>
+                            <span class="lifeline-name">50:50</span>
+                        </button>
+                        <button class="lifeline-btn" id="audience" onclick="useAudience()">
+                            <span class="lifeline-icon">👥</span>
+                            <span class="lifeline-name">Ask Audience</span>
+                        </button>
+                        <button class="lifeline-btn" id="phone" onclick="usePhone()">
+                            <span class="lifeline-icon">📞</span>
+                            <span class="lifeline-name">Phone Friend</span>
+                        </button>
                     </div>
                     
-                    <div class="bid-input-area">
-                        <label>Your answer (tacos you CAN make):</label>
-                        <input type="number" inputmode="numeric" pattern="[0-9]*" class="bid-input" id="bid-input" min="0" max="100" placeholder="?">
-                        <div style="margin-top: 12px;">
-                            <button class="btn btn-gold" id="bid-submit" onclick="submitBid()">Lock In Answer</button>
-                        </div>
-                    </div>
-                    
-                    <div class="bid-result" id="bid-result">
-                        <div class="points" id="bid-points">+100</div>
-                        <div class="explanation" id="bid-explanation">Perfect!</div>
-                    </div>
-                    
-                    <button class="btn btn-purple" id="bid-next" onclick="nextBidRound()" style="display: none;">Next Question →</button>
-                </div>
-            </div>
-            
-            <div class="game-over" id="bidding-gameover">
-                <h2>Bidding War Complete!</h2>
-                <p>You scored</p>
-                <div class="final-score" id="final-bid-score">0</div>
-                <p>out of 1,200 points</p>
-                <p style="margin-top:16px;color:var(--teal);">🏭 Factory Tycoon is now unlocked!</p>
-                <button class="restart-btn" onclick="initBidding()">Play Again</button>
-            </div>
-        </div>
-        
-        <!-- FACTORY TYCOON TAB -->
-        <div id="tycoon-tab" class="tab-content">
-            <div id="tycoon-game">
-                <div class="tycoon-header">
-                    <div class="stat-pills">
-                        <div class="stat-pill week">📅 Week <span id="ty-week">1</span>/8</div>
-                        <div class="stat-pill cash">💵 $<span id="ty-cash">500</span></div>
-                        <div class="stat-pill rep">⭐ <span id="ty-rep">50</span> rep</div>
+                    <div class="mill-actions">
+                        <button class="btn" onclick="walkAway()" id="walk-away-btn" style="background: rgba(239,68,68,0.8);">Walk Away</button>
                     </div>
                 </div>
                 
-                <div class="event-banner" id="ty-event">
-                    <div class="event-title" id="ty-event-title">⚠️ CRISIS!</div>
-                    <div class="event-desc" id="ty-event-desc">Description</div>
+                <div class="mill-result" id="mill-result" style="display: none;">
+                    <h2 id="mill-result-title">Congratulations!</h2>
+                    <div class="mill-final-amount" id="mill-final-amount">$32,000</div>
+                    <p id="mill-result-message">You answered all 10 questions correctly!</p>
+                    <button class="restart-btn" onclick="initMillionaire()">Play Again</button>
                 </div>
-                
-                <div class="main-grid">
-                    <div class="graph-container">
-                        <canvas id="tycoonCanvas" width="500" height="450"></canvas>
-                        <div class="instructions"><strong>Click the graph</strong> to set this week's production</div>
-                    </div>
-                    
-                    <div class="side-panel">
-                        <div class="market-section">
-                            <h4>📈 MARKET PRICES</h4>
-                            <div class="market-grid">
-                                <div class="market-item">
-                                    <div class="price">$<span id="ty-pizza-price">10</span></div>
-                                    <div class="item-name">per Pizza 🍕</div>
-                                </div>
-                                <div class="market-item">
-                                    <div class="price">$<span id="ty-taco-price">5</span></div>
-                                    <div class="item-name">per Taco 🌮</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="competitors">
-                            <h4>🏭 COMPETITORS</h4>
-                            <div class="competitor">
-                                <div>
-                                    <div class="name">Big Tony's</div>
-                                    <div class="strategy" id="comp1-strategy">Making 30 pizzas</div>
-                                </div>
-                            </div>
-                            <div class="competitor">
-                                <div>
-                                    <div class="name">Taco Belle</div>
-                                    <div class="strategy" id="comp2-strategy">Making 80 tacos</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="orders-section" id="ty-orders">
-                            <h4>📋 CUSTOMER ORDERS</h4>
-                            <div id="orders-list"></div>
-                        </div>
-                        
-                        <div class="production-select">
-                            <h4>🎯 YOUR PRODUCTION</h4>
-                            <div class="production-row">
-                                <div class="prod-box pizza">
-                                    <div class="icon">🍕</div>
-                                    <div class="value" id="ty-pizza">--</div>
-                                    <div class="label">PIZZAS</div>
-                                </div>
-                                <div class="prod-box taco">
-                                    <div class="icon">🌮</div>
-                                    <div class="value" id="ty-taco">--</div>
-                                    <div class="label">TACOS</div>
-                                </div>
-                            </div>
-                            
-                            <div class="projected-profit">
-                                <div class="label">PROJECTED EARNINGS</div>
-                                <div class="amount">$<span id="ty-projected">0</span></div>
-                            </div>
-                            
-                            <button class="btn btn-gold" id="ty-confirm" onclick="confirmWeek()" disabled>Confirm Production →</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-overlay" id="upgrade-modal">
-                <div class="modal">
-                    <h2>🔧 Upgrade Shop</h2>
-                    <p>Choose ONE upgrade (or skip to save money)</p>
-                    <div class="upgrade-grid" id="upgrade-list"></div>
-                    <div style="margin-top: 16px; display: flex; gap: 10px;">
-                        <button class="btn btn-purple" style="flex: 1;" onclick="buyUpgrade()">Buy Selected</button>
-                        <button class="btn" style="flex: 1; background: rgba(255,255,255,0.2);" onclick="skipUpgrade()">Skip</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-overlay" id="summary-modal">
-                <div class="modal">
-                    <h2 id="summary-title">Week 1 Results</h2>
-                    <div id="summary-content"></div>
-                    <button class="btn btn-gold" style="margin-top: 16px;" onclick="closeSummary()">Continue</button>
-                </div>
-            </div>
-            
-            <div class="game-over" id="tycoon-gameover">
-                <h2>Season Complete!</h2>
-                <p>Your factory earned</p>
-                <div class="final-score" id="final-ty-cash">$0</div>
-                <div class="final-rep" id="final-ty-rep">⭐ 0 reputation</div>
-                <p id="ty-verdict"></p>
-                <button class="restart-btn" onclick="initTycoon()">Play Again</button>
             </div>
         </div>
+        
+        <!-- QUIZ TAB -->
+        <div id="quiz-tab" class="tab-content">
+            <div id="quiz-questions" style="max-width: 800px; margin: 0 auto;">
+                <!-- Questions loaded dynamically -->
+            </div>
+            
+            <div class="quiz-nav" id="quiz-nav" style="display: none; margin-top: 30px; text-align: center;">
+                <p style="color: rgba(255,255,255,0.6); margin-bottom: 20px;">
+                    Question <span id="quiz-current-num">1</span> of 10
+                </p>
+                <button class="btn btn-gold" onclick="submitQuizAnswer()" id="quiz-submit-btn">Submit Answer</button>
+            </div>
+            
+            <div id="quiz-certificate" style="display: none; text-align: center; padding: 40px 20px;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 40px; background: linear-gradient(135deg, rgba(20,184,166,0.1), rgba(91,94,166,0.1)); border-radius: 20px; border: 3px solid var(--gold);">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 20px; color: var(--teal);">🎓 Certificate of Completion</h2>
+                    
+                    <p style="font-size: 1.2rem; margin: 20px 0;">This certifies that</p>
+                    
+                    <p style="font-size: 2rem; font-weight: bold; color: var(--gold); margin: 20px 0;">Student</p>
+                    
+                    <p style="font-size: 1.2rem; margin: 20px 0;">has successfully completed the</p>
+                    
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--teal); margin: 20px 0;">PPF Interactive Lab Quiz</p>
+                    
+                    <div style="margin: 40px 0;">
+                        <div id="quiz-grade-circle" style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; border: 8px solid;"></div>
+                    </div>
+                    
+                    <p style="font-size: 1.3rem; margin: 20px 0;">Score: <span id="quiz-final-score">0/10</span></p>
+                    
+                    <p id="quiz-grade-message" style="font-size: 1.1rem; color: rgba(255,255,255,0.8); margin: 20px 0;"></p>
+                    
+                    <div style="margin-top: 30px; padding-top: 30px; border-top: 2px solid rgba(255,255,255,0.2);">
+                        <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">Date: <span id="quiz-date"></span></p>
+                    </div>
+                    
+                    <button class="btn btn-gold" onclick="continueToEscape()" id="continue-escape-btn" style="margin-top: 30px; display: none;">Continue to Escape Room →</button>
+                    <button class="btn" onclick="retakeQuiz()" style="margin-top: 20px;">Retake Quiz</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ESCAPE ROOM TAB -->
+        <div id="escape-tab" class="tab-content">
+            <div class="escape-container">
+                <div id="escape-output"></div>
+                <input type="text" id="escape-input" placeholder="Type command here (try HELP)" onkeypress="if(event.key==='Enter') escapeCommand()">
+            </div>
+        </div>
+        
+        <!-- BONUS GAMES TAB -->
+        <div id="bonus-tab" class="tab-content">
+            <div style="max-width: 800px; margin: 0 auto; text-align: center; padding: 40px 20px;">
+                <h2 style="font-size: 2.5rem; margin-bottom: 20px; color: var(--gold);">🎮 BONUS GAMES 🎮</h2>
+                <p style="font-size: 1.2rem; margin-bottom: 40px; color: rgba(255,255,255,0.8);">You earned these bonus games!</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 700px; margin: 0 auto;">
+                    <a href="space-war.html" target="_blank" style="text-decoration: none;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 40px 30px; border-radius: 20px; border: 3px solid var(--teal); transition: all 0.3s; cursor: pointer;">
+                            <div style="font-size: 5rem; margin-bottom: 20px;">🚀</div>
+                            <h3 style="color: var(--teal); margin-bottom: 12px; font-size: 1.5rem;">Space War</h3>
+                            <p style="font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 20px;">Battle against smart AI</p>
+                            <div style="padding: 8px 16px; background: var(--teal); color: #1a1b2e; border-radius: 8px; display: inline-block; font-weight: bold;">Play Now →</div>
+                        </div>
+                    </a>
+                    
+                    <a href="dungeon-trader-enhanced-3levels.html" target="_blank" style="text-decoration: none;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 40px 30px; border-radius: 20px; border: 3px solid var(--gold); transition: all 0.3s; cursor: pointer;">
+                            <div style="font-size: 5rem; margin-bottom: 20px;">⚔️</div>
+                            <h3 style="color: var(--gold); margin-bottom: 12px; font-size: 1.5rem;">Dungeon Trader</h3>
+                            <p style="font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 20px;">3D trading adventure</p>
+                            <div style="padding: 8px 16px; background: var(--gold); color: #1a1b2e; border-radius: 8px; display: inline-block; font-weight: bold;">Play Now →</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
     </div>
     
-    <button class="help-btn" onclick="showHelp()">?</button>
-    <button class="sound-toggle" onclick="toggleSound()" id="sound-btn">🔊</button>
+    <button class="help-btn" onclick="alert('PPF Interactive Lab\\n\\nComplete the lesson, then practice with hands-on activities!')">?</button>
     
     <div style="text-align:center; padding:20px 10px; margin-top:40px; border-top:1px solid rgba(255,255,255,0.1); font-size:0.75rem; color:rgba(255,255,255,0.4);">
-        ClassClick by Robert Jones<br>© 2026 All rights reserved. | <span style="color:#bbb;font-size:10px;">SKELKEYTEC</span><br>
-        Licensed for single classroom use. Purchased via Teachers Pay Teachers.<br>
-        Redistribution or sharing prohibited.
+        ClassClick by Robert Jones<br>© 2026 All rights reserved. | <span style="color:#bbb;font-size:10px;">SKELKEYTEC</span>
     </div>
     
-    <!-- Instruction Modals -->
-    <div class="instruction-modal" id="explore-instructions">
-        <div class="instruction-content">
-            <h2 class="explore-title">📊 Explore Mode</h2>
-            <p>Welcome to the <strong>Production Possibilities Frontier!</strong> This graph shows all the combinations of pizzas and tacos your factory can produce.</p>
-            <p><strong>How to use:</strong> Click anywhere on the graph to set your production point, or click and drag to explore!</p>
-            <p><strong>Three zones to discover:</strong></p>
-            <ul class="zone-list">
-                <li class="zone-efficient"><strong>🟢 On the Curve (Efficient)</strong> — You're using ALL your resources. This is the best you can do!</li>
-                <li class="zone-inefficient"><strong>🔴 Inside the Curve (Inefficient)</strong> — You're wasting resources. You could make more!</li>
-                <li class="zone-impossible"><strong>🟣 Outside the Curve (Impossible)</strong> — You don't have enough resources to produce here.</li>
-            </ul>
-            <p><strong>Key concept:</strong> The <em>opportunity cost</em> is what you give up to get something else. More pizzas = fewer tacos!</p>
-            <label class="dont-show"><input type="checkbox" id="explore-dont-show"> Don't show this again</label>
-            <button class="btn btn-teal close-btn" onclick="closeInstructions('explore')">Got It!</button>
-        </div>
-    </div>
-    
-    <div class="instruction-modal" id="bidding-instructions">
-        <div class="instruction-content">
-            <h2 class="bidding-title">💰 Bidding War</h2>
-            <p>Test your PPF reading skills! You'll be given scenarios and must figure out the trade-offs.</p>
-            <p><strong>How to play:</strong></p>
-            <ul>
-                <li>Read the scenario and look at the highlighted point on the graph</li>
-                <li>Find how many <strong>tacos you CAN make</strong> at that pizza level</li>
-                <li>Type your answer and lock it in</li>
-            </ul>
-            <p><strong>Scoring:</strong></p>
-            <ul>
-                <li>🎯 <strong>Perfect (within 2)</strong> = 100 points</li>
-                <li>👍 <strong>Close (within 5)</strong> = 75 points</li>
-                <li>😐 <strong>Not bad (within 12)</strong> = 40 points</li>
-                <li>❌ <strong>Way off</strong> = 10 points</li>
-            </ul>
-            <p>12 rounds, 1,200 points possible. Complete this to unlock Factory Tycoon!</p>
-            <label class="dont-show"><input type="checkbox" id="bidding-dont-show"> Don't show this again</label>
-            <button class="btn btn-gold close-btn" onclick="closeInstructions('bidding')">Let's Go!</button>
-        </div>
-    </div>
-    
-    <div class="instruction-modal" id="tycoon-instructions">
-        <div class="instruction-content">
-            <h2 class="tycoon-title">🏭 Factory Tycoon</h2>
-            <p>Run your food factory for 8 weeks! Balance production, customer orders, and market prices.</p>
-            <p><strong>Each week:</strong></p>
-            <ul>
-                <li>📈 Check market prices (they change!)</li>
-                <li>📋 Accept or reject customer orders</li>
-                <li>🎯 Click the graph to set production</li>
-                <li>✅ Confirm and see your results</li>
-            </ul>
-            <p><strong>Watch out for:</strong></p>
-            <ul>
-                <li>⚠️ <strong>Random crises</strong> that limit production</li>
-                <li>🏭 <strong>Competitors</strong> affecting market prices</li>
-                <li>📉 <strong>Failed orders</strong> hurt your reputation</li>
-            </ul>
-            <p><strong>Every 2 weeks:</strong> Visit the Upgrade Shop to expand your PPF!</p>
-            <p>Goal: Maximize cash AND reputation by week 8!</p>
-            <label class="dont-show"><input type="checkbox" id="tycoon-dont-show"> Don't show this again</label>
-            <button class="btn btn-purple close-btn" onclick="closeInstructions('tycoon')">Start Factory!</button>
-        </div>
-    </div>
-
     <script>
-        // GLOBAL
-        let soundEnabled = true;
-        let currentTab = 'explore';
+        // ===========================================
+        // PREVIEW MODE & LOCK SYSTEM
+        // ===========================================
         
-        // PPF math
-        function maxTacos(p) { return Math.max(0, Math.round(100 - 0.0625 * p * p)); }
+        const urlParams = new URLSearchParams(window.location.search);
+        const previewMode = urlParams.get('preview') === 'true';
+        let lessonCompleted = false;
+        let millionaireCompleted = false;
+        let quizCompleted = false;
+        let escapeCompleted = false;
         
-        // Audio
-        let audioCtx = null;
-        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
-        
-        function playSound(type) {
-            if (!soundEnabled || !audioCtx) return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                gain.gain.value = 0.1;
-                if (type === 'click') { osc.frequency.value = 600; osc.start(); osc.stop(audioCtx.currentTime + 0.05); }
-                else if (type === 'success') { osc.frequency.value = 523; osc.start(); osc.stop(audioCtx.currentTime + 0.3); }
-                else if (type === 'fail') { osc.frequency.value = 300; osc.start(); osc.stop(audioCtx.currentTime + 0.2); }
-                else if (type === 'coin') { osc.frequency.value = 1200; osc.start(); osc.stop(audioCtx.currentTime + 0.15); }
-            } catch(e) {}
-        }
-        
-        function toggleSound() { soundEnabled = !soundEnabled; document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇'; }
-        
-        // Instruction tracking
-        var instructionsShown = { explore: false, bidding: false, tycoon: false };
+        // Check localStorage for completion status
         try {
-            instructionsShown = {
-                explore: localStorage.getItem('ppf-explore-shown') === 'true',
-                bidding: localStorage.getItem('ppf-bidding-shown') === 'true',
-                tycoon: localStorage.getItem('ppf-tycoon-shown') === 'true'
-            };
+            lessonCompleted = localStorage.getItem('ppf_lesson_completed') === 'true';
+            millionaireCompleted = localStorage.getItem('ppf_millionaire_completed') === 'true';
+            quizCompleted = localStorage.getItem('ppf_quiz_completed') === 'true';
+            escapeCompleted = localStorage.getItem('ppf_escape_completed') === 'true';
         } catch(e) {}
         
-        function showHelp() {
-            document.getElementById(currentTab + '-instructions').classList.add('show');
-        }
-        
-        function closeInstructions(tab) {
-            document.getElementById(tab + '-instructions').classList.remove('show');
-            var dontShow = document.getElementById(tab + '-dont-show');
-            if (dontShow && dontShow.checked) {
-                try { localStorage.setItem('ppf-' + tab + '-shown', 'true'); } catch(e) {}
-                instructionsShown[tab] = true;
-            }
-        }
-        
-        function maybeShowInstructions(tab) {
-            if (!instructionsShown[tab]) {
-                document.getElementById(tab + '-instructions').classList.add('show');
-            }
-        }
-        
-        function switchTab(tab) {
-            // Lock tycoon until bidding is complete
-            if (tab === 'tycoon' && !biddingCompleted) {
-                alert('Complete Bidding War first to unlock Factory Tycoon!');
-                return;
-            }
+        function updateTabLocks() {
+            const tabs = document.querySelectorAll('.tab-btn');
             
-            currentTab = tab;
-            document.querySelectorAll('.tab-btn').forEach(function(b, i) {
-                var tabs = ['explore', 'bidding', 'tycoon'];
-                b.classList.toggle('active', tabs[i] === tab);
-            });
-            document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
-            document.getElementById(tab + '-tab').classList.add('active');
-            
-            if (tab === 'explore') { initExplore(); maybeShowInstructions('explore'); }
-            if (tab === 'bidding') { initBidding(); maybeShowInstructions('bidding'); }
-            if (tab === 'tycoon') { initTycoon(); maybeShowInstructions('tycoon'); }
-        }
-        
-        // EXPLORE MODE
-        let exploreState = { pizza: 20, taco: 75, zone: 'efficient' };
-        
-        function initExplore() {
-            const c = document.getElementById('exploreCanvas');
-            drawExplore();
-            updateExploreUI();
-            
-            // Click to set point
-            c.onclick = function(e) {
-                const r = c.getBoundingClientRect();
-                const scaleX = 500 / r.width;
-                const scaleY = 450 / r.height;
-                const x = (e.clientX - r.left) * scaleX;
-                const y = (e.clientY - r.top) * scaleY;
-                setExplorePoint(x, y);
-            };
-            
-            // Drag to move point
-            c.onmousedown = function(e) {
-                c.dataset.dragging = 'true';
-                const r = c.getBoundingClientRect();
-                const scaleX = 500 / r.width;
-                const scaleY = 450 / r.height;
-                const x = (e.clientX - r.left) * scaleX;
-                const y = (e.clientY - r.top) * scaleY;
-                setExplorePoint(x, y);
-            };
-            
-            c.onmousemove = function(e) {
-                if (c.dataset.dragging === 'true') {
-                    const r = c.getBoundingClientRect();
-                    const scaleX = 500 / r.width;
-                    const scaleY = 450 / r.height;
-                    const x = (e.clientX - r.left) * scaleX;
-                    const y = (e.clientY - r.top) * scaleY;
-                    setExplorePoint(x, y);
-                }
-            };
-            
-            c.onmouseup = function() { c.dataset.dragging = 'false'; };
-            c.onmouseleave = function() { c.dataset.dragging = 'false'; };
-        }
-        
-        function setExplorePoint(x, y) {
-            const pad = 50, gw = 400, gh = 350;
-            let p = Math.round(((x - pad) / gw) * 40);
-            let t = Math.round((1 - (y - pad) / gh) * 100);
-            p = Math.max(0, Math.min(40, p));
-            t = Math.max(0, Math.min(100, t));
-            const maxT = maxTacos(p);
-            
-            let zone = 'efficient';
-            if (t < maxT - 2) zone = 'inefficient';
-            else if (t > maxT + 2) zone = 'impossible';
-            else t = maxT;
-            
-            exploreState = { pizza: p, taco: t, zone: zone };
-            playSound('click');
-            drawExplore();
-            updateExploreUI();
-        }
-        
-        function exploreSet(p, t, zone) {
-            exploreState = { pizza: p, taco: t, zone: zone };
-            playSound('click');
-            drawExplore();
-            updateExploreUI();
-        }
-        
-        function drawExplore() {
-            const c = document.getElementById('exploreCanvas');
-            drawPPF(c, exploreState.pizza, exploreState.taco, exploreState.zone);
-        }
-        
-        function updateExploreUI() {
-            document.getElementById('explore-pizza').textContent = exploreState.pizza;
-            document.getElementById('explore-taco').textContent = exploreState.taco;
-            const st = document.getElementById('explore-status');
-            const oc = document.getElementById('explore-cost');
-            
-            if (exploreState.zone === 'inefficient') {
-                st.className = 'status-badge inefficient';
-                st.textContent = 'INSIDE THE CURVE — Inefficient!';
-                oc.innerHTML = 'You\'re <span class="highlight">wasting resources!</span> Could make more.';
-            } else if (exploreState.zone === 'impossible') {
-                st.className = 'status-badge impossible';
-                st.textContent = 'OUTSIDE THE CURVE — Impossible!';
-                oc.innerHTML = '<span class="highlight">Can\'t produce here!</span> Not enough resources.';
-            } else {
-                st.className = 'status-badge efficient';
-                st.textContent = 'ON THE CURVE — Efficient!';
-                const mc = (0.125 * exploreState.pizza).toFixed(1);
-                oc.innerHTML = exploreState.pizza === 0 ? '100% tacos. Any pizza costs some tacos.' :
-                              exploreState.pizza === 40 ? '100% pizzas. Maximum output!' :
-                              '1 more pizza costs <span class="highlight">' + mc + ' tacos</span>';
-            }
-        }
-        
-        // BIDDING WAR
-        let bidState = { round: 1, score: 0, target: 0, answer: 0, submitted: false };
-        let biddingCompleted = false;
-        
-        const bidQuestions = [
-            { scenario: "A local school needs lunch for a field trip.", target: 20 },
-            { scenario: "The taco truck broke down!", target: 15 },
-            { scenario: "Wedding reception order.", target: 30 },
-            { scenario: "Food festival tomorrow!", target: 35 },
-            { scenario: "Restaurant chain stocking up.", target: 10 },
-            { scenario: "Sports stadium bulk order.", target: 25 },
-            { scenario: "Late night rush!", target: 38 },
-            { scenario: "Corporate event catering.", target: 28 },
-            { scenario: "Birthday party for 50 kids!", target: 12 },
-            { scenario: "Hospital cafeteria needs supplies.", target: 22 },
-            { scenario: "Food truck festival competition!", target: 32 },
-            { scenario: "College dorm late-night special.", target: 18 },
-        ];
-        
-        function initBidding() {
-            bidState = { round: 1, score: 0, target: 0, answer: 0, submitted: false };
-            document.getElementById('bidding-gameover').classList.remove('show');
-            document.getElementById('bidding-gameover').style.display = 'none';
-            document.querySelector('#bidding-tab .main-grid').style.display = 'grid';
-            setBidQuestion();
-        }
-        
-        function setBidQuestion() {
-            const q = bidQuestions[bidState.round - 1];
-            bidState.target = q.target;
-            bidState.answer = maxTacos(q.target);
-            bidState.submitted = false;
-            
-            document.getElementById('bid-round').textContent = bidState.round;
-            document.getElementById('bid-score').textContent = bidState.score;
-            document.getElementById('bid-scenario').textContent = q.scenario;
-            document.getElementById('bid-question').innerHTML = 'If you make <span class="highlight">' + q.target + ' pizzas</span>, how many <span class="highlight">tacos</span> can you still produce?';
-            document.getElementById('bid-input').value = '';
-            document.getElementById('bid-input').disabled = false;
-            document.getElementById('bid-submit').disabled = false;
-            document.getElementById('bid-submit').style.display = 'block';
-            document.getElementById('bid-result').className = 'bid-result';
-            document.getElementById('bid-next').style.display = 'none';
-            
-            const c = document.getElementById('biddingCanvas');
-            drawPPF(c, bidState.target, maxTacos(bidState.target), 'efficient', { highlightX: bidState.target });
-        }
-        
-        function submitBid() {
-            if (bidState.submitted) return;
-            const input = parseInt(document.getElementById('bid-input').value);
-            if (isNaN(input) || input < 0) return alert('Enter a number!');
-            
-            bidState.submitted = true;
-            document.getElementById('bid-input').disabled = true;
-            document.getElementById('bid-submit').style.display = 'none';
-            
-            const diff = Math.abs(input - bidState.answer);
-            let points = 0, cls = '', msg = '';
-            
-            if (diff <= 2) {
-                points = 100; cls = 'perfect'; msg = '🎯 PERFECT! The answer was ' + bidState.answer + ' tacos.' + (diff > 0 ? ' You were off by just ' + diff + '!' : '');
-                playSound('success');
-            } else if (diff <= 5) {
-                points = 75; cls = 'close'; msg = '👍 Close! The answer was ' + bidState.answer + ' tacos. You were off by ' + diff + '.';
-                playSound('coin');
-            } else if (diff <= 12) {
-                points = 40; cls = 'close'; msg = '😐 Not bad. The answer was ' + bidState.answer + ' tacos. You were off by ' + diff + '.';
-                playSound('click');
-            } else {
-                points = 10; cls = 'off'; msg = '❌ Way off. The answer was ' + bidState.answer + ' tacos.';
-                playSound('fail');
-            }
-            
-            bidState.score += points;
-            document.getElementById('bid-score').textContent = bidState.score;
-            document.getElementById('bid-points').textContent = '+' + points;
-            document.getElementById('bid-explanation').textContent = msg;
-            document.getElementById('bid-result').className = 'bid-result show ' + cls;
-            document.getElementById('bid-next').style.display = 'block';
-        }
-        
-        function nextBidRound() {
-            bidState.round++;
-            if (bidState.round > 12) {
-                biddingCompleted = true;
-                var tycoonBtn = document.getElementById('tycoon-tab-btn');
-                tycoonBtn.textContent = '🏭 Factory Tycoon';
-                tycoonBtn.classList.remove('locked');
-                document.querySelector('#bidding-tab .main-grid').style.display = 'none';
-                document.getElementById('bidding-gameover').style.display = 'block';
-                document.getElementById('bidding-gameover').classList.add('show');
-                document.getElementById('final-bid-score').textContent = bidState.score;
-            } else {
-                setBidQuestion();
-            }
-        }
-        
-        // FACTORY TYCOON
-        let tyState = { week: 1, cash: 500, rep: 50, pizza: null, taco: null, pizzaPrice: 10, tacoPrice: 5, orders: [], acceptedOrders: [], upgrades: [], ppfBonus: 0, priceBonus: 0, event: null };
-        
-        const upgrades = [
-            { id: 'oven', name: '🔥 Better Ovens', desc: '+5 max pizza capacity', cost: 200, effect: function() { tyState.ppfBonus += 5; } },
-            { id: 'grill', name: '🌶️ Turbo Grill', desc: '+10 max taco capacity', cost: 200, effect: function() { tyState.ppfBonus += 3; } },
-            { id: 'marketing', name: '📢 Marketing Boost', desc: '+10% sale prices', cost: 300, effect: function() { tyState.priceBonus += 0.1; } },
-            { id: 'training', name: '👨‍🍳 Staff Training', desc: '+5 reputation', cost: 150, effect: function() { tyState.rep = Math.min(100, tyState.rep + 5); } },
-            { id: 'expansion', name: '🏗️ Expansion', desc: '+8 max capacity', cost: 400, effect: function() { tyState.ppfBonus += 8; } },
-        ];
-        
-        const crises = [
-            { title: '🚚 Delivery Truck Broke!', desc: 'Only 75% capacity this week.', effect: 'capacity75' },
-            { title: '🧀 Cheese Shortage!', desc: 'Pizza prices dropped by $3.', effect: 'pizzaDrop' },
-            { title: '🌶️ Salsa Recall!', desc: 'Taco prices dropped by $2.', effect: 'tacoDrop' },
-            { title: '💪 Workers Strike!', desc: 'Production at 60% this week.', effect: 'capacity60' },
-            { title: '🔥 Kitchen Fire!', desc: 'Lost $100. Production at 80%.', effect: 'fire' },
-        ];
-        
-        function initTycoon() {
-            tyState = { week: 1, cash: 500, rep: 50, pizza: null, taco: null, pizzaPrice: 10, tacoPrice: 5, orders: [], acceptedOrders: [], upgrades: [], ppfBonus: 0, priceBonus: 0, event: null };
-            document.getElementById('tycoon-gameover').style.display = 'none';
-            document.getElementById('tycoon-gameover').classList.remove('show');
-            document.getElementById('tycoon-game').style.display = 'block';
-            setupWeek();
-        }
-        
-        function tyMaxTacos(p) {
-            let base = Math.max(0, 100 + tyState.ppfBonus - 0.0625 * p * p);
-            if (tyState.event && tyState.event.effect === 'capacity75') return Math.round(base * 0.75);
-            if (tyState.event && tyState.event.effect === 'capacity60') return Math.round(base * 0.6);
-            if (tyState.event && tyState.event.effect === 'fire') return Math.round(base * 0.8);
-            return Math.round(base);
-        }
-        
-        function tyMaxPizza() {
-            let base = 40 + Math.floor(tyState.ppfBonus / 2);
-            if (tyState.event && tyState.event.effect === 'capacity75') return Math.floor(base * 0.75);
-            if (tyState.event && tyState.event.effect === 'capacity60') return Math.floor(base * 0.6);
-            if (tyState.event && tyState.event.effect === 'fire') return Math.floor(base * 0.8);
-            return base;
-        }
-        
-        function setupWeek() {
-            tyState.pizza = null;
-            tyState.taco = null;
-            tyState.acceptedOrders = [];
-            
-            tyState.event = null;
-            if (tyState.week > 2 && Math.random() < 0.3) {
-                tyState.event = crises[Math.floor(Math.random() * crises.length)];
-                if (tyState.event.effect === 'fire') tyState.cash = Math.max(0, tyState.cash - 100);
-            }
-            
-            if (tyState.week > 1) {
-                tyState.pizzaPrice = Math.max(5, Math.min(20, tyState.pizzaPrice + Math.floor(Math.random() * 7) - 3));
-                tyState.tacoPrice = Math.max(3, Math.min(12, tyState.tacoPrice + Math.floor(Math.random() * 5) - 2));
-            }
-            
-            if (tyState.event && tyState.event.effect === 'pizzaDrop') tyState.pizzaPrice = Math.max(5, tyState.pizzaPrice - 3);
-            if (tyState.event && tyState.event.effect === 'tacoDrop') tyState.tacoPrice = Math.max(3, tyState.tacoPrice - 2);
-            
-            document.getElementById('comp1-strategy').textContent = 'Making ' + (tyState.pizzaPrice > 12 ? 35 : tyState.pizzaPrice < 8 ? 15 : 25) + ' pizzas';
-            document.getElementById('comp2-strategy').textContent = 'Making ' + (tyState.tacoPrice > 7 ? 85 : 60) + ' tacos';
-            
-            generateOrders();
-            updateTycoonUI();
-            drawTycoon();
-            
-            var c = document.getElementById('tycoonCanvas');
-            c.onclick = function(e) {
-                var r = c.getBoundingClientRect();
-                var scaleX = 500 / r.width;
-                var x = (e.clientX - r.left) * scaleX;
+            // Tab order: Learn, Explore, Millionaire, Quiz, Escape Room, Fortune
+            tabs.forEach((tab, index) => {
+                let isUnlocked = false;
                 
-                var pad = 50, gw = 400;
-                var p = Math.round(((x - pad) / gw) * tyMaxPizza());
-                p = Math.max(0, Math.min(tyMaxPizza(), p));
-                tyState.pizza = p;
-                tyState.taco = tyMaxTacos(p);
-                
-                playSound('click');
-                updateTycoonUI();
-                drawTycoon();
-            };
-        }
-        
-        function generateOrders() {
-            tyState.orders = [];
-            const num = 2 + Math.floor(Math.random() * 2);
-            for (let i = 0; i < num; i++) {
-                const isPizza = Math.random() > 0.5;
-                const qty = isPizza ? 10 + Math.floor(Math.random() * 20) : 20 + Math.floor(Math.random() * 40);
-                tyState.orders.push({ id: i, type: isPizza ? 'pizza' : 'taco', qty: qty, bonus: Math.floor(qty * (isPizza ? 3 : 1.5)), accepted: false });
-            }
-        }
-        
-        function updateTycoonUI() {
-            document.getElementById('ty-week').textContent = tyState.week;
-            document.getElementById('ty-cash').textContent = tyState.cash;
-            document.getElementById('ty-rep').textContent = tyState.rep;
-            document.getElementById('ty-pizza-price').textContent = tyState.pizzaPrice;
-            document.getElementById('ty-taco-price').textContent = tyState.tacoPrice;
-            
-            const eb = document.getElementById('ty-event');
-            if (tyState.event) {
-                eb.classList.add('show');
-                document.getElementById('ty-event-title').textContent = tyState.event.title;
-                document.getElementById('ty-event-desc').textContent = tyState.event.desc;
-            } else {
-                eb.classList.remove('show');
-            }
-            
-            const ol = document.getElementById('orders-list');
-            ol.innerHTML = '';
-            tyState.orders.forEach(function(o, i) {
-                const div = document.createElement('div');
-                div.className = 'order-card';
-                div.innerHTML = '<div class="order-info"><div class="order-req">' + o.qty + ' ' + (o.type === 'pizza' ? '🍕' : '🌮') + ' ' + o.type + 's</div><div class="order-bonus">+$' + o.bonus + ' bonus</div></div><div class="order-actions"><button class="order-btn accept" onclick="acceptOrder(' + i + ')" ' + (o.accepted ? 'disabled' : '') + '>' + (o.accepted ? '✓' : 'Accept') + '</button>' + (!o.accepted ? '<button class="order-btn reject" onclick="rejectOrder(' + i + ')">✗</button>' : '') + '</div>';
-                ol.appendChild(div);
-            });
-            
-            document.getElementById('ty-pizza').textContent = tyState.pizza !== null ? tyState.pizza : '--';
-            document.getElementById('ty-taco').textContent = tyState.taco !== null ? tyState.taco : '--';
-            
-            if (tyState.pizza !== null) {
-                const mult = 1 + tyState.priceBonus;
-                const profit = Math.floor(tyState.pizza * tyState.pizzaPrice * mult) + Math.floor(tyState.taco * tyState.tacoPrice * mult);
-                document.getElementById('ty-projected').textContent = profit;
-            } else {
-                document.getElementById('ty-projected').textContent = '0';
-            }
-            
-            document.getElementById('ty-confirm').disabled = tyState.pizza === null;
-        }
-        
-        function acceptOrder(i) { tyState.orders[i].accepted = true; tyState.acceptedOrders.push(tyState.orders[i]); playSound('coin'); updateTycoonUI(); }
-        function rejectOrder(i) { tyState.orders.splice(i, 1); tyState.rep = Math.max(0, tyState.rep - 2); playSound('click'); updateTycoonUI(); }
-        
-        function drawTycoon() {
-            const c = document.getElementById('tycoonCanvas');
-            drawPPF(c, tyState.pizza, tyState.taco, 'efficient', { maxP: tyMaxPizza(), maxTFunc: tyMaxTacos });
-        }
-        
-        function confirmWeek() {
-            const mult = 1 + tyState.priceBonus;
-            let baseProfit = Math.floor(tyState.pizza * tyState.pizzaPrice * mult) + Math.floor(tyState.taco * tyState.tacoPrice * mult);
-            let orderBonus = 0, fulfilled = 0, failed = 0;
-            
-            tyState.acceptedOrders.forEach(function(o) {
-                const have = o.type === 'pizza' ? tyState.pizza : tyState.taco;
-                if (have >= o.qty) { orderBonus += o.bonus; fulfilled++; tyState.rep = Math.min(100, tyState.rep + 3); }
-                else { failed++; tyState.rep = Math.max(0, tyState.rep - 8); }
-            });
-            
-            tyState.cash += baseProfit + orderBonus;
-            showSummary(baseProfit, orderBonus, fulfilled, failed);
-        }
-        
-        function showSummary(base, bonus, fulfilled, failed) {
-            document.getElementById('summary-title').textContent = 'Week ' + tyState.week + ' Results';
-            document.getElementById('summary-content').innerHTML = '<div style="text-align:center;padding:20px 0;"><div style="font-size:2rem;font-weight:800;color:var(--green);">+$' + (base + bonus) + '</div><div style="font-size:0.9rem;opacity:0.8;margin-top:8px;">Sales: $' + base + (bonus > 0 ? ' | Orders: +$' + bonus : '') + '</div>' + (fulfilled > 0 ? '<div style="color:var(--green);margin-top:8px;">✓ ' + fulfilled + ' order(s) fulfilled</div>' : '') + (failed > 0 ? '<div style="color:var(--red);margin-top:8px;">✗ ' + failed + ' order(s) failed</div>' : '') + '<div style="margin-top:16px;font-size:0.9rem;">Total: <strong>$' + tyState.cash + '</strong> | Rep: <strong>' + tyState.rep + '</strong></div></div>';
-            document.getElementById('summary-modal').classList.add('show');
-            playSound('success');
-        }
-        
-        function closeSummary() {
-            document.getElementById('summary-modal').classList.remove('show');
-            tyState.week++;
-            if (tyState.week > 8) endTycoon();
-            else if (tyState.week % 2 === 0) showUpgradeShop();
-            else setupWeek();
-        }
-        
-        function showUpgradeShop() {
-            const list = document.getElementById('upgrade-list');
-            list.innerHTML = '';
-            upgrades.forEach(function(u) {
-                const owned = tyState.upgrades.indexOf(u.id) >= 0;
-                const afford = tyState.cash >= u.cost;
-                const div = document.createElement('div');
-                div.className = 'upgrade-option' + (owned ? ' owned' : '');
-                div.innerHTML = '<div class="upgrade-name">' + u.name + '</div><div class="upgrade-desc">' + u.desc + '</div><div class="upgrade-cost">' + (owned ? 'OWNED' : '$' + u.cost) + '</div>';
-                if (!owned && afford) {
-                    div.onclick = function() {
-                        document.querySelectorAll('.upgrade-option').forEach(function(o) { o.classList.remove('selected'); });
-                        div.classList.add('selected');
-                        div.dataset.upgradeId = u.id;
-                    };
+                if (previewMode) {
+                    isUnlocked = true; // Preview mode unlocks everything
+                } else {
+                    switch(index) {
+                        case 0: // Learn
+                            isUnlocked = true;
+                            break;
+                        case 1: // Explore
+                        case 2: // Millionaire
+                            isUnlocked = lessonCompleted;
+                            break;
+                        case 3: // Quiz
+                            isUnlocked = millionaireCompleted;
+                            break;
+                        case 4: // Escape Room
+                            isUnlocked = quizCompleted;
+                            break;
+                        case 5: // Bonus Games
+                            isUnlocked = escapeCompleted;
+                            break;
+                    }
                 }
-                list.appendChild(div);
+                
+                if (isUnlocked) {
+                    tab.classList.remove('locked');
+                    tab.style.opacity = '1';
+                    tab.style.cursor = 'pointer';
+                    tab.innerHTML = tab.innerHTML.replace('🔒 ', '');
+                } else {
+                    tab.classList.add('locked');
+                    tab.style.opacity = '0.5';
+                    tab.style.cursor = 'not-allowed';
+                    if (!tab.innerHTML.startsWith('🔒 ')) {
+                        tab.innerHTML = '🔒 ' + tab.innerHTML;
+                    }
+                }
             });
-            document.getElementById('upgrade-modal').classList.add('show');
         }
         
-        function buyUpgrade() {
-            const sel = document.querySelector('.upgrade-option.selected');
-            if (!sel) return alert('Select an upgrade first!');
-            const u = upgrades.find(function(up) { return up.id === sel.dataset.upgradeId; });
-            if (!u || tyState.cash < u.cost) return;
-            tyState.cash -= u.cost;
-            tyState.upgrades.push(u.id);
-            u.effect();
-            playSound('coin');
-            document.getElementById('upgrade-modal').classList.remove('show');
-            setupWeek();
+        function unlockExploreAndMillionaire() {
+            lessonCompleted = true;
+            try {
+                localStorage.setItem('ppf_lesson_completed', 'true');
+            } catch(e) {}
+            updateTabLocks();
+            alert('🎉 Lesson complete! Explore and Millionaire unlocked!');
         }
         
-        function skipUpgrade() { document.getElementById('upgrade-modal').classList.remove('show'); setupWeek(); }
-        
-        function endTycoon() {
-            document.getElementById('tycoon-game').style.display = 'none';
-            document.getElementById('tycoon-gameover').style.display = 'block';
-            document.getElementById('tycoon-gameover').classList.add('show');
-            document.getElementById('final-ty-cash').textContent = '$' + tyState.cash;
-            document.getElementById('final-ty-rep').textContent = '⭐ ' + tyState.rep + ' reputation';
-            let v = tyState.cash >= 2000 && tyState.rep >= 70 ? '🏆 Factory Mogul!' : tyState.cash >= 2000 ? '💰 Money Machine!' : tyState.rep >= 70 ? '⭐ Customer Favorite!' : tyState.cash >= 1000 ? '📊 Solid Business.' : '📉 Rough season.';
-            document.getElementById('ty-verdict').textContent = v;
+        function unlockQuiz() {
+            millionaireCompleted = true;
+            try {
+                localStorage.setItem('ppf_millionaire_completed', 'true');
+            } catch(e) {}
+            updateTabLocks();
+            alert('💰 Great job! Quiz unlocked!');
         }
         
-        // DRAW PPF
-        function drawPPF(canvas, px, tx, zone, opts) {
-            opts = opts || {};
+        function unlockEscapeRoom() {
+            quizCompleted = true;
+            try {
+                localStorage.setItem('ppf_quiz_completed', 'true');
+            } catch(e) {}
+            updateTabLocks();
+        }
+        
+        function unlockBonusGames() {
+            escapeCompleted = true;
+            try {
+                localStorage.setItem('ppf_escape_completed', 'true');
+            } catch(e) {}
+            updateTabLocks();
+            alert('🎮 Bonus Games unlocked! Check out Space War and Dungeon Trader!');
+        }
+        
+        // ===========================================
+        // LESSON MODE
+        // ===========================================
+        
+        let currentSlide = 1;
+        const totalSlides = 10;
+        
+        function showSlide(slideNum) {
+            document.querySelectorAll('.lesson-slide').forEach(s => s.classList.remove('active'));
+            document.querySelector(`[data-slide="${slideNum}"]`).classList.add('active');
+            
+            currentSlide = slideNum;
+            
+            // Update buttons
+            document.getElementById('prev-btn').disabled = slideNum === 1;
+            document.getElementById('next-btn').textContent = slideNum === totalSlides ? 'Finish Lesson' : 'Next →';
+            
+            // Update progress
+            const progress = (slideNum / totalSlides) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            
+            // Initialize slide-specific features
+            if (slideNum === 5) {
+                drawLessonPPF();
+            } else if (slideNum === 7) {
+                setTimeout(drawZonesCanvas, 100);
+            }
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                showSlide(currentSlide + 1);
+            } else {
+                // Lesson complete! Unlock Explore and Millionaire
+                unlockExploreAndMillionaire();
+                setTimeout(() => {
+                    switchTab('explore');
+                }, 1000);
+            }
+        }
+        
+        function prevSlide() {
+            if (currentSlide > 1) {
+                showSlide(currentSlide - 1);
+            }
+        }
+        
+        // Slide 1: Choice selection
+        
+        // Slide 3: Animated bars
+        let barAnimationRunning = false;
+        
+        function animateBars() {
+            if (barAnimationRunning) return;
+            
+            barAnimationRunning = true;
+            const btn = document.getElementById('animate-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Animating...';
+            
+            const steps = [
+                { pizzas: 10, tacos: 90 },
+                { pizzas: 20, tacos: 75 },
+                { pizzas: 30, tacos: 50 },
+                { pizzas: 35, tacos: 25 }
+            ];
+            
+            let currentStep = 0;
+            
+            function animateStep() {
+                if (currentStep >= steps.length) {
+                    btn.disabled = false;
+                    btn.textContent = '🔄 Play Again';
+                    barAnimationRunning = false;
+                    document.getElementById('slide-message').textContent = '↗️ See? Pizzas slide UP, Tacos slide DOWN!';
+                    return;
+                }
+                
+                const step = steps[currentStep];
+                
+                document.getElementById('pizza-count').textContent = step.pizzas;
+                document.getElementById('taco-count').textContent = step.tacos;
+                document.getElementById('pizza-bar').style.width = (step.pizzas / 40 * 100) + '%';
+                document.getElementById('pizza-bar').textContent = step.pizzas;
+                document.getElementById('taco-bar').style.width = (step.tacos / 100 * 100) + '%';
+                document.getElementById('taco-bar').textContent = step.tacos;
+                
+                currentStep++;
+                setTimeout(animateStep, 1000);
+            }
+            
+            document.getElementById('slide-message').textContent = 'Watch carefully...';
+            animateStep();
+        }
+        
+        // Slide 5: PPF drawing
+        function drawLessonPPF() {
+            const canvas = document.getElementById('lesson-ppf-canvas');
             const ctx = canvas.getContext('2d');
-            const w = 500, h = 450;
-            const pad = 50, gw = 400, gh = 350;
-            const maxP = opts.maxP || 40;
-            const maxTFunc = opts.maxTFunc || maxTacos;
             
-            ctx.clearRect(0, 0, w, h);
-            ctx.fillStyle = '#1a1b2e';
-            ctx.fillRect(0, 0, w, h);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Grid
-            ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-            ctx.lineWidth = 1;
-            for (let i = 0; i <= 8; i++) {
-                ctx.beginPath();
-                ctx.moveTo(pad + (gw / 8) * i, pad);
-                ctx.lineTo(pad + (gw / 8) * i, h - pad);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(pad, pad + (gh / 8) * i);
-                ctx.lineTo(w - pad, pad + (gh / 8) * i);
-                ctx.stroke();
-            }
-            
-            // Axes
-            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+            // Draw axes
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(pad, pad);
-            ctx.lineTo(pad, h - pad);
-            ctx.lineTo(w - pad, h - pad);
+            ctx.moveTo(100, 350);
+            ctx.lineTo(750, 350);
+            ctx.moveTo(100, 350);
+            ctx.lineTo(100, 50);
             ctx.stroke();
             
-            // Labels
-            ctx.fillStyle = 'rgba(255,255,255,0.7)';
-            ctx.font = 'bold 12px system-ui';
-            ctx.textAlign = 'center';
-            ctx.fillText('PIZZAS 🍕', w / 2, h - 10);
-            ctx.save();
-            ctx.translate(14, h / 2);
-            ctx.rotate(-Math.PI / 2);
-            ctx.fillText('TACOS 🌮', 0, 0);
-            ctx.restore();
-            
-            // Numbers
-            ctx.font = '11px system-ui';
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            for (let i = 0; i <= 4; i++) {
-                ctx.fillText(Math.round((maxP / 4) * i).toString(), pad + (gw / 4) * i, h - pad + 18);
-                ctx.fillText(Math.round((maxTFunc(0) / 4) * i).toString(), pad - 22, h - pad - (gh / 4) * i + 4);
-            }
-            
-            // Shaded inside
-            ctx.fillStyle = 'rgba(20, 184, 166, 0.08)';
-            ctx.beginPath();
-            ctx.moveTo(pad, h - pad);
-            for (let p = 0; p <= maxP; p++) {
-                const t = maxTFunc(p);
-                const x = pad + (p / maxP) * gw;
-                const y = h - pad - (t / maxTFunc(0)) * gh;
-                ctx.lineTo(x, y);
-            }
-            ctx.lineTo(w - pad, h - pad);
-            ctx.closePath();
-            ctx.fill();
-            
-            // Shaded outside (impossible)
-            ctx.fillStyle = 'rgba(91, 94, 166, 0.08)';
-            ctx.beginPath();
-            ctx.moveTo(pad, pad);
-            for (let p = 0; p <= maxP; p++) {
-                const t = maxTFunc(p);
-                const x = pad + (p / maxP) * gw;
-                const y = h - pad - (t / maxTFunc(0)) * gh;
-                ctx.lineTo(x, y);
-            }
-            ctx.lineTo(w - pad, pad);
-            ctx.closePath();
-            ctx.fill();
-            
-            // PPF Curve
-            ctx.strokeStyle = '#E8505B';
+            // Draw PPF curve
+            ctx.strokeStyle = '#14B8A6';
             ctx.lineWidth = 4;
-            ctx.lineCap = 'round';
             ctx.beginPath();
-            for (let p = 0; p <= maxP; p++) {
-                const t = maxTFunc(p);
-                const x = pad + (p / maxP) * gw;
-                const y = h - pad - (t / maxTFunc(0)) * gh;
+            for (let p = 0; p <= 40; p++) {
+                const t = calculatePPF(p);
+                const x = 100 + (p / 40) * 650;
+                const y = 350 - (t / 100) * 300;
                 if (p === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
             }
             ctx.stroke();
             
-            // Highlight line
-            if (opts.highlightX !== undefined) {
-                const hx = pad + (opts.highlightX / maxP) * gw;
-                ctx.strokeStyle = 'rgba(245, 158, 11, 0.5)';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([5, 5]);
-                ctx.beginPath();
-                ctx.moveTo(hx, pad);
-                ctx.lineTo(hx, h - pad);
-                ctx.stroke();
-                ctx.setLineDash([]);
-            }
+            // Labels
+            ctx.fillStyle = 'white';
+            ctx.font = '20px system-ui';
+            ctx.fillText('Pizzas →', 350, 385);
+            ctx.save();
+            ctx.translate(60, 200);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('Tacos →', 0, 0);
+            ctx.restore();
             
-            // Point
-            if (px !== null && tx !== null) {
-                const pxPos = pad + (px / maxP) * gw;
-                const pyPos = h - pad - (tx / maxTFunc(0)) * gh;
+            // Animate a point moving along curve
+            let t = 0;
+            function animatePoint() {
+                t += 0.01;
+                if (t > 1) t = 0;
                 
-                // Dashed lines
+                const pizzas = Math.floor(t * 40);
+                const tacos = calculatePPF(pizzas);
+                const x = 100 + (pizzas / 40) * 650;
+                const y = 350 - (tacos / 100) * 300;
+                
+                // Redraw
+                drawLessonPPF();
+                
+                // Draw point
+                ctx.fillStyle = '#F59E0B';
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if (currentSlide === 5) {
+                    requestAnimationFrame(animatePoint);
+                }
+            }
+            animatePoint();
+        }
+        
+        // Slide 7: Draw zones canvas
+        function drawZonesCanvas() {
+            const canvas = document.getElementById('zones-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            let dragPoint = { pizzas: 20, tacos: 75 };
+            let isDragging = false;
+            
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw axes
                 ctx.strokeStyle = 'rgba(255,255,255,0.3)';
                 ctx.lineWidth = 2;
-                ctx.setLineDash([6, 4]);
                 ctx.beginPath();
-                ctx.moveTo(pxPos, pyPos);
-                ctx.lineTo(pxPos, h - pad);
-                ctx.moveTo(pxPos, pyPos);
-                ctx.lineTo(pad, pyPos);
+                ctx.moveTo(50, 300);
+                ctx.lineTo(350, 300);
+                ctx.moveTo(50, 300);
+                ctx.lineTo(50, 50);
                 ctx.stroke();
-                ctx.setLineDash([]);
                 
-                // Dot
-                let color = '#14B8A6';
-                if (zone === 'inefficient') color = '#E8505B';
-                if (zone === 'impossible') color = '#5B5EA6';
-                
+                // Draw PPF curve
+                ctx.strokeStyle = '#14B8A6';
+                ctx.lineWidth = 4;
                 ctx.beginPath();
-                ctx.arc(pxPos, pyPos, 12, 0, Math.PI * 2);
+                for (let p = 0; p <= 40; p++) {
+                    const t = calculatePPF(p);
+                    const x = 50 + (p / 40) * 300;
+                    const y = 300 - (t / 100) * 250;
+                    if (p === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                
+                // Calculate position
+                const px = 50 + (dragPoint.pizzas / 40) * 300;
+                const py = 300 - (dragPoint.tacos / 100) * 250;
+                
+                // Determine zone
+                const expectedTacos = calculatePPF(dragPoint.pizzas);
+                let zone, color, zoneName;
+                
+                if (Math.abs(dragPoint.tacos - expectedTacos) < 3) {
+                    zone = 'efficient';
+                    color = '#10B981';
+                    zoneName = 'ON CURVE - EFFICIENT';
+                } else if (dragPoint.tacos < expectedTacos) {
+                    zone = 'inefficient';
+                    color = '#E8505B';
+                    zoneName = 'INSIDE - WASTED';
+                } else {
+                    zone = 'impossible';
+                    color = '#5B5EA6';
+                    zoneName = 'OUTSIDE - IMPOSSIBLE';
+                }
+                
+                // Draw draggable point
                 ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(px, py, 12, 0, Math.PI * 2);
                 ctx.fill();
+                
+                // Draw white ring to show it's draggable
                 ctx.strokeStyle = 'white';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(px, py, 12, 0, Math.PI * 2);
                 ctx.stroke();
+                
+                // Draw status text above point
+                ctx.fillStyle = color;
+                ctx.font = 'bold 14px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText(zoneName, px, py - 20);
+                
+                // Draw coordinates
+                ctx.fillStyle = 'white';
+                ctx.font = '12px system-ui';
+                ctx.fillText(`${Math.round(dragPoint.pizzas)} pizzas, ${Math.round(dragPoint.tacos)} tacos`, px, py + 30);
+                
+                // Labels
+                ctx.textAlign = 'left';
+                ctx.fillStyle = 'white';
+                ctx.font = '14px system-ui';
+                ctx.fillText('Pizzas →', 150, 330);
+                ctx.save();
+                ctx.translate(20, 180);
+                ctx.rotate(-Math.PI / 2);
+                ctx.fillText('Tacos →', 0, 0);
+                ctx.restore();
+                
+                // Instruction
+                ctx.textAlign = 'center';
+                ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                ctx.font = 'italic 12px system-ui';
+                ctx.fillText('👆 Drag the point to explore!', 200, 20);
+            }
+            
+            function getMousePos(e) {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                };
+            }
+            
+            function isPointInCircle(mx, my) {
+                const px = 50 + (dragPoint.pizzas / 40) * 300;
+                const py = 300 - (dragPoint.tacos / 100) * 250;
+                const dist = Math.sqrt((mx - px) ** 2 + (my - py) ** 2);
+                return dist <= 12;
+            }
+            
+            canvas.addEventListener('mousedown', function(e) {
+                const pos = getMousePos(e);
+                if (isPointInCircle(pos.x, pos.y)) {
+                    isDragging = true;
+                    canvas.style.cursor = 'grabbing';
+                }
+            });
+            
+            canvas.addEventListener('mousemove', function(e) {
+                const pos = getMousePos(e);
+                
+                if (isDragging) {
+                    // Update point position
+                    dragPoint.pizzas = Math.max(0, Math.min(40, ((pos.x - 50) / 300) * 40));
+                    dragPoint.tacos = Math.max(0, Math.min(100, (1 - (pos.y - 50) / 250) * 100));
+                    draw();
+                } else {
+                    // Change cursor if hovering over point
+                    canvas.style.cursor = isPointInCircle(pos.x, pos.y) ? 'grab' : 'default';
+                }
+            });
+            
+            canvas.addEventListener('mouseup', function() {
+                isDragging = false;
+                canvas.style.cursor = 'grab';
+            });
+            
+            canvas.addEventListener('mouseleave', function() {
+                isDragging = false;
+                canvas.style.cursor = 'default';
+            });
+            
+            draw();
+        }
+        
+        // Slide 6: Interactive slider
+        function updateSlider(pizzas) {
+            const tacos = calculatePPF(pizzas);
+            document.getElementById('slider-pizzas').textContent = pizzas;
+            document.getElementById('slider-tacos').textContent = tacos;
+        }
+        
+        // Slide 9: Practice question
+        function checkPractice() {
+            const answer = document.getElementById('practice-answer').value.trim();
+            const feedback = document.getElementById('practice-feedback');
+            
+            if (answer === '2.5' || answer === '2' || answer === '3') {
+                feedback.textContent = '✓ Correct! 100 tacos ÷ 40 pizzas = 2.5 tacos per pizza';
+                feedback.style.color = 'var(--green)';
+                document.getElementById('practice-answer').parentElement.classList.add('correct');
+            } else {
+                feedback.textContent = '✗ Try again. Formula: What you give up ÷ What you gain';
+                feedback.style.color = 'var(--red)';
+                document.getElementById('practice-answer').parentElement.classList.add('incorrect');
+                setTimeout(() => {
+                    document.getElementById('practice-answer').parentElement.classList.remove('incorrect');
+                }, 500);
             }
         }
         
-        // Init
-        window.onload = function() { initExplore(); maybeShowInstructions('explore'); };
+        // ===========================================
+        // TAB SWITCHING
+        // ===========================================
+        
+        function switchTab(tabName) {
+            // Check if tab is locked
+            if (!previewMode) {
+                if (tabName === 'explore' || tabName === 'millionaire') {
+                    if (!lessonCompleted) {
+                        alert('🔒 Complete the lesson first!');
+                        return;
+                    }
+                } else if (tabName === 'quiz') {
+                    if (!millionaireCompleted) {
+                        alert('🔒 Complete Millionaire first!');
+                        return;
+                    }
+                } else if (tabName === 'escape') {
+                    if (!quizCompleted) {
+                        alert('🔒 Complete the Quiz first!');
+                        return;
+                    }
+                } else if (tabName === 'bonus') {
+                    if (!escapeCompleted) {
+                        alert('🔒 Complete the Escape Room first!');
+                        return;
+                    }
+                }
+            }
+            
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            // Initialize tab if needed
+            if (tabName === 'explore' && !window.exploreInitialized) {
+                initExplore();
+            } else if (tabName === 'millionaire' && !window.millionaireInitialized) {
+                initMillionaire();
+            } else if (tabName === 'quiz' && !window.quizInitialized) {
+                initQuiz();
+            } else if (tabName === 'escape' && !window.escapeInitialized) {
+                initEscapeRoom();
+            }
+            // Bonus tab has no initialization - just links to external games
+        }
+        
+        // ===========================================
+        // PPF CALCULATION
+        // ===========================================
+        
+        function calculatePPF(pizzas) {
+            const maxPizzas = 40;
+            const maxTacos = 100;
+            return Math.round(maxTacos * (1 - Math.pow(pizzas / maxPizzas, 0.5)));
+        }
+        
+        // ===========================================
+        // EXPLORE MODE
+        // ===========================================
+        
+        function initExplore() {
+            const canvas = document.getElementById('exploreCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            let currentPizzas = 20;
+            let currentTacos = 75;
+            
+            function drawGraph() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw axes
+                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(50, 400);
+                ctx.lineTo(450, 400);
+                ctx.moveTo(50, 400);
+                ctx.lineTo(50, 50);
+                ctx.stroke();
+                
+                // Draw PPF curve
+                ctx.strokeStyle = '#14B8A6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                for (let p = 0; p <= 40; p++) {
+                    const t = calculatePPF(p);
+                    const x = 50 + (p / 40) * 400;
+                    const y = 400 - (t / 100) * 350;
+                    if (p === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                
+                // Draw current point
+                const px = 50 + (currentPizzas / 40) * 400;
+                const py = 400 - (currentTacos / 100) * 350;
+                ctx.fillStyle = '#F59E0B';
+                ctx.beginPath();
+                ctx.arc(px, py, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Labels
+                ctx.fillStyle = 'white';
+                ctx.font = '14px system-ui';
+                ctx.fillText('Pizzas →', 200, 430);
+                ctx.save();
+                ctx.translate(20, 250);
+                ctx.rotate(-Math.PI / 2);
+                ctx.fillText('Tacos →', 0, 0);
+                ctx.restore();
+            }
+            
+            function updateDisplay() {
+                document.getElementById('explore-pizza').textContent = currentPizzas;
+                document.getElementById('explore-taco').textContent = currentTacos;
+                
+                const oppCost = (100 / 40).toFixed(1);
+                document.getElementById('explore-cost').innerHTML = 
+                    `1 more pizza costs <span class="highlight">${oppCost} tacos</span>`;
+                
+                const expectedTacos = calculatePPF(currentPizzas);
+                const status = document.getElementById('explore-status');
+                
+                if (Math.abs(currentTacos - expectedTacos) < 3) {
+                    status.className = 'status-badge efficient';
+                    status.textContent = 'ON THE CURVE — Efficient!';
+                } else if (currentTacos < expectedTacos) {
+                    status.className = 'status-badge inefficient';
+                    status.textContent = 'INSIDE — Inefficient!';
+                } else {
+                    status.className = 'status-badge impossible';
+                    status.textContent = 'OUTSIDE — Impossible!';
+                }
+                
+                drawGraph();
+            }
+            
+            canvas.addEventListener('click', function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                currentPizzas = Math.round(((x - 50) / 400) * 40);
+                currentTacos = Math.round((1 - (y - 50) / 350) * 100);
+                
+                currentPizzas = Math.max(0, Math.min(40, currentPizzas));
+                currentTacos = Math.max(0, Math.min(100, currentTacos));
+                
+                updateDisplay();
+            });
+            
+            window.exploreSet = function(p, t) {
+                currentPizzas = p;
+                currentTacos = t;
+                updateDisplay();
+            };
+            
+            updateDisplay();
+            window.exploreInitialized = true;
+        }
+        
+        // Initialize explore on load
+        initExplore();
+        
+        // ===========================================
+        // SPACE SHOOTER (Same as before)
+        // ===========================================
+        
+        function initSpaceShooter() {
+            const canvas = document.getElementById('space-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const vocab = [
+                { term: 'Opportunity Cost', definition: 'What you give up when making a choice' },
+                { term: 'Scarcity', definition: 'Limited resources vs unlimited wants' },
+                { term: 'Efficient', definition: 'Using all resources, on the curve' },
+                { term: 'Inefficient', definition: 'Wasted resources, inside the curve' },
+                { term: 'Impossible', definition: 'Outside the curve, cannot reach' },
+                { term: 'Trade-off', definition: 'Giving up one thing for another' },
+                { term: 'PPF', definition: 'Graph showing all production possibilities' },
+                { term: 'Economic Growth', definition: 'PPF shifts outward' },
+                { term: 'Production', definition: 'Making goods with limited resources' },
+                { term: 'Resources', definition: 'Inputs used to make goods' },
+                { term: 'Capital', definition: 'Tools and machines for production' },
+                { term: 'Specialization', definition: 'Focusing on what you do best' }
+            ];
+            
+            let level = 1;
+            let score = 0;
+            let lives = 3;
+            let selectedTerm = 0;
+            let ship = { x: 400, y: 300, angle: 0, vx: 0, vy: 0 };
+            let asteroids = [];
+            let bullets = [];
+            let keys = {};
+            let gameActive = false;
+            
+            function createTermSelector() {
+                const selector = document.getElementById('term-selector');
+                selector.innerHTML = '';
+                const termsThisLevel = vocab.slice((level - 1) * 4, level * 4);
+                termsThisLevel.forEach((v, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'term-btn' + (i === selectedTerm ? ' selected' : '');
+                    btn.textContent = `[${i + 1}] ${v.term}`;
+                    btn.onclick = () => {
+                        selectedTerm = i;
+                        createTermSelector();
+                    };
+                    selector.appendChild(btn);
+                });
+            }
+            
+            function startLevel() {
+                asteroids = [];
+                const termsThisLevel = vocab.slice((level - 1) * 4, level * 4);
+                const speed = 0.3 + (level - 1) * 0.3;
+                
+                for (let i = 0; i < 4; i++) {
+                    asteroids.push({
+                        x: Math.random() * 700 + 50,
+                        y: Math.random() * 500 + 50,
+                        vx: (Math.random() - 0.5) * speed,
+                        vy: (Math.random() - 0.5) * speed,
+                        radius: 40,
+                        definition: termsThisLevel[i].definition,
+                        correctTerm: termsThisLevel[i].term
+                    });
+                }
+                
+                ship = { x: 400, y: 300, angle: 0, vx: 0, vy: 0 };
+                bullets = [];
+                gameActive = true;
+                createTermSelector();
+                gameLoop();
+            }
+            
+            function gameLoop() {
+                if (!gameActive) return;
+                
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Update ship
+                if (keys['ArrowLeft']) ship.angle -= 0.1;
+                if (keys['ArrowRight']) ship.angle += 0.1;
+                if (keys['ArrowUp']) {
+                    ship.vx += Math.cos(ship.angle) * 0.1;
+                    ship.vy += Math.sin(ship.angle) * 0.1;
+                }
+                
+                ship.vx *= 0.99;
+                ship.vy *= 0.99;
+                ship.x += ship.vx;
+                ship.y += ship.vy;
+                
+                // Wrap ship
+                if (ship.x < 0) ship.x = canvas.width;
+                if (ship.x > canvas.width) ship.x = 0;
+                if (ship.y < 0) ship.y = canvas.height;
+                if (ship.y > canvas.height) ship.y = 0;
+                
+                // Draw ship
+                ctx.save();
+                ctx.translate(ship.x, ship.y);
+                ctx.rotate(ship.angle);
+                ctx.strokeStyle = '#14B8A6';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(10, 0);
+                ctx.lineTo(-8, -6);
+                ctx.lineTo(-5, 0);
+                ctx.lineTo(-8, 6);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.restore();
+                
+                // Update asteroids
+                asteroids.forEach((ast, i) => {
+                    ast.x += ast.vx;
+                    ast.y += ast.vy;
+                    
+                    if (ast.x < 0) ast.x = canvas.width;
+                    if (ast.x > canvas.width) ast.x = 0;
+                    if (ast.y < 0) ast.y = canvas.height;
+                    if (ast.y > canvas.height) ast.y = 0;
+                    
+                    ctx.fillStyle = '#555';
+                    ctx.beginPath();
+                    ctx.arc(ast.x, ast.y, ast.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = '11px Arial';
+                    ctx.textAlign = 'center';
+                    const words = ast.definition.split(' ');
+                    let line = '';
+                    let y = ast.y - 10;
+                    words.forEach(word => {
+                        const testLine = line + word + ' ';
+                        const metrics = ctx.measureText(testLine);
+                        if (metrics.width > ast.radius * 1.5) {
+                            ctx.fillText(line, ast.x, y);
+                            line = word + ' ';
+                            y += 12;
+                        } else {
+                            line = testLine;
+                        }
+                    });
+                    ctx.fillText(line, ast.x, y);
+                    
+                    const dx = ship.x - ast.x;
+                    const dy = ship.y - ast.y;
+                    if (Math.sqrt(dx * dx + dy * dy) < ast.radius) {
+                        lives--;
+                        updateHUD();
+                        if (lives <= 0) {
+                            endGame();
+                            return;
+                        }
+                        asteroids.splice(i, 1);
+                    }
+                });
+                
+                // Update bullets
+                bullets.forEach((b, i) => {
+                    b.x += b.vx;
+                    b.y += b.vy;
+                    b.life--;
+                    
+                    if (b.life <= 0) {
+                        bullets.splice(i, 1);
+                        return;
+                    }
+                    
+                    ctx.fillStyle = '#F59E0B';
+                    ctx.beginPath();
+                    ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    asteroids.forEach((ast, ai) => {
+                        const dx = b.x - ast.x;
+                        const dy = b.y - ast.y;
+                        if (Math.sqrt(dx * dx + dy * dy) < ast.radius) {
+                            bullets.splice(i, 1);
+                            
+                            const termsThisLevel = vocab.slice((level - 1) * 4, level * 4);
+                            if (b.term === ast.correctTerm) {
+                                score += 100;
+                                asteroids.splice(ai, 1);
+                                
+                                if (asteroids.length === 0) {
+                                    nextLevel();
+                                }
+                            } else {
+                                score = Math.max(0, score - 25);
+                            }
+                            updateHUD();
+                        }
+                    });
+                });
+                
+                requestAnimationFrame(gameLoop);
+            }
+            
+            function updateHUD() {
+                document.getElementById('space-score').textContent = score;
+                document.getElementById('space-level').textContent = level;
+                document.getElementById('space-lives').textContent = '❤️'.repeat(lives);
+                document.getElementById('space-asteroids').textContent = asteroids.length;
+            }
+            
+            function nextLevel() {
+                if (level >= 3) {
+                    gameActive = false;
+                    endGame();
+                } else {
+                    level++;
+                    startLevel();
+                }
+            }
+            
+            function endGame() {
+                gameActive = false;
+                document.getElementById('space-final-score').textContent = score;
+                document.getElementById('space-levels-cleared').textContent = level;
+                document.getElementById('space-gameover').classList.add('active');
+            }
+            
+            document.addEventListener('keydown', (e) => {
+                if (!gameActive) return;
+                keys[e.key] = true;
+                
+                if (e.key === ' ') {
+                    e.preventDefault();
+                    const termsThisLevel = vocab.slice((level - 1) * 4, level * 4);
+                    bullets.push({
+                        x: ship.x,
+                        y: ship.y,
+                        vx: Math.cos(ship.angle) * 5,
+                        vy: Math.sin(ship.angle) * 5,
+                        life: 60,
+                        term: termsThisLevel[selectedTerm].term
+                    });
+                } else if (e.key >= '1' && e.key <= '4') {
+                    selectedTerm = parseInt(e.key) - 1;
+                    createTermSelector();
+                }
+            });
+            
+            document.addEventListener('keyup', (e) => {
+                keys[e.key] = false;
+            });
+            
+            window.initSpaceShooter = function() {
+                level = 1;
+                score = 0;
+                lives = 3;
+                selectedTerm = 0;
+                document.getElementById('space-gameover').classList.remove('active');
+                updateHUD();
+                startLevel();
+            };
+            
+            startLevel();
+            window.spaceInitialized = true;
+        }
+        
+        // ===========================================
+        // ESCAPE ROOM (Same as before)
+        // ===========================================
+        
+        function initEscapeRoom() {
+            const output = document.getElementById('escape-output');
+            const input = document.getElementById('escape-input');
+            
+            const rooms = [
+                {
+                    name: 'MACHINE ROOM',
+                    description: 'You are in the MACHINE ROOM. Conveyor belts stretch endlessly. A locked DOOR leads NORTH. A computer terminal displays a production problem.',
+                    puzzle: 'Factory data: Max 40 pizzas OR 100 tacos. If you make 20 pizzas, what is the opportunity cost of making 1 MORE pizza? (Calculate tacos lost)',
+                    answer: '2.5',
+                    hint: 'Opportunity cost = What you give up ÷ What you gain. At 40 pizzas you give up 100 tacos. Per pizza = 100÷40 = 2.5 tacos.'
+                },
+                {
+                    name: 'PRODUCTION FLOOR',
+                    description: 'The PRODUCTION FLOOR buzzes with dormant machinery. A control panel shows three production points. One is EFFICIENT. Which one?',
+                    puzzle: 'Choose efficient point: A) 15 pizzas, 80 tacos  B) 20 pizzas, 50 tacos  C) 10 pizzas, 40 tacos',
+                    answer: 'B',
+                    hint: 'Efficient means using 100% of capacity. Calculate: (pizzas÷40) + (tacos÷100) should equal 1.0 (or 100%). Only B works: (20÷40)+(50÷100) = 0.5+0.5 = 1.0 ✓'
+                },
+                {
+                    name: 'GROWTH LAB',
+                    description: 'The GROWTH LAB contains research data. A scientist left a question: What shifts the PPF OUTWARD?',
+                    puzzle: 'What causes economic growth? A) Using less resources  B) Better technology  C) Working inefficiently',
+                    answer: 'B',
+                    hint: 'Economic growth = more production capacity. Technology, more workers, better education all help!'
+                },
+                {
+                    name: 'EXIT',
+                    description: 'You solved all puzzles! The exit door opens. You mastered the PPF!',
+                    isFinal: true
+                }
+            ];
+            
+            let currentRoom = 0;
+            
+            function print(text, color = '#0f0') {
+                const div = document.createElement('div');
+                div.style.color = color;
+                div.textContent = text;
+                output.appendChild(div);
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            function showRoom() {
+                const room = rooms[currentRoom];
+                print('');
+                print('═══════════════════════════════════════', '#14B8A6');
+                print(`  ${room.name}`, '#F59E0B');
+                print('═══════════════════════════════════════', '#14B8A6');
+                print('');
+                print(room.description);
+                
+                if (!room.isFinal) {
+                    print('');
+                    print(room.puzzle, '#fff');
+                    print('');
+                    print('Commands: CALCULATE [answer], HINT, HELP, LOOK');
+                } else {
+                    print('');
+                    print('🎉 Congratulations! You escaped!', '#F59E0B');
+                }
+            }
+            
+            window.escapeCommand = function() {
+                const cmd = input.value.trim().toUpperCase();
+                input.value = '';
+                
+                print('> ' + cmd, '#14B8A6');
+                
+                const room = rooms[currentRoom];
+                
+                if (cmd === 'HELP') {
+                    print('Available commands: CALCULATE [answer], HINT, LOOK, NORTH');
+                } else if (cmd === 'LOOK') {
+                    showRoom();
+                } else if (cmd === 'HINT') {
+                    print(room.hint, '#FBBF24');
+                } else if (cmd.startsWith('CALCULATE ')) {
+                    const answer = cmd.replace('CALCULATE ', '').trim();
+                    if (answer === room.answer || answer === room.answer.toLowerCase()) {
+                        print('✓ CORRECT! Door unlocked!', '#22C55E');
+                        currentRoom++;
+                        
+                        // Check if they reached the final room (escaped)
+                        if (currentRoom >= rooms.length - 1 && !escapeCompleted) {
+                            setTimeout(() => unlockBonusGames(), 2000);
+                        }
+                        
+                        setTimeout(showRoom, 1000);
+                    } else {
+                        print('✗ Incorrect. Try again or type HINT.', '#EF4444');
+                    }
+                } else if (cmd === 'NORTH') {
+                    if (currentRoom === rooms.length - 1) {
+                        print('You already escaped!', '#F59E0B');
+                    } else {
+                        print('The door is locked. Solve the puzzle first!', '#EF4444');
+                    }
+                } else {
+                    print('Unknown command. Type HELP for commands.');
+                }
+            };
+            
+            print('INITIALIZING FACTORY TERMINAL...', '#14B8A6');
+            print('SYSTEM READY', '#22C55E');
+            print('');
+            print('Welcome to FACTORY ESCAPE. Solve PPF puzzles to escape!');
+            showRoom();
+            
+            window.escapeInitialized = true;
+        }
+        
+        // ===========================================
+        // QUIZ (Same as before)
+        // ===========================================
+        
+        function initQuiz() {
+            const questions = [
+                {
+                    q: 'What is opportunity cost?',
+                    options: [
+                        'The money you pay for something',
+                        'What you give up when making a choice',
+                        'The total cost of production',
+                        'The price of goods'
+                    ],
+                    correct: 1
+                },
+                {
+                    q: 'What does the PPF show?',
+                    options: [
+                        'Only inefficient production',
+                        'All possible production combinations',
+                        'Just the maximum output',
+                        'Future economic predictions'
+                    ],
+                    correct: 1
+                },
+                {
+                    q: 'A point INSIDE the PPF curve means:',
+                    options: [
+                        'Efficient production',
+                        'Impossible to reach',
+                        'Inefficient/wasted resources',
+                        'Economic growth'
+                    ],
+                    correct: 2
+                },
+                {
+                    q: 'A point ON the PPF curve means:',
+                    options: [
+                        'Wasting resources',
+                        'Using all resources efficiently',
+                        'Impossible production',
+                        'Economic decline'
+                    ],
+                    correct: 1
+                },
+                {
+                    q: 'What shifts the PPF outward?',
+                    options: [
+                        'Using fewer resources',
+                        'Economic growth (new tech, workers)',
+                        'Producing less efficiently',
+                        'Reducing production'
+                    ],
+                    correct: 1
+                },
+                {
+                    q: 'Factory max: 50 cars OR 100 bikes. Opportunity cost of 1 car?',
+                    options: [
+                        '0.5 bikes',
+                        '2 bikes',
+                        '50 bikes',
+                        '100 bikes'
+                    ],
+                    correct: 1
+                },
+                {
+                    q: 'Moving along the PPF curve shows:',
+                    options: [
+                        'Wasted resources',
+                        'Economic growth',
+                        'Trade-offs between goods',
+                        'Impossible choices'
+                    ],
+                    correct: 2
+                },
+                {
+                    q: 'Scarcity means:',
+                    options: [
+                        'Everything is expensive',
+                        'Limited resources vs unlimited wants',
+                        'Nobody has enough money',
+                        'Shortage of one specific good'
+                    ],
+                    correct: 1
+                },
+                {
+                    q: 'Why is the PPF curved (bowed out)?',
+                    options: [
+                        'Random design choice',
+                        'Resources not equally good at making both goods',
+                        'It should be a straight line',
+                        'To make it look nice'
+                    ],
+                    correct: 1
+                },
+                {
+                    q: 'A country produces OUTSIDE its PPF. This is:',
+                    options: [
+                        'Efficient',
+                        'Inefficient',
+                        'Impossible with current resources',
+                        'The goal'
+                    ],
+                    correct: 2
+                }
+            ];
+            
+            let currentQ = 0;
+            let answers = new Array(questions.length).fill(null);
+            let showingReview = false;
+            
+            function renderQuestion() {
+                const container = document.getElementById('quiz-questions');
+                container.innerHTML = '';
+                
+                const q = questions[currentQ];
+                const qDiv = document.createElement('div');
+                qDiv.className = 'quiz-question';
+                
+                const title = document.createElement('h3');
+                title.textContent = `Question ${currentQ + 1}`;
+                qDiv.appendChild(title);
+                
+                const text = document.createElement('p');
+                text.textContent = q.q;
+                qDiv.appendChild(text);
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'quiz-options';
+                
+                q.options.forEach((opt, i) => {
+                    const optDiv = document.createElement('div');
+                    optDiv.className = 'quiz-option';
+                    if (answers[currentQ] === i) optDiv.classList.add('selected');
+                    if (showingReview) {
+                        if (i === q.correct) optDiv.classList.add('correct');
+                        if (answers[currentQ] === i && i !== q.correct) optDiv.classList.add('incorrect');
+                    }
+                    optDiv.textContent = opt;
+                    optDiv.onclick = () => {
+                        if (!showingReview) {
+                            answers[currentQ] = i;
+                            renderQuestion();
+                        }
+                    };
+                    optionsDiv.appendChild(optDiv);
+                });
+                
+                qDiv.appendChild(optionsDiv);
+                container.appendChild(qDiv);
+                
+                document.getElementById('quiz-current').textContent = currentQ + 1;
+                document.getElementById('quiz-total').textContent = questions.length;
+                
+                document.getElementById('quiz-prev').disabled = currentQ === 0;
+                document.getElementById('quiz-next').style.display = currentQ === questions.length - 1 ? 'none' : 'block';
+                document.getElementById('quiz-submit').style.display = currentQ === questions.length - 1 && !showingReview ? 'block' : 'none';
+            }
+            
+            window.nextQuizQuestion = function() {
+                if (currentQ < questions.length - 1) {
+                    currentQ++;
+                    renderQuestion();
+                }
+            };
+            
+            window.prevQuizQuestion = function() {
+                if (currentQ > 0) {
+                    currentQ--;
+                    renderQuestion();
+                }
+            };
+            
+            window.submitQuiz = function() {
+                let correct = 0;
+                questions.forEach((q, i) => {
+                    if (answers[i] === q.correct) correct++;
+                });
+                
+                document.getElementById('quiz-container').style.display = 'none';
+                document.getElementById('quiz-results').style.display = 'block';
+                document.getElementById('quiz-score-percent').textContent = Math.round((correct / questions.length) * 100) + '%';
+                document.getElementById('quiz-correct').textContent = correct;
+                document.getElementById('quiz-total-score').textContent = questions.length;
+            };
+            
+            window.reviewQuiz = function() {
+                showingReview = true;
+                currentQ = 0;
+                document.getElementById('quiz-container').style.display = 'block';
+                document.getElementById('quiz-results').style.display = 'none';
+                renderQuestion();
+            };
+            
+            window.resetQuiz = function() {
+                currentQ = 0;
+                answers = new Array(questions.length).fill(null);
+                showingReview = false;
+                document.getElementById('quiz-container').style.display = 'block';
+                document.getElementById('quiz-results').style.display = 'none';
+                renderQuestion();
+            };
+            
+            renderQuestion();
+            window.quizInitialized = true;
+        }
+        
+        // ===========================================
+        // MILLIONAIRE GAME
+        // ===========================================
+        
+        function initMillionaire() {
+            const questions = [
+                {
+                    q: "What does PPF stand for?",
+                    a: ["Pretty Fun Forecast", "Production Possibilities Frontier", "Pizza Productivity Factor", "Price Point Finder"],
+                    correct: 1
+                },
+                {
+                    q: "What is opportunity cost?",
+                    a: ["The price you pay at the store", "What you give up when making a choice", "The total cost of production", "A discount opportunity"],
+                    correct: 1
+                },
+                {
+                    q: "A point ON the PPF curve means production is:",
+                    a: ["Wasting resources", "Using all resources efficiently", "Impossible to reach", "Losing money"],
+                    correct: 1
+                },
+                {
+                    q: "A point INSIDE the PPF curve means:",
+                    a: ["Maximum efficiency", "Wasted or unused resources", "Economic growth", "Perfect production"],
+                    correct: 1
+                },
+                {
+                    q: "What does scarcity mean in economics?",
+                    a: ["Everything is expensive", "Limited resources vs unlimited wants", "Running out of one product", "A temporary shortage"],
+                    correct: 1
+                },
+                {
+                    q: "What shifts the PPF curve OUTWARD?",
+                    a: ["Using fewer resources", "Economic growth (new tech/workers)", "Making fewer products", "Reducing efficiency"],
+                    correct: 1
+                },
+                {
+                    q: "If max production is 40 pizzas OR 100 tacos, what's the opportunity cost of 1 pizza?",
+                    a: ["1 taco", "2.5 tacos", "40 tacos", "100 tacos"],
+                    correct: 1
+                },
+                {
+                    q: "Moving along the PPF curve shows:",
+                    a: ["Economic growth", "Trade-offs between goods", "Wasted resources", "Impossible choices"],
+                    correct: 1
+                },
+                {
+                    q: "A point OUTSIDE the PPF is:",
+                    a: ["The goal to reach", "Efficient production", "Impossible with current resources", "Wasting money"],
+                    correct: 2
+                },
+                {
+                    q: "What does 'efficient production' mean?",
+                    a: ["Making products quickly", "Using all available resources", "Producing the cheapest goods", "Hiring more workers"],
+                    correct: 1
+                }
+            ];
+            
+            const moneyLadder = [
+                "$100", "$200", "$500", "$1,000", "$2,000", 
+                "$4,000", "$8,000", "$16,000", "$32,000", "$1,000,000"
+            ];
+            
+            let currentQuestion = 0;
+            let moneyWon = 0;
+            let lifelines = {
+                fiftyFifty: true,
+                audience: true,
+                phone: true
+            };
+            let selectedAnswer = null;
+            let answersRevealed = false;
+            
+            function buildMoneyLadder() {
+                const ladder = document.getElementById('money-ladder');
+                ladder.innerHTML = '<h3 style="text-align:center;margin-bottom:16px;color:var(--gold);">💰 PRIZE</h3>';
+                
+                for (let i = moneyLadder.length - 1; i >= 0; i--) {
+                    const step = document.createElement('div');
+                    step.className = 'money-step';
+                    step.textContent = (i + 1) + ". " + moneyLadder[i];
+                    
+                    if (i === currentQuestion) {
+                        step.classList.add('current');
+                    } else if (i < currentQuestion) {
+                        step.classList.add('won');
+                    }
+                    
+                    ladder.appendChild(step);
+                }
+            }
+            
+            function showQuestion() {
+                answersRevealed = false;
+                selectedAnswer = null;
+                
+                const q = questions[currentQuestion];
+                
+                document.getElementById('mill-question-num').textContent = currentQuestion + 1;
+                document.getElementById('mill-question').textContent = q.q;
+                
+                const answersGrid = document.getElementById('mill-answers');
+                answersGrid.innerHTML = '';
+                
+                const letters = ['A', 'B', 'C', 'D'];
+                q.a.forEach((answer, i) => {
+                    const option = document.createElement('div');
+                    option.className = 'answer-option';
+                    option.innerHTML = `<span class="letter">${letters[i]}</span>${answer}`;
+                    option.onclick = () => selectAnswer(i);
+                    option.dataset.index = i;
+                    answersGrid.appendChild(option);
+                });
+                
+                buildMoneyLadder();
+                
+                document.getElementById('fifty-fifty').disabled = !lifelines.fiftyFifty;
+                document.getElementById('audience').disabled = !lifelines.audience;
+                document.getElementById('phone').disabled = !lifelines.phone;
+                
+                document.getElementById('question-area').style.display = 'block';
+                document.getElementById('mill-result').style.display = 'none';
+            }
+            
+            function selectAnswer(index) {
+                if (answersRevealed) return;
+                
+                const options = document.querySelectorAll('.answer-option');
+                options.forEach(opt => opt.classList.remove('selected'));
+                options[index].classList.add('selected');
+                selectedAnswer = index;
+                
+                setTimeout(() => revealAnswer(), 1000);
+            }
+            
+            function revealAnswer() {
+                if (selectedAnswer === null) return;
+                
+                answersRevealed = true;
+                const q = questions[currentQuestion];
+                const options = document.querySelectorAll('.answer-option');
+                
+                options.forEach((opt, i) => {
+                    opt.classList.add('disabled');
+                    if (i === q.correct) {
+                        opt.classList.add('correct');
+                    }
+                    if (i === selectedAnswer && i !== q.correct) {
+                        opt.classList.add('incorrect');
+                    }
+                });
+                
+                if (selectedAnswer === q.correct) {
+                    setTimeout(() => {
+                        currentQuestion++;
+                        moneyWon = currentQuestion;
+                        
+                        if (currentQuestion >= questions.length) {
+                            showFinalResult(true);
+                        } else {
+                            showQuestion();
+                        }
+                    }, 2000);
+                } else {
+                    setTimeout(() => {
+                        showFinalResult(false);
+                    }, 2000);
+                }
+            }
+            
+            window.useFiftyFifty = function() {
+                if (!lifelines.fiftyFifty || answersRevealed) return;
+                
+                lifelines.fiftyFifty = false;
+                document.getElementById('fifty-fifty').disabled = true;
+                
+                const q = questions[currentQuestion];
+                const options = document.querySelectorAll('.answer-option');
+                
+                let removed = 0;
+                options.forEach((opt, i) => {
+                    if (i !== q.correct && removed < 2) {
+                        opt.classList.add('disabled');
+                        opt.style.opacity = '0.2';
+                        removed++;
+                    }
+                });
+            };
+            
+            window.useAudience = function() {
+                if (!lifelines.audience || answersRevealed) return;
+                
+                lifelines.audience = false;
+                document.getElementById('audience').disabled = true;
+                
+                const q = questions[currentQuestion];
+                
+                const questionArea = document.getElementById('question-area');
+                const existingPoll = document.querySelector('.audience-poll');
+                if (existingPoll) existingPoll.remove();
+                
+                const poll = document.createElement('div');
+                poll.className = 'audience-poll';
+                
+                const letters = ['A', 'B', 'C', 'D'];
+                const percentages = [0, 0, 0, 0];
+                
+                percentages[q.correct] = 60 + Math.random() * 20;
+                
+                let remaining = 100 - percentages[q.correct];
+                for (let i = 0; i < 4; i++) {
+                    if (i !== q.correct) {
+                        const share = Math.random() * remaining;
+                        percentages[i] = share;
+                        remaining -= share;
+                    }
+                }
+                
+                percentages.forEach((pct, i) => {
+                    const barDiv = document.createElement('div');
+                    barDiv.className = 'poll-bar';
+                    barDiv.innerHTML = `
+                        <div class="poll-letter">${letters[i]}</div>
+                        <div class="poll-bar-fill">
+                            <div class="poll-bar-inner" style="height: ${pct}%"></div>
+                        </div>
+                        <div class="poll-percent">${Math.round(pct)}%</div>
+                    `;
+                    poll.appendChild(barDiv);
+                });
+                
+                questionArea.insertBefore(poll, document.getElementById('mill-answers'));
+            };
+            
+            window.usePhone = function() {
+                if (!lifelines.phone || answersRevealed) return;
+                
+                lifelines.phone = false;
+                document.getElementById('phone').disabled = true;
+                
+                const q = questions[currentQuestion];
+                const letters = ['A', 'B', 'C', 'D'];
+                
+                let advice = Math.random() < 0.8 
+                    ? `I'm pretty sure it's ${letters[q.correct]}!`
+                    : `Hmm, I think it's either ${letters[q.correct]} or ${letters[(q.correct + 1) % 4]}...`;
+                
+                alert(`📞 Your friend says: "${advice}"`);
+            };
+            
+            window.walkAway = function() {
+                showFinalResult(false, true);
+            };
+            
+            function showFinalResult(won, walkedAway = false) {
+                document.getElementById('question-area').style.display = 'none';
+                document.getElementById('mill-result').style.display = 'block';
+                
+                const title = document.getElementById('mill-result-title');
+                const amount = document.getElementById('mill-final-amount');
+                const message = document.getElementById('mill-result-message');
+                
+                const finalMoney = moneyWon > 0 ? moneyLadder[moneyWon - 1] : "$0";
+                
+                if (won && currentQuestion >= questions.length) {
+                    title.textContent = "🎉 MILLIONAIRE! 🎉";
+                    amount.textContent = "$1,000,000";
+                    message.textContent = "You answered all 10 questions correctly! You're a PPF expert!";
+                    
+                    // Unlock Quiz
+                    if (!millionaireCompleted) {
+                        setTimeout(() => unlockQuiz(), 1500);
+                    }
+                } else if (walkedAway) {
+                    title.textContent = "You Walked Away";
+                    amount.textContent = finalMoney;
+                    message.textContent = `Smart move! You're taking home ${finalMoney}`;
+                } else {
+                    title.textContent = "Game Over";
+                    amount.textContent = finalMoney;
+                    message.textContent = moneyWon > 0 
+                        ? `You got ${moneyWon} question${moneyWon === 1 ? '' : 's'} correct and won ${finalMoney}!`
+                        : "Better luck next time!";
+                }
+            }
+            
+            currentQuestion = 0;
+            moneyWon = 0;
+            lifelines = { fiftyFifty: true, audience: true, phone: true };
+            showQuestion();
+            
+            window.millionaireInitialized = true;
+        }
+        
+        // ===========================================
+        // QUIZ GAME
+        // ===========================================
+        
+        function initQuiz() {
+            const questions = [
+                {
+                    q: "The PPF shows all possible combinations of two goods that can be produced with:",
+                    options: ["Unlimited resources", "Fixed resources", "Increasing resources", "Decreasing resources"],
+                    correct: 1
+                },
+                {
+                    q: "Opportunity cost is:",
+                    options: ["The money you pay for something", "What you give up to get something", "The total cost of production", "The price at the store"],
+                    correct: 1
+                },
+                {
+                    q: "A point ON the PPF curve represents:",
+                    options: ["Inefficient production", "Efficient production", "Impossible production", "Future production"],
+                    correct: 1
+                },
+                {
+                    q: "A point INSIDE the PPF curve means:",
+                    options: ["All resources are being used", "Resources are being wasted", "Production is impossible", "The economy is growing"],
+                    correct: 1
+                },
+                {
+                    q: "What does scarcity mean in economics?",
+                    options: ["Everything is expensive", "Limited resources vs unlimited wants", "Temporary shortage", "Government restrictions"],
+                    correct: 1
+                },
+                {
+                    q: "What shifts the PPF curve OUTWARD?",
+                    options: ["Using fewer workers", "Economic growth", "Production decreases", "Higher prices"],
+                    correct: 1
+                },
+                {
+                    q: "If a factory can make 40 pizzas OR 100 tacos, the opportunity cost of 1 pizza is:",
+                    options: ["1 taco", "2.5 tacos", "40 tacos", "100 tacos"],
+                    correct: 1
+                },
+                {
+                    q: "Moving along the PPF shows:",
+                    options: ["Economic growth", "Trade-offs between goods", "Inflation", "Unemployment"],
+                    correct: 1
+                },
+                {
+                    q: "The slope of the PPF represents:",
+                    options: ["Total production", "Opportunity cost", "Market price", "Profit margin"],
+                    correct: 1
+                },
+                {
+                    q: "What best describes 'efficient production'?",
+                    options: ["Making products quickly", "Using all available resources", "Producing at lowest cost", "Maximum profit"],
+                    correct: 1
+                }
+            ];
+            
+            let currentQ = 0;
+            let score = 0;
+            let selectedAnswer = null;
+            
+            function showQuestion() {
+                const container = document.getElementById('quiz-questions');
+                const q = questions[currentQ];
+                
+                container.innerHTML = `
+                    <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 16px; border: 2px solid var(--teal);">
+                        <h3 style="color: var(--teal); margin-bottom: 30px;">Question ${currentQ + 1} of 10</h3>
+                        <p style="font-size: 1.2rem; margin-bottom: 30px; line-height: 1.6;">${q.q}</p>
+                        
+                        <div style="display: grid; gap: 12px;">
+                            ${q.options.map((opt, i) => `
+                                <button class="quiz-option" data-index="${i}" onclick="selectQuizAnswer(${i})" 
+                                    style="padding: 16px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); 
+                                    border-radius: 12px; cursor: pointer; text-align: left; transition: all 0.3s; font-size: 1rem;">
+                                    <span style="display: inline-block; width: 30px; height: 30px; background: var(--gold); color: #1a1b2e; 
+                                        border-radius: 50%; text-align: center; line-height: 30px; font-weight: bold; margin-right: 12px;">
+                                        ${String.fromCharCode(65 + i)}
+                                    </span>
+                                    ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('quiz-nav').style.display = 'block';
+                document.getElementById('quiz-current-num').textContent = currentQ + 1;
+                document.getElementById('quiz-submit-btn').disabled = true;
+                selectedAnswer = null;
+            }
+            
+            window.selectQuizAnswer = function(index) {
+                selectedAnswer = index;
+                
+                document.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.style.borderColor = 'rgba(255,255,255,0.2)';
+                    opt.style.background = 'rgba(255,255,255,0.05)';
+                });
+                
+                const selected = document.querySelector(`[data-index="${index}"]`);
+                selected.style.borderColor = 'var(--gold)';
+                selected.style.background = 'rgba(245,158,11,0.2)';
+                
+                document.getElementById('quiz-submit-btn').disabled = false;
+            };
+            
+            window.submitQuizAnswer = function() {
+                if (selectedAnswer === null) return;
+                
+                const q = questions[currentQ];
+                const options = document.querySelectorAll('.quiz-option');
+                
+                // Show correct/incorrect
+                options.forEach((opt, i) => {
+                    opt.style.pointerEvents = 'none';
+                    if (i === q.correct) {
+                        opt.style.borderColor = 'var(--green)';
+                        opt.style.background = 'rgba(16,185,129,0.2)';
+                    }
+                    if (i === selectedAnswer && i !== q.correct) {
+                        opt.style.borderColor = 'var(--red)';
+                        opt.style.background = 'rgba(232,80,91,0.2)';
+                    }
+                });
+                
+                if (selectedAnswer === q.correct) {
+                    score++;
+                }
+                
+                setTimeout(() => {
+                    currentQ++;
+                    if (currentQ < questions.length) {
+                        showQuestion();
+                    } else {
+                        showCertificate();
+                    }
+                }, 2000);
+            };
+            
+            function showCertificate() {
+                document.getElementById('quiz-questions').style.display = 'none';
+                document.getElementById('quiz-nav').style.display = 'none';
+                document.getElementById('quiz-certificate').style.display = 'block';
+                
+                const percentage = (score / questions.length) * 100;
+                let grade, gradeColor, gradeMessage;
+                
+                if (percentage >= 90) {
+                    grade = 'A';
+                    gradeColor = '#10B981';
+                    gradeMessage = 'Outstanding! You have mastered PPF concepts!';
+                } else if (percentage >= 80) {
+                    grade = 'B';
+                    gradeColor = '#14B8A6';
+                    gradeMessage = 'Great job! You have a strong understanding of PPF!';
+                } else if (percentage >= 70) {
+                    grade = 'C';
+                    gradeColor = '#F59E0B';
+                    gradeMessage = 'Good work! You understand the basics of PPF!';
+                } else if (percentage >= 60) {
+                    grade = 'D';
+                    gradeColor = '#F97316';
+                    gradeMessage = 'You passed, but consider reviewing the material.';
+                } else {
+                    grade = 'F';
+                    gradeColor = '#E8505B';
+                    gradeMessage = 'Please review the lesson and try again.';
+                }
+                
+                const circle = document.getElementById('quiz-grade-circle');
+                circle.textContent = grade;
+                circle.style.borderColor = gradeColor;
+                circle.style.color = gradeColor;
+                circle.style.background = `${gradeColor}22`;
+                
+                document.getElementById('quiz-final-score').textContent = `${score}/${questions.length} (${Math.round(percentage)}%)`;
+                document.getElementById('quiz-grade-message').textContent = gradeMessage;
+                
+                const now = new Date();
+                document.getElementById('quiz-date').textContent = now.toLocaleDateString('en-US', { 
+                    year: 'numeric', month: 'long', day: 'numeric' 
+                });
+                
+                // Show continue button if passing grade
+                if (percentage >= 60) {
+                    document.getElementById('continue-escape-btn').style.display = 'inline-block';
+                    if (!quizCompleted) {
+                        unlockEscapeRoom();
+                    }
+                }
+            }
+            
+            window.retakeQuiz = function() {
+                currentQ = 0;
+                score = 0;
+                selectedAnswer = null;
+                document.getElementById('quiz-certificate').style.display = 'none';
+                document.getElementById('quiz-questions').style.display = 'block';
+                showQuestion();
+            };
+            
+            window.continueToEscape = function() {
+                switchTab('escape');
+            };
+            
+            showQuestion();
+            window.quizInitialized = true;
+        }
+        
+        // ===========================================
+        // INITIALIZE ON PAGE LOAD
+        // ===========================================
+        
+        // Set initial lock states
+        updateTabLocks();
+        
+        // Show preview banner if in preview mode
+        if (previewMode) {
+            const banner = document.createElement('div');
+            banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,#EF4444,#DC2626);color:white;padding:12px;text-align:center;font-weight:bold;z-index:10000;box-shadow:0 4px 6px rgba(0,0,0,0.3);';
+            banner.textContent = '🎓 TEACHER PREVIEW MODE — All activities unlocked';
+            document.body.insertBefore(banner, document.body.firstChild);
+        }
     </script>
 </body>
 </html>

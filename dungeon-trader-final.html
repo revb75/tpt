@@ -191,6 +191,22 @@
 
         <div class="stats-panel">
             <div class="stat-row">
+                <div><span class="stat-label">LEVEL:</span></div>
+                <div class="stat-value" id="dungeonLevel">1</div>
+            </div>
+            <div class="stat-row">
+                <div><span class="stat-label">HEALTH:</span></div>
+                <div class="stat-value"><span id="healthAmount">100</span>/100</div>
+            </div>
+            <div class="stat-row">
+                <div><span class="stat-label">ATTACK:</span></div>
+                <div class="stat-value" id="attackAmount">5</div>
+            </div>
+            <div class="stat-row">
+                <div><span class="stat-label">DEFENSE:</span></div>
+                <div class="stat-value" id="defenseAmount">0</div>
+            </div>
+            <div class="stat-row">
                 <div><span class="stat-label">GOLD:</span></div>
                 <div class="stat-value" id="goldAmount">50</div>
             </div>
@@ -217,7 +233,7 @@
         </div>
 
         <div class="message-box" id="messageBox">
-            *** DUNGEON TRADER ***<br><br>
+            *** DUNGEON TRADER - 3 LEVELS ***<br><br>
             GOAL: EARN 500 GOLD TO BUY THE ESCAPE KEY!<br><br>
             1. EXPLORE AND FIND 5 MERCHANTS<br>
             2. BUY ITEMS WHERE CHEAP<br>
@@ -269,7 +285,9 @@
             inventory: { bread: 2, ore: 0, gems: 0, herbs: 0 },
             hasKey: false,
             gameWon: false,
-            player: { x: 1, z: 1, dir: 0 }
+            player: { x: 1, z: 1, dir: 0, health: 100, maxHealth: 100, attack: 5, defense: 0 },
+            currentLevel: 1,
+            upgrades: { weapon: 0, armor: 0 }
         };
 
         const MAP_SIZE = 13;
@@ -277,25 +295,92 @@
         const CELL_WALL = 1;
         const CELL_MERCHANT = 2;
         const CELL_DOOR = 3;
+        const CELL_STAIRS_DOWN = 5;
+        const CELL_STAIRS_UP = 6;
 
-        const map = [
-            [1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,1,0,0,0,0,0,3,1],
-            [1,0,2,0,0,1,0,2,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,1,0,0,0,0,0,0,1],
-            [1,1,1,0,1,1,1,0,1,1,1,1,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,1,0,0,0,0,0,0,1],
-            [1,0,2,0,0,1,0,2,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,0,1,1,1],
-            [1,0,0,2,0,0,0,0,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1]
-        ];
+        // 3 DUNGEON LEVELS!
+        const dungeonLevels = {
+            1: {
+                map: [
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,0,0,0,0,1,0,0,0,0,0,0,1],
+                    [1,0,2,0,0,1,0,2,0,0,0,0,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,0,0,0,0,1,0,0,0,0,0,0,1],
+                    [1,1,1,0,1,1,1,0,1,1,1,1,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,0,0,0,0,1,0,0,0,0,0,0,1],
+                    [1,0,2,0,0,1,0,2,0,0,0,5,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,1,1,1,1,1,1,1,1,0,1,1,1],
+                    [1,0,0,2,0,0,0,0,0,0,0,0,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1]
+                ],
+                bats: [
+                    { x: 5, z: 6, dir: 0, moveTimer: 0, attacking: false, health: 20, maxHealth: 20 }
+                ]
+            },
+            2: {
+                map: [
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,6,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,0,1,1,1,1,1,1,1,1,1,0,1],
+                    [1,0,1,0,0,0,0,0,0,0,1,0,1],
+                    [1,0,1,0,1,1,0,1,1,0,1,0,1],
+                    [1,0,1,2,1,0,0,2,0,0,1,5,1],
+                    [1,0,1,0,0,0,1,1,0,1,1,0,1],
+                    [1,0,1,1,1,0,0,0,0,0,1,0,1],
+                    [1,0,0,0,0,0,1,0,1,0,0,0,1],
+                    [1,0,1,0,1,0,0,0,0,0,1,0,1],
+                    [1,0,1,2,1,1,1,0,1,1,1,0,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1]
+                ],
+                bats: [
+                    { x: 7, z: 5, dir: 0, moveTimer: 0, attacking: false, health: 30, maxHealth: 30 },
+                    { x: 3, z: 9, dir: 0, moveTimer: 0, attacking: false, health: 30, maxHealth: 30 }
+                ]
+            },
+            3: {
+                map: [
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,6,0,0,0,1,0,0,0,0,0,3,1],
+                    [1,0,2,0,0,1,0,2,0,0,0,0,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,0,0,0,0,1,0,0,0,0,0,0,1],
+                    [1,1,1,0,1,1,1,0,1,1,1,1,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,0,0,0,0,1,0,0,0,0,0,0,1],
+                    [1,0,2,0,0,1,0,2,0,0,0,0,1],
+                    [1,0,0,0,0,0,0,0,0,0,0,0,1],
+                    [1,1,1,1,1,1,1,1,1,0,1,1,1],
+                    [1,0,0,2,0,0,0,0,0,0,0,0,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1]
+                ],
+                bats: [
+                    { x: 5, z: 6, dir: 0, moveTimer: 0, attacking: false, health: 40, maxHealth: 40 },
+                    { x: 9, z: 3, dir: 0, moveTimer: 0, attacking: false, health: 40, maxHealth: 40 },
+                    { x: 3, z: 9, dir: 0, moveTimer: 0, attacking: false, health: 40, maxHealth: 40 }
+                ]
+            }
+        };
+        
+        // Helper functions for current level
+        function getCurrentMap() {
+            return dungeonLevels[game.currentLevel].map;
+        }
+        
+        function getCurrentBats() {
+            return dungeonLevels[game.currentLevel].bats;
+        }
+        
+        // Keep these for backwards compatibility
+        const map = dungeonLevels[1].map;
+        const bats = dungeonLevels[1].bats;
 
         const merchants = [
-            { x: 2, z: 2, room: 0, name: 'GRUFF MINER',
+            // LEVEL 1 MERCHANTS
+            { x: 2, z: 2, room: 0, level: 1, name: 'GRUFF MINER',
               prices: {
                 bread: { buy: 25, sell: 20, reason: 'HIGH DEMAND - MINERS NEED FOOD!' },
                 ore: { buy: 8, sell: 5, reason: 'ABUNDANT SUPPLY HERE' },
@@ -303,7 +388,7 @@
                 herbs: { buy: 45, sell: 35, reason: 'SCARCE IN CAVES' }
               }
             },
-            { x: 7, z: 2, room: 1, name: 'HERB GATHERER',
+            { x: 7, z: 2, room: 1, level: 1, name: 'HERB GATHERER',
               prices: {
                 bread: { buy: 12, sell: 8, reason: 'FAIR MARKET VALUE' },
                 ore: { buy: 30, sell: 25, reason: 'HIGH DEMAND - NO MINES!' },
@@ -311,7 +396,7 @@
                 herbs: { buy: 10, sell: 5, reason: 'PLENTIFUL HERE' }
               }
             },
-            { x: 2, z: 8, room: 2, name: 'GEM DEALER',
+            { x: 2, z: 8, room: 2, level: 1, name: 'GEM DEALER',
               prices: {
                 bread: { buy: 15, sell: 10, reason: 'AVERAGE DEMAND' },
                 ore: { buy: 18, sell: 12, reason: 'AVERAGE DEMAND' },
@@ -319,7 +404,7 @@
                 herbs: { buy: 60, sell: 50, reason: 'POPULAR WITH WEALTHY' }
               }
             },
-            { x: 7, z: 8, room: 3, name: 'DESPERATE TRADER',
+            { x: 7, z: 8, room: 3, level: 1, name: 'DESPERATE TRADER',
               prices: {
                 bread: { buy: 30, sell: 25, reason: 'CRITICAL NEED!' },
                 ore: { buy: 25, sell: 20, reason: 'NEEDS TOOLS' },
@@ -327,13 +412,89 @@
                 herbs: { buy: 55, sell: 45, reason: 'MEDICAL EMERGENCY' }
               }
             },
-            { x: 3, z: 11, room: 4, name: 'GATEKEEPER',
+            { x: 3, z: 11, room: 11, level: 1, name: 'HEALER',
               prices: {
                 bread: { buy: 15, sell: 10, reason: 'STANDARD RATE' },
                 ore: { buy: 20, sell: 15, reason: 'STANDARD RATE' },
                 gems: { buy: 75, sell: 65, reason: 'STANDARD RATE' },
                 herbs: { buy: 40, sell: 30, reason: 'STANDARD RATE' }
+              },
+              healsFor: 20,
+              healCost: 30
+            },
+            
+            // LEVEL 2 MERCHANTS - BLACKSMITH + TRADERS
+            { x: 3, z: 5, room: 5, level: 2, name: 'BLACKSMITH', isBlacksmith: true,
+              upgrades: {
+                'IRON SWORD': { cost: 100, type: 'weapon', level: 1, attack: 3, desc: '+3 ATTACK' },
+                'STEEL SWORD': { cost: 300, type: 'weapon', level: 2, attack: 7, desc: '+7 ATTACK' },
+                'LEGENDARY BLADE': { cost: 800, type: 'weapon', level: 3, attack: 12, desc: '+12 ATTACK' },
+                'IRON ARMOR': { cost: 80, type: 'armor', level: 1, defense: 2, desc: '+2 DEFENSE' },
+                'STEEL ARMOR': { cost: 250, type: 'armor', level: 2, defense: 5, desc: '+5 DEFENSE' },
+                'LEGENDARY PLATE': { cost: 700, type: 'armor', level: 3, defense: 10, desc: '+10 DEFENSE' }
               }
+            },
+            { x: 7, z: 5, room: 6, level: 2, name: 'DEEP TRADER',
+              prices: {
+                bread: { buy: 35, sell: 28, reason: 'HIGH DEMAND UNDERGROUND!' },
+                ore: { buy: 40, sell: 32, reason: 'PREMIUM PRICE!' },
+                gems: { buy: 120, sell: 100, reason: 'RARE DOWN HERE!' },
+                herbs: { buy: 70, sell: 58, reason: 'CRITICAL NEED!' }
+              }
+            },
+            { x: 3, z: 10, room: 7, level: 2, name: 'CAVE MERCHANT',
+              prices: {
+                bread: { buy: 32, sell: 26, reason: 'DEEPER = COSTLIER!' },
+                ore: { buy: 38, sell: 30, reason: 'BETTER PRICE!' },
+                gems: { buy: 110, sell: 92, reason: 'VALUABLE HERE!' },
+                herbs: { buy: 65, sell: 54, reason: 'NEEDED FOR SURVIVAL!' }
+              }
+            },
+            
+            // LEVEL 3 MERCHANTS - BEST PRICES!
+            { x: 2, z: 2, room: 8, level: 3, name: 'ANCIENT MERCHANT',
+              prices: {
+                bread: { buy: 45, sell: 38, reason: 'HIGHEST DEMAND!' },
+                ore: { buy: 55, sell: 48, reason: 'BEST PRICE!' },
+                gems: { buy: 150, sell: 135, reason: 'MAXIMUM VALUE!' },
+                herbs: { buy: 90, sell: 78, reason: 'DESPERATE NEED!' }
+              }
+            },
+            { x: 7, z: 2, room: 9, level: 3, name: 'FINAL TRADER',
+              prices: {
+                bread: { buy: 48, sell: 40, reason: 'FINAL OFFER!' },
+                ore: { buy: 58, sell: 50, reason: 'ULTIMATE PRICE!' },
+                gems: { buy: 160, sell: 145, reason: 'LEGENDARY VALUE!' },
+                herbs: { buy: 95, sell: 82, reason: 'LIFE OR DEATH!' }
+              }
+            },
+            { x: 2, z: 8, room: 10, level: 3, name: 'ESCAPE MERCHANT',
+              prices: {
+                bread: { buy: 50, sell: 42, reason: 'LAST CHANCE!' },
+                ore: { buy: 60, sell: 52, reason: 'FINAL SALE!' },
+                gems: { buy: 170, sell: 155, reason: 'ESCAPE PREMIUM!' },
+                herbs: { buy: 100, sell: 85, reason: 'FINAL HEALING!' }
+              },
+              sellsKey: true,
+              keyPrice: 500
+            },
+            { x: 7, z: 8, room: 4, level: 3, name: 'GATEKEEPER',
+              prices: {
+                bread: { buy: 40, sell: 35, reason: 'GUARD RATE' },
+                ore: { buy: 50, sell: 45, reason: 'GUARD RATE' },
+                gems: { buy: 140, sell: 125, reason: 'GUARD RATE' },
+                herbs: { buy: 85, sell: 75, reason: 'GUARD RATE' }
+              }
+            },
+            { x: 3, z: 11, room: 12, level: 3, name: 'EXIT HEALER',
+              prices: {
+                bread: { buy: 35, sell: 30, reason: 'LAST STOP' },
+                ore: { buy: 45, sell: 40, reason: 'LAST STOP' },
+                gems: { buy: 130, sell: 115, reason: 'LAST STOP' },
+                herbs: { buy: 80, sell: 70, reason: 'LAST STOP' }
+              },
+              healsFor: 30,
+              healCost: 50
             }
         ];
 
@@ -368,6 +529,10 @@
         }
 
         function updateUI() {
+            document.getElementById('dungeonLevel').textContent = game.currentLevel;
+            document.getElementById('healthAmount').textContent = game.player.health;
+            document.getElementById('attackAmount').textContent = game.player.attack;
+            document.getElementById('defenseAmount').textContent = game.player.defense;
             document.getElementById('goldAmount').textContent = game.gold;
             document.getElementById('breadCount').textContent = game.inventory.bread;
             document.getElementById('oreCount').textContent = game.inventory.ore;
@@ -406,14 +571,25 @@
             const newZ = game.player.z + dz;
 
             if (newZ >= 0 && newZ < MAP_SIZE && newX >= 0 && newX < MAP_SIZE) {
-                if (map[newZ][newX] !== CELL_WALL) {
+                const currentMap = getCurrentMap();
+                if (currentMap[newZ][newX] !== CELL_WALL) {
                     game.player.x = newX;
                     game.player.z = newZ;
+                    
+                    // Check for stairs
+                    if (currentMap[newZ][newX] === CELL_STAIRS_DOWN) {
+                        handleStairsDown();
+                        return;
+                    } else if (currentMap[newZ][newX] === CELL_STAIRS_UP) {
+                        handleStairsUp();
+                        return;
+                    }
+                    
                     moveBats();
                     checkBatEncounter();
                     render();
                     
-                    const merchant = merchants.find(m => m.x === newX && m.z === newZ);
+                    const merchant = merchants.find(m => m.x === newX && m.z === newZ && m.level === game.currentLevel);
                     if (merchant) {
                         setMessage(`FOUND ${merchant.name}!<br>PRESS E TO TRADE.`);
                     } else {
@@ -439,7 +615,8 @@
             const newZ = game.player.z - dz;
 
             if (newZ >= 0 && newZ < MAP_SIZE && newX >= 0 && newX < MAP_SIZE) {
-                if (map[newZ][newX] !== CELL_WALL) {
+                const currentMap = getCurrentMap();
+                if (currentMap[newZ][newX] !== CELL_WALL) {
                     game.player.x = newX;
                     game.player.z = newZ;
                     render();
@@ -452,10 +629,42 @@
             }
         }
 
+        function handleStairsDown() {
+            if (game.currentLevel < 3) {
+                game.currentLevel++;
+                game.player.x = 1;
+                game.player.z = 1;
+                game.player.dir = 0;
+                render();
+                setMessage(`⬇️ DESCENDED TO LEVEL ${game.currentLevel}!<br>DANGER INCREASES... PRICES IMPROVE!`);
+            } else {
+                setMessage('NO STAIRS HERE!');
+            }
+        }
+        
+        function handleStairsUp() {
+            if (game.currentLevel > 1) {
+                game.currentLevel--;
+                game.player.x = 11;
+                game.player.z = 8;
+                game.player.dir = 2;
+                render();
+                setMessage(`⬆️ CLIMBED TO LEVEL ${game.currentLevel}.`);
+            } else {
+                setMessage('NO STAIRS HERE!');
+            }
+        }
+
         function checkBatEncounter() {
-            for (let bat of bats) {
-                if (bat.x === game.player.x && bat.z === game.player.z) {
+            const currentBats = getCurrentBats();
+            for (let bat of currentBats) {
+                if (bat.x === game.player.x && bat.z === game.player.z && bat.health > 0) {
                     if (bat.attacking) {
+                        // Bat deals HEALTH DAMAGE based on level!
+                        const baseDamage = 5 + (game.currentLevel * 3);
+                        const actualDamage = Math.max(1, baseDamage - game.player.defense);
+                        game.player.health -= actualDamage;
+                        
                         // Bat steals 20% of gold (minimum 20 gold)
                         const goldStolen = Math.max(20, Math.floor(game.gold * 0.20));
                         const actualGoldStolen = Math.min(goldStolen, game.gold); // Can't steal more than you have
@@ -473,17 +682,31 @@
                         
                         updateUI();
                         
+                        // CHECK IF PLAYER DIED!
+                        if (game.player.health <= 0) {
+                            setMessage('💀 YOU DIED! THE BATS HAVE DEFEATED YOU! 💀');
+                            setTimeout(() => {
+                                alert('GAME OVER! YOU DIED!');
+                                location.reload();
+                            }, 2000);
+                            return;
+                        }
+                        
                         // Message about what was stolen
                         let message = '🦇 BAT ATTACK! 🦇<br>';
+                        message += `YOU TAKE ${actualDamage} DAMAGE! (HP: ${game.player.health}/${game.player.maxHealth})<br>`;
                         message += `THE BAT STEALS ${actualGoldStolen} GOLD!`;
                         if (stolenItem) {
                             message += `<br>AND YOUR ${itemNames[stolenItem].toUpperCase()}!`;
                         }
                         message += '<br>IT FLIES AWAY INTO THE DARKNESS!';
                         
-                        // Check if player is broke
+                        // Check if player is broke or low health
                         if (game.gold < 10) {
                             message += '<br><br>⚠️ LOW FUNDS! FIND ITEMS TO SELL!';
+                        }
+                        if (game.player.health < 30) {
+                            message += '<br><br>⚠️ LOW HEALTH! FIND HEALING!';
                         }
                         
                         setMessage(message);
@@ -497,7 +720,8 @@
                         const newZ = bat.z + dz * 2;
                         
                         if (newZ >= 0 && newZ < MAP_SIZE && newX >= 0 && newX < MAP_SIZE) {
-                            if (map[newZ][newX] !== CELL_WALL) {
+                            const currentMap = getCurrentMap();
+                            if (currentMap[newZ][newX] !== CELL_WALL) {
                                 bat.x = newX;
                                 bat.z = newZ;
                             }
@@ -510,8 +734,12 @@
         
         function moveBats() {
             const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+            const currentBats = getCurrentBats();
+            const currentMap = getCurrentMap();
             
-            for (let bat of bats) {
+            for (let bat of currentBats) {
+                if (bat.health <= 0) continue; // Skip dead bats
+                
                 bat.moveTimer++;
                 
                 // Move every 2 player moves (faster/more aggressive)
@@ -544,7 +772,7 @@
                     
                     // Move if valid
                     if (newZ >= 0 && newZ < MAP_SIZE && newX >= 0 && newX < MAP_SIZE) {
-                        if (map[newZ][newX] !== CELL_WALL) {
+                        if (currentMap[newZ][newX] !== CELL_WALL) {
                             bat.x = newX;
                             bat.z = newZ;
                             
@@ -563,19 +791,20 @@
 
         function interact() {
             for (let m of merchants) {
-                if (m.x === game.player.x && m.z === game.player.z) {
+                if (m.x === game.player.x && m.z === game.player.z && m.level === game.currentLevel) {
                     openTrade(m);
                     return;
                 }
             }
 
-            if (game.player.x === 11 && game.player.z === 1) {
+            const currentMap = getCurrentMap();
+            if (currentMap[game.player.z][game.player.x] === CELL_DOOR) {
                 if (game.hasKey) {
                     game.gameWon = true;
                     document.getElementById('finalGold').textContent = game.gold;
                     document.getElementById('victoryScreen').classList.add('active');
                 } else {
-                    setMessage('THE DOOR IS LOCKED!<br>YOU NEED THE ESCAPE KEY.<br>BUY IT FROM ANY MERCHANT FOR 500 GOLD.');
+                    setMessage('THE DOOR IS LOCKED!<br>YOU NEED THE ESCAPE KEY.<br>BUY IT FROM KEY SELLER FOR 500 GOLD.');
                 }
                 return;
             }
@@ -595,31 +824,72 @@
             const itemList = document.getElementById('itemList');
             itemList.innerHTML = '';
 
-            Object.entries(merchant.prices).forEach(([item, data]) => {
-                const div = document.createElement('div');
-                div.className = 'item-row';
-                div.innerHTML = `
-                    <div class="item-name">${itemNames[item]}</div>
-                    <div class="item-info">${data.reason}<br>YOU HAVE: ${game.inventory[item]}</div>
-                    <div class="item-actions">
-                        <button class="btn" onclick="buyItem('${item}')">BUY ${data.buy}G</button>
-                        <button class="btn" onclick="sellItem('${item}')">SELL ${data.sell}G</button>
-                    </div>
-                `;
-                itemList.appendChild(div);
-            });
+            // BLACKSMITH - Show equipment upgrades!
+            if (merchant.isBlacksmith) {
+                itemList.innerHTML = '<div style="color: #FFFF55; margin-bottom: 10px; text-align: center; font-size: 16px;">⚒️ EQUIPMENT UPGRADES ⚒️</div>';
+                
+                Object.entries(merchant.upgrades).forEach(([name, upgrade]) => {
+                    const currentUpgrade = upgrade.type === 'weapon' ? game.upgrades.weapon : game.upgrades.armor;
+                    const canBuy = currentUpgrade < upgrade.level;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'item-row';
+                    if (!canBuy) div.style.opacity = '0.5';
+                    div.innerHTML = `
+                        <div class="item-name">${name}</div>
+                        <div class="item-info">${upgrade.desc}<br>${canBuy ? `COST: ${upgrade.cost} GOLD` : 'ALREADY OWNED/HIGHER'}</div>
+                        <button class="btn" onclick="buyUpgrade('${name}')" ${!canBuy ? 'disabled' : ''} style="grid-column: 1 / -1;">
+                            ${canBuy ? `BUY ${upgrade.cost}G` : 'N/A'}
+                        </button>
+                    `;
+                    itemList.appendChild(div);
+                });
+            } else {
+                // NORMAL MERCHANT - Show items
+                Object.entries(merchant.prices).forEach(([item, data]) => {
+                    const div = document.createElement('div');
+                    div.className = 'item-row';
+                    div.innerHTML = `
+                        <div class="item-name">${itemNames[item]}</div>
+                        <div class="item-info">${data.reason}<br>YOU HAVE: ${game.inventory[item]}</div>
+                        <div class="item-actions">
+                            <button class="btn" onclick="buyItem('${item}')">BUY ${data.buy}G</button>
+                            <button class="btn" onclick="sellItem('${item}')">SELL ${data.sell}G</button>
+                        </div>
+                    `;
+                    itemList.appendChild(div);
+                });
 
-            const keyDiv = document.createElement('div');
-            keyDiv.className = 'item-row';
-            keyDiv.style.border = '3px solid #FFFF55';
-            keyDiv.innerHTML = `
-                <div class="item-name">★ ESCAPE KEY ★</div>
-                <div class="item-info">UNLOCKS THE EXIT DOOR<br>YOU NEED: 500 GOLD | YOU HAVE: ${game.gold} GOLD</div>
-                <button class="btn" onclick="buyKey()" ${game.hasKey ? 'disabled' : ''} style="grid-column: 1 / -1;">
-                    ${game.hasKey ? 'ALREADY PURCHASED' : 'BUY 500G'}
-                </button>
-            `;
-            itemList.appendChild(keyDiv);
+                // ESCAPE KEY (only for merchants who sell it)
+                if (merchant.sellsKey) {
+                    const keyDiv = document.createElement('div');
+                    keyDiv.className = 'item-row';
+                    keyDiv.style.border = '3px solid #FFFF55';
+                    keyDiv.innerHTML = `
+                        <div class="item-name">★ ESCAPE KEY ★</div>
+                        <div class="item-info">UNLOCKS THE EXIT DOOR<br>YOU NEED: ${merchant.keyPrice} GOLD | YOU HAVE: ${game.gold} GOLD</div>
+                        <button class="btn" onclick="buyKey()" ${game.hasKey ? 'disabled' : ''} style="grid-column: 1 / -1;">
+                            ${game.hasKey ? 'ALREADY PURCHASED' : `BUY ${merchant.keyPrice}G`}
+                        </button>
+                    `;
+                    itemList.appendChild(keyDiv);
+                }
+                
+                // HEALING (for healers)
+                if (merchant.healsFor) {
+                    const healDiv = document.createElement('div');
+                    healDiv.className = 'item-row';
+                    healDiv.style.border = '2px solid #00FF00';
+                    healDiv.innerHTML = `
+                        <div class="item-name">💚 HEALING 💚</div>
+                        <div class="item-info">RESTORE ${merchant.healsFor} HP<br>CURRENT HP: ${game.player.health}/${game.player.maxHealth}</div>
+                        <button class="btn" onclick="buyHealing()" ${game.player.health >= game.player.maxHealth ? 'disabled' : ''} style="grid-column: 1 / -1;">
+                            ${game.player.health >= game.player.maxHealth ? 'FULL HEALTH' : `HEAL ${merchant.healCost}G`}
+                        </button>
+                    `;
+                    itemList.appendChild(healDiv);
+                }
+            }
 
             document.getElementById('tradingMenu').classList.add('active');
         }
@@ -667,22 +937,65 @@
             }
         }
 
+        function buyUpgrade(upgradeName) {
+            const upgrade = currentMerchant.upgrades[upgradeName];
+            if (game.gold >= upgrade.cost) {
+                game.gold -= upgrade.cost;
+                
+                if (upgrade.type === 'weapon') {
+                    game.upgrades.weapon = upgrade.level;
+                    game.player.attack = 5 + upgrade.attack;
+                    setMessage(`PURCHASED ${upgradeName}!<br>ATTACK: ${game.player.attack}`);
+                } else {
+                    game.upgrades.armor = upgrade.level;
+                    game.player.defense = upgrade.defense;
+                    setMessage(`PURCHASED ${upgradeName}!<br>DEFENSE: ${game.player.defense}`);
+                }
+                
+                updateUI();
+                openTrade(currentMerchant);
+            } else {
+                setMessage('NOT ENOUGH GOLD!');
+            }
+        }
+        
+        function buyHealing() {
+            if (game.gold >= currentMerchant.healCost) {
+                game.gold -= currentMerchant.healCost;
+                game.player.health = Math.min(game.player.maxHealth, game.player.health + currentMerchant.healsFor);
+                setMessage(`HEALED ${currentMerchant.healsFor} HP!<br>HP: ${game.player.health}/${game.player.maxHealth}`);
+                updateUI();
+                openTrade(currentMerchant);
+            } else {
+                setMessage('NOT ENOUGH GOLD!');
+            }
+        }
+
         function isWall(x, z) {
             if (x < 0 || x >= MAP_SIZE || z < 0 || z >= MAP_SIZE) return true;
-            return map[z][x] === CELL_WALL;
+            const currentMap = getCurrentMap();
+            return currentMap[z][x] === CELL_WALL;
         }
 
         function isDoor(x, z) {
             if (x < 0 || x >= MAP_SIZE || z < 0 || z >= MAP_SIZE) return false;
-            return map[z][x] === CELL_DOOR;
+            const currentMap = getCurrentMap();
+            return currentMap[z][x] === CELL_DOOR;
+        }
+        
+        function isStairs(x, z) {
+            if (x < 0 || x >= MAP_SIZE || z < 0 || z >= MAP_SIZE) return false;
+            const currentMap = getCurrentMap();
+            return currentMap[z][x] === CELL_STAIRS_DOWN || currentMap[z][x] === CELL_STAIRS_UP;
         }
 
         function isMerchant(x, z) {
-            return merchants.some(m => m.x === x && m.z === z);
+            return merchants.some(m => m.x === x && m.z === z && m.level === game.currentLevel);
         }
 
         function isBat(x, z) {
-            return bats.some(b => b.x === x && b.z === z);
+            const currentBats = getCurrentBats();
+            return currentBats.some(b => b.x === x && b.z === z && b.health > 0);
         }
 
         function adjustBrightness(color, factor) {
@@ -999,7 +1312,8 @@
                     right: isWall(rightX, rightZ),
                     door: isDoor(x, z),
                     merchant: isMerchant(x, z),
-                    bat: isBat(x, z)
+                    bat: isBat(x, z),
+                    stairs: isStairs(x, z)
                 });
             }
             
@@ -1279,6 +1593,30 @@
                         ctx.fillText('LOCKED - NEED KEY', 260, 385);
                     }
                     
+                } else if (walls[0].stairs) {
+                    // Draw stairs!
+                    drawBrickWall(100, 50, 600, 300, roomColor.wall, 0.8);
+                    
+                    // Determine if up or down stairs
+                    const currentMap = getCurrentMap();
+                    const stairsType = currentMap[game.player.z + dirs[p.dir][1]][game.player.x + dirs[p.dir][0]];
+                    
+                    if (stairsType === CELL_STAIRS_DOWN) {
+                        ctx.fillStyle = '#FFFF55';
+                        ctx.font = 'bold 120px monospace';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('⬇', 400, 250);
+                        ctx.font = '30px monospace';
+                        ctx.fillText('STAIRS DOWN', 400, 310);
+                    } else {
+                        ctx.fillStyle = '#FFFF55';
+                        ctx.font = 'bold 120px monospace';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('⬆', 400, 250);
+                        ctx.font = '30px monospace';
+                        ctx.fillText('STAIRS UP', 400, 310);
+                    }
+                    
                 } else if (walls[0].merchant) {
                     drawStore(100, 50, 600, 300, roomColor.wall);
                     
@@ -1293,17 +1631,23 @@
         function drawMinimap() {
             const ctx = minimapCtx;
             const cellSize = 9;
+            const currentMap = getCurrentMap();
+            const currentBats = getCurrentBats();
             
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, 120, 120);
             
             for (let z = 0; z < MAP_SIZE; z++) {
                 for (let x = 0; x < MAP_SIZE; x++) {
-                    if (map[z][x] === CELL_WALL) {
+                    if (currentMap[z][x] === CELL_WALL) {
                         ctx.fillStyle = '#AAAAFF';
-                    } else if (map[z][x] === CELL_DOOR) {
+                    } else if (currentMap[z][x] === CELL_DOOR) {
                         ctx.fillStyle = game.hasKey ? '#00FF00' : '#FF0000';
-                    } else if (map[z][x] === CELL_MERCHANT) {
+                    } else if (currentMap[z][x] === CELL_STAIRS_DOWN) {
+                        ctx.fillStyle = '#FFD700'; // Gold for down stairs
+                    } else if (currentMap[z][x] === CELL_STAIRS_UP) {
+                        ctx.fillStyle = '#FFA500'; // Orange for up stairs
+                    } else if (currentMap[z][x] === CELL_MERCHANT) {
                         ctx.fillStyle = '#FFFF55';
                     } else {
                         ctx.fillStyle = '#333333';
@@ -1316,8 +1660,10 @@
             ctx.fillRect(game.player.x * cellSize + 2, game.player.z * cellSize + 2, cellSize - 4, cellSize - 4);
             
             ctx.fillStyle = '#8B008B';
-            for (let bat of bats) {
-                ctx.fillRect(bat.x * cellSize + 3, bat.z * cellSize + 3, cellSize - 6, cellSize - 6);
+            for (let bat of currentBats) {
+                if (bat.health > 0) {
+                    ctx.fillRect(bat.x * cellSize + 3, bat.z * cellSize + 3, cellSize - 6, cellSize - 6);
+                }
             }
             
             const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
