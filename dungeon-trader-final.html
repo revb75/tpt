@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dungeon Trader - C64 Style</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -9,24 +10,27 @@
             font-family: 'Courier New', monospace;
             background: #0000AA;
             color: #AAAAFF;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
+            padding: 20px 10px;
         }
         .container {
-            width: 800px;
-            max-width: 95vw;
+            width: 100%;
+            max-width: 800px;
             background: #0000AA;
             border: 4px solid #AAAAFF;
-            padding: 20px;
+            padding: 15px;
+            margin: 0 auto;
         }
         .title {
             text-align: center;
             color: #FFFFFF;
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: clamp(18px, 5vw, 24px);
+            margin-bottom: 15px;
         }
         .game-view {
             background: #000000;
@@ -37,7 +41,9 @@
         #gameCanvas {
             display: block;
             width: 100%;
-            height: 400px;
+            height: auto;
+            max-height: 50vh;
+            min-height: 300px;
         }
         .stats-panel {
             background: #000055;
@@ -48,21 +54,21 @@
         .stat-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 8px;
-            font-size: 14px;
+            gap: 10px;
+            margin-bottom: 6px;
+            font-size: 13px;
         }
         .stat-label { color: #FFFF55; }
         .stat-value { color: #FFFFFF; text-align: right; }
         .message-box {
             background: #000000;
             border: 2px solid #AAAAFF;
-            padding: 15px;
-            margin-bottom: 20px;
-            min-height: 80px;
+            padding: 12px;
+            margin-bottom: 15px;
+            min-height: 60px;
             color: #FFFFFF;
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 13px;
+            line-height: 1.5;
         }
         .controls {
             display: grid;
@@ -74,11 +80,12 @@
             background: #000055;
             border: 2px solid #AAAAFF;
             color: #FFFFFF;
-            padding: 15px;
+            padding: 12px;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             text-transform: uppercase;
+            white-space: nowrap;
         }
         .btn:hover { background: #0000FF; color: #FFFF55; }
         .btn:disabled { background: #000033; color: #555555; cursor: not-allowed; }
@@ -148,6 +155,28 @@
             height: 120px;
             background: rgba(0, 0, 85, 0.8);
             border: 2px solid #AAAAFF;
+        }
+    
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            body { padding: 10px 5px; }
+            .container { padding: 10px; border-width: 2px; }
+            .title { font-size: 18px; margin-bottom: 10px; }
+            .stat-row { font-size: 11px; gap: 8px; }
+            .message-box { font-size: 12px; padding: 10px; min-height: 50px; }
+            .btn { font-size: 11px; padding: 10px; }
+            #gameCanvas { min-height: 250px; }
+            .controls { gap: 8px; }
+            .action-buttons { gap: 8px; }
+        }
+        
+        @media (max-width: 480px) {
+            .container { padding: 8px; }
+            .title { font-size: 16px; }
+            .stat-row { font-size: 10px; }
+            .message-box { font-size: 11px; }
+            .btn { font-size: 10px; padding: 8px; }
         }
     </style>
 </head>
@@ -427,18 +456,37 @@
             for (let bat of bats) {
                 if (bat.x === game.player.x && bat.z === game.player.z) {
                     if (bat.attacking) {
-                        // Bat is actively attacking!
+                        // Bat steals 20% of gold (minimum 20 gold)
+                        const goldStolen = Math.max(20, Math.floor(game.gold * 0.20));
+                        const actualGoldStolen = Math.min(goldStolen, game.gold); // Can't steal more than you have
+                        game.gold -= actualGoldStolen;
+                        
+                        // Bat also steals 1 random item if you have any
                         const items = ['bread', 'ore', 'gems', 'herbs'];
                         const availableItems = items.filter(item => game.inventory[item] > 0);
+                        let stolenItem = null;
                         
                         if (availableItems.length > 0) {
-                            const stolenItem = availableItems[Math.floor(Math.random() * availableItems.length)];
+                            stolenItem = availableItems[Math.floor(Math.random() * availableItems.length)];
                             game.inventory[stolenItem]--;
-                            updateUI();
-                            setMessage(`🦇 BAT ATTACK! 🦇<br>THE BAT SWOOPS AND STEALS YOUR ${itemNames[stolenItem].toUpperCase()}!<br>IT FLIES AWAY INTO THE DARKNESS!`);
-                        } else {
-                            setMessage('🦇 BAT ATTACK! 🦇<br>THE BAT SWOOPS AT YOU!<br>YOU HAVE NOTHING FOR IT TO STEAL!');
                         }
+                        
+                        updateUI();
+                        
+                        // Message about what was stolen
+                        let message = '🦇 BAT ATTACK! 🦇<br>';
+                        message += `THE BAT STEALS ${actualGoldStolen} GOLD!`;
+                        if (stolenItem) {
+                            message += `<br>AND YOUR ${itemNames[stolenItem].toUpperCase()}!`;
+                        }
+                        message += '<br>IT FLIES AWAY INTO THE DARKNESS!';
+                        
+                        // Check if player is broke
+                        if (game.gold < 10) {
+                            message += '<br><br>⚠️ LOW FUNDS! FIND ITEMS TO SELL!';
+                        }
+                        
+                        setMessage(message);
                         
                         // Bat flees after attacking
                         bat.attacking = false;
@@ -455,11 +503,11 @@
                             }
                         }
                     }
-                    break;
                 }
             }
         }
 
+        
         function moveBats() {
             const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
             
