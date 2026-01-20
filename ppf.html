@@ -3,3097 +3,897 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPF Interactive Lab - Complete</title>
+    <title>ISLAND ECONOMIST | PPF Learning Game</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --purple: #5B5EA6;
-            --red: #E8505B;
-            --teal: #14B8A6;
-            --navy: #2B2D42;
-            --gold: #F59E0B;
-            --green: #10B981;
-        }
-        
-        body {
-            font-family: system-ui, sans-serif;
-            background: linear-gradient(135deg, var(--navy) 0%, #1a1b2e 100%);
+        body { 
+            font-family: 'Courier New', monospace; 
+            background: linear-gradient(135deg, #0a4a3a 0%, #1a3a4a 100%);
+            color: #00ff88;
             min-height: 100vh;
-            color: white;
-        }
-        
-        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-        
-        header { text-align: center; padding: 15px 0 10px; }
-        
-        h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--teal), var(--purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .subtitle { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-top: 4px; }
-        
-        .tabs { display: flex; justify-content: center; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
-        
-        .tab-btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.7);
-            min-height: 44px;
-        }
-        
-        .tab-btn:hover { background: rgba(255,255,255,0.15); color: white; }
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--purple), var(--teal));
-            color: white;
-        }
-        .tab-btn.locked {
-            opacity: 0.5;
-            cursor: not-allowed;
-            position: relative;
-        }
-        .tab-btn.locked:hover {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.7);
-        }
-        
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        /* LESSON STYLES */
-        .lesson-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 40px;
-            min-height: 500px;
-            position: relative;
-        }
-        
-        .lesson-slide {
-            display: none;
-            animation: slideIn 0.4s ease-out;
-        }
-        
-        .lesson-slide.active {
-            display: block;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        .lesson-slide h2 {
-            font-size: 2.2rem;
-            margin-bottom: 24px;
-            color: var(--teal);
-            text-align: center;
-        }
-        
-        .lesson-slide h3 {
-            font-size: 1.4rem;
-            margin: 24px 0 16px;
-            color: var(--gold);
-        }
-        
-        .lesson-slide p {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin-bottom: 16px;
-            color: rgba(255,255,255,0.9);
-        }
-        
-        .example-box {
-            background: rgba(20, 184, 166, 0.1);
-            border-left: 4px solid var(--teal);
             padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
         }
         
-        .choice-container {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 20px;
-            align-items: center;
-            margin: 30px 0;
-        }
-        
-        .choice-box {
-            background: rgba(255,255,255,0.08);
-            border: 3px solid rgba(255,255,255,0.2);
-            border-radius: 16px;
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #0a0a0a;
+            border: 3px solid #00ff88;
             padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+        
+        .header {
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #00ff88;
         }
         
-        .choice-box:hover {
-            border-color: var(--gold);
-            transform: scale(1.05);
-        }
-        
-        .choice-box.selected {
-            border-color: var(--gold);
-            background: rgba(245, 158, 11, 0.2);
-        }
-        
-        .choice-box.faded {
-            opacity: 0.3;
-            transform: scale(0.95);
-        }
-        
-        .choice-box .emoji {
-            font-size: 4rem;
-            margin-bottom: 16px;
-        }
-        
-        .choice-box .label {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--gold);
-        }
-        
-        .vs {
+        .header h1 {
             font-size: 2rem;
-            color: var(--gold);
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88;
+            margin-bottom: 10px;
+        }
+        
+        .day-tracker {
+            background: #1a1a00;
+            border: 2px solid #ffcc00;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ffcc00;
+            font-size: 1.2rem;
             font-weight: bold;
         }
         
-        /* Sliding bars animation */
-        .sliding-bars {
-            margin: 40px 0;
-        }
-        
-        .bar-container {
-            margin: 20px 0;
-        }
-        
-        .bar-label {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .bar {
-            height: 50px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            overflow: hidden;
+        .time-bar {
+            background: #1a1a1a;
+            border: 2px solid #00ccff;
+            height: 40px;
+            margin-bottom: 20px;
             position: relative;
+            overflow: hidden;
         }
         
-        .bar-fill {
+        .time-fill {
+            background: linear-gradient(90deg, #00ccff, #0088cc);
             height: 100%;
-            transition: width 0.8s ease-out;
+            width: 100%;
+            transition: width 0.5s;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #000;
             font-weight: bold;
-            font-size: 1.2rem;
-        }
-        
-        .bar-fill.pizza {
-            background: linear-gradient(90deg, #F59E0B, #FBBF24);
-        }
-        
-        .bar-fill.taco {
-            background: linear-gradient(90deg, #14B8A6, #2DD4BF);
-        }
-        
-        /* Interactive slider */
-        .slider-demo {
-            margin: 40px 0;
-            padding: 30px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 16px;
-        }
-        
-        .slider-demo input[type="range"] {
-            width: 100%;
-            height: 8px;
-            margin: 20px 0;
-        }
-        
-        .slider-values {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .slider-value {
-            text-align: center;
-            padding: 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-        }
-        
-        .slider-value .icon {
-            font-size: 2.5rem;
-            margin-bottom: 8px;
-        }
-        
-        .slider-value .number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--gold);
-        }
-        
-        /* PPF Curve Animation */
-        .ppf-demo {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            margin: 30px 0;
-        }
-        
-        .ppf-canvas {
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.3);
-            border-radius: 16px;
-        }
-        
-        /* Fill in the blank */
-        .fill-blank {
-            display: inline-block;
-            min-width: 150px;
-            padding: 8px 16px;
-            background: rgba(245, 158, 11, 0.2);
-            border: 2px solid var(--gold);
-            border-radius: 8px;
-            font-weight: bold;
-            color: var(--gold);
-            text-align: center;
-        }
-        
-        .fill-blank input {
-            background: transparent;
-            border: none;
-            color: var(--gold);
             font-size: 1.1rem;
+        }
+        
+        .output {
+            min-height: 500px;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            padding: 20px;
+            background: #000;
+            border: 2px solid #003322;
+        }
+        
+        .output p { margin: 12px 0; }
+        
+        .vocab-box {
+            background: #1a1a00;
+            border: 2px solid #ffcc00;
+            padding: 15px;
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+        
+        .vocab-term {
+            color: #ffcc00;
             font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .vocab-def {
+            color: #00ff88;
+            margin-left: 20px;
+        }
+        
+        .location {
+            color: #ffcc00;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
             text-align: center;
-            width: 100%;
-            outline: none;
+            border-top: 2px solid #ffcc00;
+            border-bottom: 2px solid #ffcc00;
+            padding: 10px 0;
         }
         
-        .fill-blank.correct {
-            border-color: var(--green);
-            background: rgba(16, 185, 129, 0.2);
-        }
-        
-        .fill-blank.incorrect {
-            border-color: var(--red);
-            background: rgba(232, 80, 91, 0.2);
-            animation: shake 0.3s;
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-        
-        .check-btn {
-            padding: 12px 32px;
-            background: linear-gradient(135deg, var(--teal), #2DD4BF);
-            border: none;
-            border-radius: 50px;
-            color: white;
+        .exits {
+            background: #1a1a1a;
+            border: 2px solid #00ccff;
+            padding: 12px;
+            margin: 15px 0;
+            color: #00ccff;
             font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 16px;
         }
         
-        .check-btn:hover {
-            transform: scale(1.05);
+        .lesson-header {
+            background: #1a1a00;
+            border: 3px solid #ffcc00;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            color: #ffcc00;
+            font-size: 1.3rem;
+            font-weight: bold;
         }
         
-        /* Navigation */
-        .lesson-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+        .lesson-content {
+            background: #0a0a0a;
+            border: 2px solid #00ff88;
+            padding: 20px;
+            margin: 15px 0;
+            line-height: 1.9;
         }
-        
-        .nav-btn {
-            padding: 12px 32px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-        
-        .nav-btn:hover {
-            background: rgba(255,255,255,0.15);
-        }
-        
-        .nav-btn.primary {
-            background: linear-gradient(135deg, var(--purple), var(--teal));
-        }
-        
-        .nav-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        
-        .progress-bar {
-            flex: 1;
-            margin: 0 20px;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--teal), var(--purple));
-            transition: width 0.3s;
-        }
-        
-        /* Other activity styles */
-        .main-grid { display: grid; grid-template-columns: 1fr 360px; gap: 20px; }
-        @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } }
         
         .graph-container {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        canvas { 
-            display: block;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            cursor: crosshair; 
-            border-radius: 10px;
-        }
-        
-        .side-panel { display: flex; flex-direction: column; gap: 12px; }
-        
-        .card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .card-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: rgba(255,255,255,0.5);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-        }
-        
-        .production-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        
-        .prod-box {
-            background: rgba(255,255,255,0.08);
-            border-radius: 10px;
-            padding: 16px;
-            text-align: center;
-        }
-        
-        .prod-box .icon { font-size: 2rem; margin-bottom: 8px; }
-        .prod-box .value { font-size: 2rem; font-weight: bold; color: white; }
-        .prod-box .label { font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 4px; }
-        
-        .opp-cost {
-            background: linear-gradient(135deg, var(--purple), var(--teal));
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-        }
-        
-        .opp-cost .label { font-size: 0.75rem; font-weight: 600; margin-bottom: 8px; opacity: 0.9; }
-        .opp-cost .text { font-size: 0.95rem; line-height: 1.4; }
-        .opp-cost .highlight { color: var(--gold); font-weight: bold; }
-        
-        .status-badge {
-            padding: 12px 16px;
-            border-radius: 50px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-        
-        .status-badge.efficient { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 2px solid var(--green); }
-        .status-badge.inefficient { background: rgba(232, 80, 91, 0.2); color: var(--red); border: 2px solid var(--red); }
-        .status-badge.impossible { background: rgba(91, 94, 166, 0.2); color: var(--purple); border: 2px solid var(--purple); }
-        
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            width: 100%;
-        }
-        
-        .btn:hover { background: rgba(255,255,255,0.15); }
-        .btn-purple { background: linear-gradient(135deg, var(--purple), #7D80C8); }
-        .btn-teal { background: linear-gradient(135deg, var(--teal), #17D4BB); }
-        .btn-gold { background: linear-gradient(135deg, var(--gold), #FBBF24); color: #1a1b2e; }
-        .btn-green { background: linear-gradient(135deg, var(--green), #22C55E); }
-        .btn-red { background: linear-gradient(135deg, var(--red), #EF4444); }
-        
-        .instructions {
-            margin-top: 12px;
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.6);
-        }
-        
-        /* Space Shooter */
-        #space-canvas {
             background: #000;
-            display: block;
+            border: 2px solid #00ff88;
+            padding: 25px;
             margin: 20px auto;
-            border: 3px solid var(--teal);
-            border-radius: 10px;
         }
         
-        .space-hud {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .space-stat {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .space-stat .label { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
-        .space-stat .value { font-size: 1.5rem; font-weight: bold; }
-        
-        .space-controls {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 12px;
-        }
-        
-        .space-controls h4 { margin-bottom: 12px; font-size: 0.9rem; }
-        .space-controls p { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin: 4px 0; }
-        
-        .term-selector {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-top: 12px;
-        }
-        
-        .term-btn {
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid transparent;
-            border-radius: 8px;
-            color: white;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .term-btn:hover { background: rgba(255,255,255,0.15); }
-        .term-btn.selected { 
-            border-color: var(--gold);
-            background: rgba(245, 158, 11, 0.2);
-        }
-        
-        /* Escape Room */
-        .escape-container {
-            background: #0a0a0a;
-            border-radius: 12px;
-            padding: 20px;
-            border: 2px solid var(--teal);
-            font-family: 'Courier New', monospace;
-        }
-        
-        #escape-output {
-            height: 400px;
-            overflow-y: auto;
-            background: #000;
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: #0f0;
-        }
-        
-        #escape-input {
-            width: 100%;
-            padding: 12px;
-            background: #000;
-            border: 2px solid var(--teal);
-            border-radius: 8px;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-        }
-        
-        /* Quiz */
-        .quiz-question {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 20px;
-        }
-        
-        .quiz-question h3 {
-            color: var(--teal);
-            margin-bottom: 16px;
-            font-size: 1.1rem;
-        }
-        
-        .quiz-question p {
-            margin-bottom: 16px;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-        
-        .quiz-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .quiz-option {
-            padding: 14px 18px;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-        }
-        
-        .quiz-option:hover { background: rgba(255,255,255,0.1); border-color: var(--teal); }
-        .quiz-option.selected { border-color: var(--gold); background: rgba(245, 158, 11, 0.15); }
-        .quiz-option.correct { border-color: var(--green); background: rgba(16, 185, 129, 0.15); }
-        .quiz-option.incorrect { border-color: var(--red); background: rgba(232, 80, 91, 0.15); }
-        
-        .quiz-nav {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        
-        .quiz-results {
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .quiz-results .score-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--teal), var(--purple));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 30px;
-            font-size: 3rem;
+        .graph-title {
+            color: #ffcc00;
+            font-size: 1.2rem;
             font-weight: bold;
-        }
-        
-        .game-over {
-            display: none;
+            margin-bottom: 20px;
             text-align: center;
-            padding: 40px 20px;
         }
         
-        .game-over.active { display: block; }
-        .game-over h2 { font-size: 2rem; margin-bottom: 16px; }
-        .game-over .final-score { font-size: 4rem; font-weight: bold; color: var(--gold); margin: 20px 0; }
-        
-        .restart-btn {
-            padding: 14px 32px;
-            background: linear-gradient(135deg, var(--purple), var(--teal));
-            border: none;
-            border-radius: 50px;
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        
-        .help-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: none;
-            background: linear-gradient(135deg, var(--purple), var(--teal));
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        
-        /* MILLIONAIRE STYLES */
-        .millionaire-container {
-            display: grid;
-            grid-template-columns: 200px 1fr;
-            gap: 20px;
-            max-width: 1000px;
+        canvas {
+            display: block;
             margin: 0 auto;
+            background: #000;
+            border: 1px solid #003322;
         }
         
-        @media (max-width: 850px) {
-            .millionaire-container {
-                grid-template-columns: 1fr;
-            }
-            .money-ladder {
-                order: 2;
-            }
+        .graph-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
         }
         
-        .money-ladder {
-            background: rgba(0,0,0,0.4);
-            border-radius: 12px;
-            padding: 16px;
-            border: 2px solid var(--gold);
-        }
-        
-        .money-step {
-            padding: 10px;
-            margin: 4px 0;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s;
-        }
-        
-        .money-step.current {
-            background: linear-gradient(135deg, var(--gold), #FBBF24);
-            color: #1a1b2e;
-            transform: scale(1.1);
-            border-color: var(--gold);
-        }
-        
-        .money-step.won {
-            background: rgba(16,185,129,0.2);
-            border-color: var(--green);
-            color: var(--green);
-        }
-        
-        .question-area {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 30px;
-            border: 2px solid var(--teal);
-        }
-        
-        .question-number {
-            text-align: center;
-            color: var(--teal);
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #00ff88;
             font-size: 0.9rem;
-            margin-bottom: 20px;
-            font-weight: 600;
         }
         
-        .question-text {
-            font-size: 1.3rem;
-            text-align: center;
-            margin-bottom: 30px;
-            line-height: 1.6;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 500;
-        }
-        
-        .answers-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 30px;
-        }
-        
-        .answer-option {
-            padding: 16px;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1rem;
-            text-align: left;
-        }
-        
-        .answer-option:hover:not(.disabled) {
-            background: rgba(255,255,255,0.1);
-            border-color: var(--gold);
-            transform: scale(1.02);
-        }
-        
-        .answer-option.selected {
-            border-color: var(--gold);
-            background: rgba(245,158,11,0.2);
-        }
-        
-        .answer-option.correct {
-            border-color: var(--green);
-            background: rgba(16,185,129,0.2);
-            animation: correctPulse 0.5s;
-        }
-        
-        .answer-option.incorrect {
-            border-color: var(--red);
-            background: rgba(232,80,91,0.2);
-            animation: shake 0.5s;
-        }
-        
-        .answer-option.disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        
-        .answer-option .letter {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            background: var(--gold);
-            color: #1a1b2e;
+        .legend-dot {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            text-align: center;
-            line-height: 30px;
-            font-weight: bold;
-            margin-right: 12px;
         }
         
-        @keyframes correctPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
+        .action { color: #00ccff; font-weight: bold; }
+        .warning { color: #ffaa00; font-weight: bold; }
+        .danger { color: #ff4444; font-weight: bold; }
+        .success { color: #00ff88; font-weight: bold; }
         
-        .lifelines {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .lifeline-btn {
-            padding: 12px 20px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid var(--teal);
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .lifeline-btn:hover:not(:disabled) {
-            background: rgba(20,184,166,0.2);
-            transform: scale(1.05);
-        }
-        
-        .lifeline-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            border-color: rgba(255,255,255,0.2);
-        }
-        
-        .lifeline-icon {
-            font-size: 1.5rem;
-        }
-        
-        .lifeline-name {
-            font-size: 0.75rem;
-        }
-        
-        .mill-actions {
-            text-align: center;
-        }
-        
-        .mill-result {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        
-        .mill-result h2 {
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            color: var(--teal);
-        }
-        
-        .mill-final-amount {
-            font-size: 5rem;
-            font-weight: bold;
-            color: var(--gold);
-            margin: 30px 0;
-            text-shadow: 0 0 20px rgba(245,158,11,0.5);
-        }
-        
-        .audience-poll {
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             margin: 20px 0;
-            padding: 20px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
         }
         
-        .poll-bar {
+        .stat-box {
+            background: #1a1a1a;
+            border: 2px solid #00ff88;
+            padding: 15px;
             text-align: center;
         }
         
-        .poll-letter {
-            font-weight: bold;
-            margin-bottom: 8px;
+        .stat-label {
+            color: #00ff88;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
         }
         
-        .poll-bar-fill {
-            width: 100%;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            overflow: hidden;
-            height: 100px;
-            position: relative;
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        
+        .input-area {
             display: flex;
-            align-items: flex-end;
+            gap: 10px;
         }
         
-        .poll-bar-inner {
-            width: 100%;
-            background: linear-gradient(135deg, var(--teal), var(--purple));
-            border-radius: 8px 8px 0 0;
-            transition: height 1s ease-out;
+        #commandInput {
+            flex: 1;
+            background: #000;
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            padding: 15px;
         }
         
-        .poll-percent {
-            margin-top: 8px;
+        #commandInput:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        button {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
             font-weight: bold;
-            color: var(--teal);
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #00cc66;
+        }
+        
+        .hint-box {
+            background: #1a1a00;
+            border: 2px solid #ffcc00;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .game-container { padding: 15px; }
+            .header h1 { font-size: 1.5rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            canvas { width: 100% !important; height: auto !important; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>PPF Interactive Lab</h1>
-            <p class="subtitle">Master opportunity cost through interactive learning</p>
-        </header>
-        
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('learn')">📖 Learn</button>
-            <button class="tab-btn" onclick="switchTab('explore')">🔍 Explore</button>
-            <button class="tab-btn" onclick="switchTab('millionaire')">💰 Millionaire</button>
-            <button class="tab-btn" onclick="switchTab('quiz')">📝 Quiz</button>
-            <button class="tab-btn" onclick="switchTab('escape')">🔐 Escape Room</button>
-            <button class="tab-btn" onclick="switchTab('bonus')">🎮 Bonus Games</button>
+    <div class="game-container">
+        <div class="header">
+            <h1>🏝️ ISLAND ECONOMIST 🏝️</h1>
+            <div>Production Possibilities Frontier Adventure</div>
+            <div style="color:#00ccff;margin-top:10px;">ClassClick Economics</div>
         </div>
         
-        <!-- LEARN TAB -->
-        <div id="learn-tab" class="tab-content active">
-            <div class="lesson-container">
-                <!-- Slide 1: Opening -->
-                <div class="lesson-slide active" data-slide="1">
-                    <h2>The Friday Night Decision</h2>
-                    
-                    <div class="example-box" style="background: rgba(20,184,166,0.1); border-color: var(--teal);">
-                        <p style="font-size: 1.2rem; line-height: 1.8;">
-                            You saved <strong>$20</strong> from your allowance. It's Friday night.
-                        </p>
-                        <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 16px;">
-                            Your friends are going to a <strong>concert</strong> ($20 ticket).
-                        </p>
-                        <p style="font-size: 1.2rem; line-height: 1.8; margin-top: 16px;">
-                            BUT... there's also that <strong>new pizza place</strong> you've been dying to try ($20).
-                        </p>
-                    </div>
-                    
-                    <p style="text-align: center; font-size: 1.4rem; margin: 40px 0; color: var(--gold); font-weight: bold;">
-                        You can only afford ONE. 💰
-                    </p>
-                    
-                    <div class="example-box" style="background: rgba(245,158,11,0.1); border-color: var(--gold);">
-                        <h3 style="color: var(--gold); margin: 0 0 16px 0;">Here's the Economics:</h3>
-                        <p style="font-size: 1.1rem; margin: 0;">
-                            If you choose the <strong>concert</strong>, your <strong style="color: var(--gold);">opportunity cost</strong> is the pizza you gave up.
-                        </p>
-                        <p style="font-size: 1.1rem; margin: 16px 0 0 0;">
-                            If you choose the <strong>pizza</strong>, your <strong style="color: var(--gold);">opportunity cost</strong> is the concert you gave up.
-                        </p>
-                    </div>
-                    
-                    <p style="text-align: center; font-size: 1.2rem; margin-top: 40px; color: var(--teal);">
-                        <strong>Every choice has a cost — what you give up.</strong>
-                    </p>
-                </div>
-                
-                <!-- Slide 2: Definition -->
-                <div class="lesson-slide" data-slide="2">
-                    <h2>Opportunity Cost</h2>
-                    <div class="example-box">
-                        <p style="font-size: 1.3rem; text-align: center; margin: 20px 0;">
-                            <strong>Opportunity Cost</strong> = The value of the <span class="fill-blank">next best alternative</span> you give up when making a choice.
-                        </p>
-                    </div>
-                    
-                    <p>Every choice has a cost. Not money — but what you could have had instead.</p>
-                    
-                    <h3>Three Types:</h3>
-                    <p><strong>⏰ TIME:</strong> Every hour gaming is an hour you could have spent studying.</p>
-                    <p><strong>💵 MONEY:</strong> Every $50 on sneakers is $50 you can't spend on headphones.</p>
-                    <p><strong>🏭 RESOURCES:</strong> Every car built uses steel that could have built something else.</p>
-                </div>
-                
-                <!-- Slide 3: The Sliding Trade-off -->
-                <div class="lesson-slide" data-slide="3">
-                    <h2>The Sliding Trade-off</h2>
-                    <p>Watch what happens when your factory makes more pizzas:</p>
-                    
-                    <div class="sliding-bars">
-                        <div class="bar-container">
-                            <div class="bar-label">
-                                <span>🍕 PIZZAS</span>
-                                <span id="pizza-count">10</span>
-                            </div>
-                            <div class="bar">
-                                <div class="bar-fill pizza" id="pizza-bar" style="width: 25%;">10</div>
-                            </div>
-                        </div>
-                        
-                        <div class="bar-container">
-                            <div class="bar-label">
-                                <span>🌮 TACOS</span>
-                                <span id="taco-count">70</span>
-                            </div>
-                            <div class="bar">
-                                <div class="bar-fill taco" id="taco-bar" style="width: 70%;">70</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button class="check-btn" id="animate-btn" onclick="animateBars()">▶️ Watch The Slide</button>
-                    
-                    <p id="slide-message" style="text-align: center; margin-top: 30px; font-size: 1.2rem; color: var(--gold); min-height: 30px;"></p>
-                </div>
-                
-                <!-- Slide 4: Real Examples -->
-                <div class="lesson-slide" data-slide="4">
-                    <h2>Real-World Examples</h2>
-                    
-                    <div class="example-box">
-                        <h3>Example 1: Friday Night</h3>
-                        <p><strong>Option A:</strong> Game Night (play with friends)</p>
-                        <p><strong>Option B:</strong> Study Session (prep for Monday's exam)</p>
-                        <p style="margin-top: 16px;">Choose gaming? Your opportunity cost = <span class="fill-blank">the better grade</span> you gave up.</p>
-                    </div>
-                    
-                    <div class="example-box">
-                        <h3>Example 2: $150 Birthday Money</h3>
-                        <p>You can buy: <strong>Sneakers</strong>, <strong>AirPods</strong>, or put it in <strong>Savings</strong></p>
-                        <p style="margin-top: 16px;">Buy sneakers? Opportunity cost = <span class="fill-blank">AirPods or Savings</span> (whichever you wanted second most).</p>
-                    </div>
-                    
-                    <p style="margin-top: 30px; font-size: 1.1rem;"><strong>Key:</strong> It's ONLY the next best alternative. Not everything you gave up — just the ONE thing you would have picked instead.</p>
-                </div>
-                
-                <!-- Slide 5: PPF Introduction -->
-                <div class="lesson-slide" data-slide="5">
-                    <h2>The PPF Curve</h2>
-                    <p><strong>PPF</strong> = Production Possibilities Frontier</p>
-                    <p>A graph that shows opportunity cost for an entire economy.</p>
-                    
-                    <div class="ppf-demo">
-                        <canvas id="lesson-ppf-canvas" class="ppf-canvas" width="800" height="400"></canvas>
-                    </div>
-                    
-                    <p style="text-align: center; font-size: 1.1rem; margin-top: 20px;">
-                        The curve shows ALL possible combinations of pizzas and tacos your factory can make.
-                    </p>
-                </div>
-                
-                <!-- Slide 6: Interactive Slider -->
-                <div class="lesson-slide" data-slide="6">
-                    <h2>Feel The Slide</h2>
-                    <p>Drag the slider. Watch pizzas and tacos move in opposite directions.</p>
-                    
-                    <div class="slider-demo">
-                        <input type="range" id="pizza-slider" min="0" max="40" value="20" oninput="updateSlider(this.value)">
-                        
-                        <div class="slider-values">
-                            <div class="slider-value">
-                                <div class="icon">🍕</div>
-                                <div class="number" id="slider-pizzas">20</div>
-                                <div>PIZZAS</div>
-                            </div>
-                            <div class="slider-value">
-                                <div class="icon">🌮</div>
-                                <div class="number" id="slider-tacos">75</div>
-                                <div>TACOS</div>
-                            </div>
-                        </div>
-                        
-                        <p style="text-align: center; margin-top: 20px; color: var(--gold);">
-                            <strong>👉 This is the trade-off in action!</strong>
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Slide 7: Three Zones + Calculation -->
-                <div class="lesson-slide" data-slide="7">
-                    <h2>Three Zones + How to Calculate</h2>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                        <div>
-                            <h3 style="color: var(--teal); margin-bottom: 16px;">See the Zones:</h3>
-                            <canvas id="zones-canvas" width="400" height="350" style="background: rgba(0,0,0,0.3); border-radius: 12px; width: 100%;"></canvas>
-                        </div>
-                        
-                        <div>
-                            <div class="example-box" style="border-color: var(--green); background: rgba(16, 185, 129, 0.1); margin-bottom: 12px;">
-                                <h3 style="color: var(--green); margin: 0 0 8px 0; font-size: 1.1rem;">🟢 ON = EFFICIENT</h3>
-                                <p style="margin: 0; font-size: 0.95rem;">Using ALL resources</p>
-                            </div>
-                            
-                            <div class="example-box" style="border-color: var(--red); background: rgba(232, 80, 91, 0.1); margin-bottom: 12px;">
-                                <h3 style="color: var(--red); margin: 0 0 8px 0; font-size: 1.1rem;">🔴 INSIDE = WASTED</h3>
-                                <p style="margin: 0; font-size: 0.95rem;">Could make more</p>
-                            </div>
-                            
-                            <div class="example-box" style="border-color: var(--purple); background: rgba(91, 94, 166, 0.1);">
-                                <h3 style="color: var(--purple); margin: 0 0 8px 0; font-size: 1.1rem;">🟣 OUTSIDE = IMPOSSIBLE</h3>
-                                <p style="margin: 0; font-size: 0.95rem;">Need more resources</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="example-box" style="background: rgba(245,158,11,0.1); border-color: var(--gold);">
-                        <h3 style="color: var(--gold); margin: 0 0 16px 0;">📊 How to Calculate Opportunity Cost:</h3>
-                        
-                        <p style="margin: 0 0 12px 0;"><strong>Given:</strong> Max production = 40 pizzas OR 100 tacos</p>
-                        
-                        <p style="margin: 0 0 8px 0;"><strong>Question:</strong> What's the opportunity cost of making 1 pizza?</p>
-                        
-                        <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 8px; margin: 16px 0;">
-                            <p style="margin: 0 0 12px 0; font-size: 1.05rem;"><strong>Step 1:</strong> What do you GIVE UP? → <span style="color: var(--teal);">100 tacos</span></p>
-                            <p style="margin: 0 0 12px 0; font-size: 1.05rem;"><strong>Step 2:</strong> What do you GAIN? → <span style="color: var(--gold);">40 pizzas</span></p>
-                            <p style="margin: 0 0 12px 0; font-size: 1.05rem;"><strong>Step 3:</strong> Divide to get "PER pizza" → <span style="color: var(--teal);">100</span> ÷ <span style="color: var(--gold);">40</span> = <strong style="color: var(--green);">2.5</strong></p>
-                        </div>
-                        
-                        <p style="margin: 0; font-size: 1.1rem; text-align: center;"><strong>Answer:</strong> Making 1 pizza costs <span style="color: var(--green); font-size: 1.3rem;">2.5 tacos</span></p>
-                        
-                        <p style="margin: 16px 0 0 0; font-size: 0.95rem; color: rgba(255,255,255,0.8);"><strong>Why divide?</strong> We want cost "per unit" — how many tacos you lose for EACH pizza made. That's why 100÷40 = 2.5 tacos per pizza.</p>
-                    </div>
-                </div>
-                
-                <!-- Slide 8: Economic Growth -->
-                <div class="lesson-slide" data-slide="8">
-                    <h2>What Shifts the PPF Outward?</h2>
-                    <p>Economic growth means producing MORE of everything. The PPF curve shifts outward.</p>
-                    
-                    <h3>Four Factors That Cause Growth:</h3>
-                    
-                    <p><strong>🔧 TECHNOLOGY:</strong> Better machines, automation, new processes</p>
-                    <p><strong>👷 LABOR:</strong> Population growth, immigration, more workers</p>
-                    <p><strong>🎓 SKILLS:</strong> Better education, training, human capital</p>
-                    <p><strong>⛏️ RESOURCES:</strong> New resources like oil, land, raw materials</p>
-                    
-                    <div class="example-box">
-                        <p style="text-align: center; font-size: 1.2rem; margin: 20px 0;">
-                            <strong>Economic Growth = PPF shifting outward = more possibilities for everyone</strong>
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Slide 9: Practice Question -->
-                <div class="lesson-slide" data-slide="9">
-                    <h2>Check Your Understanding</h2>
-                    
-                    <div class="example-box">
-                        <p style="font-size: 1.2rem; margin-bottom: 20px;">
-                            Your factory can make a maximum of <strong>40 pizzas</strong> OR <strong>100 tacos</strong>.
-                        </p>
-                        <p style="font-size: 1.2rem;">
-                            What is the opportunity cost of making 1 pizza?
-                        </p>
-                        <p style="text-align: center; margin: 30px 0;">
-                            Answer: <span class="fill-blank"><input type="text" id="practice-answer" placeholder="?" style="width: 100px;"></span> tacos
-                        </p>
-                        <button class="check-btn" onclick="checkPractice()">Check Answer</button>
-                        <p id="practice-feedback" style="margin-top: 16px; text-align: center; font-size: 1.1rem;"></p>
-                    </div>
-                    
-                    <p style="margin-top: 30px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">
-                        <strong>Hint:</strong> What you give up (100 tacos) ÷ What you gain (40 pizzas) = ?
-                    </p>
-                </div>
-                
-                <!-- Slide 10: Summary -->
-                <div class="lesson-slide" data-slide="10">
-                    <h2>🎉 Lesson Complete!</h2>
-                    
-                    <h3>Key Takeaways:</h3>
-                    
-                    <p>✅ <strong>Opportunity Cost</strong> = what you give up when you make a choice</p>
-                    <p>✅ It's only the <strong>next best alternative</strong>, not everything</p>
-                    <p>✅ The <strong>PPF</strong> shows all possible production combinations</p>
-                    <p>✅ When one slides UP ↗️, the other slides DOWN ↘️</p>
-                    <p>✅ <strong>On curve</strong> = efficient | <strong>Inside</strong> = wasted | <strong>Outside</strong> = impossible</p>
-                    <p>✅ <strong>Economic growth</strong> shifts the PPF outward</p>
-                    
-                    <div class="example-box" style="margin-top: 40px;">
-                        <p style="text-align: center; font-size: 1.3rem;">
-                            <strong>Ready for hands-on practice?</strong><br>
-                            Click the <strong>Explore</strong> tab to interact with the PPF!
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Navigation -->
-                <div class="lesson-nav">
-                    <button class="nav-btn" onclick="prevSlide()" id="prev-btn" disabled>← Previous</button>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill" style="width: 10%;"></div>
-                    </div>
-                    <button class="nav-btn primary" onclick="nextSlide()" id="next-btn">Next →</button>
-                </div>
+        <div class="day-tracker" id="dayTracker" style="display:none;">DAY 1</div>
+        
+        <div class="time-bar" style="display:none;">
+            <div class="time-fill" id="timeFill">⏰ 10 HOURS</div>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid" style="display:none;">
+            <div class="stat-box">
+                <div class="stat-label">🐟 FISH</div>
+                <div class="stat-value" id="fishCount">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">🪵 WOOD</div>
+                <div class="stat-value" id="woodCount">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">🔥 FIRES</div>
+                <div class="stat-value" id="fireCount">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">🛖 WALLS</div>
+                <div class="stat-value" id="wallsCount">0</div>
             </div>
         </div>
         
-        <!-- EXPLORE TAB -->
-        <div id="explore-tab" class="tab-content">
-            <div class="main-grid">
-                <div class="graph-container">
-                    <canvas id="exploreCanvas" width="500" height="450"></canvas>
-                    <div class="instructions"><strong>Click or drag</strong> anywhere on the graph to set production</div>
-                </div>
-                <div class="side-panel">
-                    <div class="card">
-                        <div class="card-label">YOUR PRODUCTION</div>
-                        <div class="production-row">
-                            <div class="prod-box pizza">
-                                <div class="icon">🍕</div>
-                                <div class="value" id="explore-pizza">20</div>
-                                <div class="label">PIZZAS</div>
-                            </div>
-                            <div class="prod-box taco">
-                                <div class="icon">🌮</div>
-                                <div class="value" id="explore-taco">75</div>
-                                <div class="label">TACOS</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="opp-cost">
-                        <div class="label">OPPORTUNITY COST</div>
-                        <div class="text" id="explore-cost">1 more pizza costs <span class="highlight">2.5 tacos</span></div>
-                    </div>
-                    
-                    <div id="explore-status" class="status-badge efficient">ON THE CURVE — Efficient!</div>
-                    
-                    <div class="card">
-                        <div class="card-label">QUICK SCENARIOS</div>
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <button class="btn btn-purple" onclick="exploreSet(0, 100, 'efficient')">All Tacos (0 pizzas)</button>
-                            <button class="btn btn-gold" onclick="exploreSet(40, 0, 'efficient')">All Pizzas (40 pizzas)</button>
-                            <button class="btn" style="background:var(--red);color:white" onclick="exploreSet(15, 45, 'inefficient')">Inefficient (Inside)</button>
-                            <button class="btn" style="background:var(--purple);color:white" onclick="exploreSet(20, 90, 'impossible')">Impossible (Outside)</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="output" id="output"></div>
+        
+        <div class="input-area">
+            <input type="text" id="commandInput" placeholder="Press ENTER to start..." autofocus>
+            <button onclick="processCommand()">ENTER</button>
         </div>
+        
+        <div class="hint-box" id="helpBox">Press ENTER to begin</div>
+    </div>
 
-        <!-- MILLIONAIRE TAB -->
-        <div id="millionaire-tab" class="tab-content">
-            <div class="millionaire-container">
-                <div class="money-ladder" id="money-ladder">
-                    <!-- Money values displayed here -->
-                </div>
-                
-                <div class="question-area" id="question-area">
-                    <div class="question-number">Question <span id="mill-question-num">1</span> of 10</div>
-                    <div class="question-text" id="mill-question">Loading...</div>
-                    
-                    <div class="answers-grid" id="mill-answers">
-                        <!-- Answer options A B C D -->
-                    </div>
-                    
-                    <div class="lifelines" id="mill-lifelines">
-                        <button class="lifeline-btn" id="fifty-fifty" onclick="useFiftyFifty()">
-                            <span class="lifeline-icon">5️⃣0️⃣</span>
-                            <span class="lifeline-name">50:50</span>
-                        </button>
-                        <button class="lifeline-btn" id="audience" onclick="useAudience()">
-                            <span class="lifeline-icon">👥</span>
-                            <span class="lifeline-name">Ask Audience</span>
-                        </button>
-                        <button class="lifeline-btn" id="phone" onclick="usePhone()">
-                            <span class="lifeline-icon">📞</span>
-                            <span class="lifeline-name">Phone Friend</span>
-                        </button>
-                    </div>
-                    
-                    <div class="mill-actions">
-                        <button class="btn" onclick="walkAway()" id="walk-away-btn" style="background: rgba(239,68,68,0.8);">Walk Away</button>
-                    </div>
-                </div>
-                
-                <div class="mill-result" id="mill-result" style="display: none;">
-                    <h2 id="mill-result-title">Congratulations!</h2>
-                    <div class="mill-final-amount" id="mill-final-amount">$32,000</div>
-                    <p id="mill-result-message">You answered all 10 questions correctly!</p>
-                    <button class="restart-btn" onclick="initMillionaire()">Play Again</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- QUIZ TAB -->
-        <div id="quiz-tab" class="tab-content">
-            <div id="quiz-questions" style="max-width: 800px; margin: 0 auto;">
-                <!-- Questions loaded dynamically -->
-            </div>
-            
-            <div class="quiz-nav" id="quiz-nav" style="display: none; margin-top: 30px; text-align: center;">
-                <p style="color: rgba(255,255,255,0.6); margin-bottom: 20px;">
-                    Question <span id="quiz-current-num">1</span> of 10
-                </p>
-                <button class="btn btn-gold" onclick="submitQuizAnswer()" id="quiz-submit-btn">Submit Answer</button>
-            </div>
-            
-            <div id="quiz-certificate" style="display: none; text-align: center; padding: 40px 20px;">
-                <div style="max-width: 600px; margin: 0 auto; padding: 40px; background: linear-gradient(135deg, rgba(20,184,166,0.1), rgba(91,94,166,0.1)); border-radius: 20px; border: 3px solid var(--gold);">
-                    <h2 style="font-size: 2.5rem; margin-bottom: 20px; color: var(--teal);">🎓 Certificate of Completion</h2>
-                    
-                    <p style="font-size: 1.2rem; margin: 20px 0;">This certifies that</p>
-                    
-                    <p style="font-size: 2rem; font-weight: bold; color: var(--gold); margin: 20px 0;">Student</p>
-                    
-                    <p style="font-size: 1.2rem; margin: 20px 0;">has successfully completed the</p>
-                    
-                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--teal); margin: 20px 0;">PPF Interactive Lab Quiz</p>
-                    
-                    <div style="margin: 40px 0;">
-                        <div id="quiz-grade-circle" style="width: 150px; height: 150px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; border: 8px solid;"></div>
-                    </div>
-                    
-                    <p style="font-size: 1.3rem; margin: 20px 0;">Score: <span id="quiz-final-score">0/10</span></p>
-                    
-                    <p id="quiz-grade-message" style="font-size: 1.1rem; color: rgba(255,255,255,0.8); margin: 20px 0;"></p>
-                    
-                    <div style="margin-top: 30px; padding-top: 30px; border-top: 2px solid rgba(255,255,255,0.2);">
-                        <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">Date: <span id="quiz-date"></span></p>
-                    </div>
-                    
-                    <button class="btn btn-gold" onclick="continueToEscape()" id="continue-escape-btn" style="margin-top: 30px; display: none;">Continue to Escape Room →</button>
-                    <button class="btn" onclick="retakeQuiz()" style="margin-top: 20px;">Retake Quiz</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ESCAPE ROOM TAB -->
-        <div id="escape-tab" class="tab-content">
-            <div class="escape-container">
-                <div id="escape-output"></div>
-                <input type="text" id="escape-input" placeholder="Type command here (try HELP)" onkeypress="if(event.key==='Enter') escapeCommand()">
-            </div>
-        </div>
-        
-        <!-- BONUS GAMES TAB -->
-        <div id="bonus-tab" class="tab-content">
-            <div style="max-width: 800px; margin: 0 auto; text-align: center; padding: 40px 20px;">
-                <h2 style="font-size: 2.5rem; margin-bottom: 20px; color: var(--gold);">🎮 BONUS GAMES 🎮</h2>
-                <p style="font-size: 1.2rem; margin-bottom: 40px; color: rgba(255,255,255,0.8);">You earned these bonus games!</p>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 700px; margin: 0 auto;">
-                    <a href="space-war.html" target="_blank" style="text-decoration: none;">
-                        <div style="background: rgba(255,255,255,0.05); padding: 40px 30px; border-radius: 20px; border: 3px solid var(--teal); transition: all 0.3s; cursor: pointer;">
-                            <div style="font-size: 5rem; margin-bottom: 20px;">🚀</div>
-                            <h3 style="color: var(--teal); margin-bottom: 12px; font-size: 1.5rem;">Space War</h3>
-                            <p style="font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 20px;">Battle against smart AI</p>
-                            <div style="padding: 8px 16px; background: var(--teal); color: #1a1b2e; border-radius: 8px; display: inline-block; font-weight: bold;">Play Now →</div>
-                        </div>
-                    </a>
-                    
-                    <a href="dungeon-trader-enhanced-3levels.html" target="_blank" style="text-decoration: none;">
-                        <div style="background: rgba(255,255,255,0.05); padding: 40px 30px; border-radius: 20px; border: 3px solid var(--gold); transition: all 0.3s; cursor: pointer;">
-                            <div style="font-size: 5rem; margin-bottom: 20px;">⚔️</div>
-                            <h3 style="color: var(--gold); margin-bottom: 12px; font-size: 1.5rem;">Dungeon Trader</h3>
-                            <p style="font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 20px;">3D trading adventure</p>
-                            <div style="padding: 8px 16px; background: var(--gold); color: #1a1b2e; border-radius: 8px; display: inline-block; font-weight: bold;">Play Now →</div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-    </div>
+<script>
+// GAME STATE
+let gameState = {
+    phase: 'intro',
+    vocabStep: 0,
+    day: 1,
+    hoursRemaining: 10,
+    currentLocation: 'camp',
+    fish: 0, wood: 0, fires: 0, walls: 0,
+    fishingRate: 2, gatheringRate: 1, fireRate: 1, buildingRate: 3,
+    hasNet: false,
+    dayActions: [],
+    currentLessonQuestion: null,
+    quizAnswers: [] // Track student answers
+};
+
+const locations = {
+    camp: { name: "CAMP", desc: "Your shelter (${walls} walls). Fire pit${fireDesc}.", exits: ['BEACH', 'FOREST', 'CLIFF'], actions: ['BUILD', 'FIRE'] },
+    beach: { name: "BEACH", desc: "Waves crash. Fish swim.${netDesc}", exits: ['CAMP'], actions: ['FISH'] },
+    forest: { name: "FOREST", desc: "Dense trees. Wood everywhere.", exits: ['CAMP', 'CLIFF'], actions: ['GATHER'] },
+    cliff: { name: "CLIFF", desc: "High overlook. Your journal.", exits: ['CAMP', 'FOREST'], actions: ['MAP'] }
+};
+
+// QUIZ QUESTIONS (Answer Key: B, B, C, B, A)
+const quizQuestions = [
+    {
+        day: 1,
+        question: "Using only 7 out of 10 hours means you're:",
+        options: ["A) EFFICIENT (on the frontier)", "B) INEFFICIENT (inside, wasting 3 hours)", "C) Beyond the frontier (impossible)"],
+        correct: 'B',
+        explanation: "INEFFICIENT = wasting resources = INSIDE the frontier!"
+    },
+    {
+        day: 2,
+        question: "A point INSIDE the PPF curve means:",
+        options: ["A) Using all resources efficiently", "B) Wasting some resources", "C) Producing more than possible"],
+        correct: 'B',
+        explanation: "Inside the curve = not using all available time/resources = INEFFICIENT!"
+    },
+    {
+        day: 3,
+        question: "When a country has 10% unemployment, it is:",
+        options: ["A) On the PPF", "B) Outside the PPF", "C) Inside the PPF"],
+        correct: 'C',
+        explanation: "Unemployed workers = wasted labor! The economy could produce MORE = INSIDE PPF!"
+    },
+    {
+        day: 4,
+        question: "Finding the fishing net shifted your PPF. This represents:",
+        options: ["A) Inefficiency", "B) Economic growth", "C) Opportunity cost"],
+        correct: 'B',
+        explanation: "Better technology = more productive = PPF shifts OUTWARD = ECONOMIC GROWTH!"
+    },
+    {
+        day: 5,
+        question: "If you build 1 wall (3 hrs) instead of fishing, your opportunity cost is:",
+        options: ["A) 1.5 fish (with 2hr rate)", "B) 1 wall", "C) 3 hours"],
+        correct: 'A',
+        explanation: "3 hours could catch 1.5 fish (3÷2=1.5). That's what you GAVE UP = opportunity cost!"
+    }
+];
+
+// VOCABULARY TUTORIAL
+const vocabSteps = [
+    () => {
+        clearScreen();
+        print("<span class='success' style='font-size:1.5rem;'>ISLAND ECONOMIST</span>");
+        print("");
+        print("Welcome! You'll survive on a desert island for 5 days.");
+        print("");
+        print("But first, let's learn the VOCABULARY.");
+        print("");
+        print("<span class='action'>Press ENTER...</span>");
+    },
+    () => {
+        clearScreen();
+        print("<div class='lesson-header'>📚 VOCABULARY: SCARCITY</div>");
+        print("<div class='vocab-box'>");
+        print("<span class='vocab-term'>SCARCITY</span>");
+        print("<div class='vocab-def'>SCARCE = not enough, limited</div>");
+        print("<div class='vocab-def'>-ITY = the condition of being</div>");
+        print("");
+        print("<span class='success'>SCARCITY = the condition of not having enough</span>");
+        print("</div>");
+        print("<span class='action'>Press ENTER...</span>");
+    },
+    () => {
+        clearScreen();
+        print("<div class='lesson-header'>📚 VOCABULARY: PRODUCTION</div>");
+        print("<div class='vocab-box'>");
+        print("<span class='vocab-term'>PRODUCTION</span>");
+        print("<div class='vocab-def'>PRODUCE = to make, create</div>");
+        print("<div class='vocab-def'>-TION = the act of</div>");
+        print("");
+        print("<span class='success'>PRODUCTION = the act of making things</span>");
+        print("</div>");
+        print("<span class='action'>Press ENTER...</span>");
+    },
+    () => {
+        clearScreen();
+        print("<div class='lesson-header'>📚 VOCABULARY: POSSIBILITIES</div>");
+        print("<div class='vocab-box'>");
+        print("<span class='vocab-term'>POSSIBILITIES</span>");
+        print("<div class='vocab-def'>POSSIBLE = could happen, able to be done</div>");
+        print("<div class='vocab-def'>-ITIES = plural, many options</div>");
+        print("");
+        print("<span class='success'>POSSIBILITIES = all the different options</span>");
+        print("</div>");
+        print("<span class='action'>Press ENTER...</span>");
+    },
+    () => {
+        clearScreen();
+        print("<div class='lesson-header'>📚 VOCABULARY: FRONTIER</div>");
+        print("<div class='vocab-box'>");
+        print("<span class='vocab-term'>FRONTIER</span>");
+        print("<div class='vocab-def'>FRONTIER = edge, boundary, limit</div>");
+        print("");
+        print("<span class='success'>FRONTIER = the LIMIT of what's possible</span>");
+        print("</div>");
+        print("<span class='action'>Press ENTER...</span>");
+    },
+    () => {
+        clearScreen();
+        print("<div class='lesson-header'>📚 PUTTING IT TOGETHER</div>");
+        print("<div class='vocab-box'>");
+        print("<span class='vocab-term'>PRODUCTION POSSIBILITIES FRONTIER (PPF)</span>");
+        print("");
+        print("<span class='action'>PRODUCTION</span> = what you make");
+        print("<span class='action'>POSSIBILITIES</span> = all your options");
+        print("<span class='action'>FRONTIER</span> = the LIMIT");
+        print("");
+        print("<span class='success'>PPF = THE LIMIT OF WHAT YOU CAN PRODUCE</span>");
+        print("</div>");
+        print("<span class='action'>Press ENTER...</span>");
+    },
+    () => {
+        clearScreen();
+        print("<div class='lesson-header'>📚 VOCABULARY: OPPORTUNITY COST</div>");
+        print("<div class='vocab-box'>");
+        print("<span class='vocab-term'>OPPORTUNITY COST</span>");
+        print("<div class='vocab-def'>OPPORTUNITY = a chance to do something</div>");
+        print("<div class='vocab-def'>COST = what you give up</div>");
+        print("");
+        print("<span class='success'>OPPORTUNITY COST = what you GIVE UP when you choose</span>");
+        print("</div>");
+        print("<span class='action'>Press ENTER...</span>");
+    },
+    () => {
+        clearScreen();
+        print("<div class='lesson-header'>📚 VOCABULARY: EFFICIENT vs INEFFICIENT</div>");
+        print("<div class='vocab-box'>");
+        print("<span class='vocab-term'>EFFICIENT = using all resources wisely, no waste</span>");
+        print("<span class='vocab-term'>INEFFICIENT = wasting resources</span>");
+        print("</div>");
+        print("<span class='action'>Press ENTER to start Day 1...</span>");
+    },
+    () => { startDay1(); }
+];
+
+function runVocabTutorial() {
+    if (gameState.vocabStep < vocabSteps.length) {
+        vocabSteps[gameState.vocabStep]();
+        gameState.vocabStep++;
+    }
+}
+
+// PPF GRAPH
+function drawPPFGraph(yourFish = 0, yourWalls = 0, showOld = false) {
+    const output = document.getElementById('output');
+    const container = document.createElement('div');
+    container.className = 'graph-container';
+    container.innerHTML = `
+        <div class="graph-title">📊 PRODUCTION POSSIBILITIES FRONTIER</div>
+        <canvas id="ppfCanvas" width="800" height="500"></canvas>
+    `;
+    output.appendChild(container);
     
-    <button class="help-btn" onclick="alert('PPF Interactive Lab\\n\\nComplete the lesson, then practice with hands-on activities!')">?</button>
-    
-    <div style="text-align:center; padding:20px 10px; margin-top:40px; border-top:1px solid rgba(255,255,255,0.1); font-size:0.75rem; color:rgba(255,255,255,0.4);">
-        ClassClick by Robert Jones<br>© 2026 All rights reserved. | <span style="color:#bbb;font-size:10px;">SKELKEYTEC</span>
-    </div>
-    
-    <script>
-        // ===========================================
-        // PREVIEW MODE & LOCK SYSTEM
-        // ===========================================
+    setTimeout(() => {
+        const canvas = document.getElementById('ppfCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const W = 800, H = 500, PAD = 80;
+        const GW = W - PAD * 2, GH = H - PAD * 2;
         
-        const urlParams = new URLSearchParams(window.location.search);
-        const previewMode = urlParams.get('preview') === 'true';
-        let lessonCompleted = false;
-        let millionaireCompleted = false;
-        let quizCompleted = false;
-        let escapeCompleted = false;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, W, H);
         
-        // Check localStorage for completion status
-        try {
-            lessonCompleted = localStorage.getItem('ppf_lesson_completed') === 'true';
-            millionaireCompleted = localStorage.getItem('ppf_millionaire_completed') === 'true';
-            quizCompleted = localStorage.getItem('ppf_quiz_completed') === 'true';
-            escapeCompleted = localStorage.getItem('ppf_escape_completed') === 'true';
-        } catch(e) {}
+        const maxF = 10 / gameState.fishingRate;
+        const maxW = 10 / gameState.buildingRate;
         
-        function updateTabLocks() {
-            const tabs = document.querySelectorAll('.tab-btn');
-            
-            // Tab order: Learn, Explore, Millionaire, Quiz, Escape Room, Fortune
-            tabs.forEach((tab, index) => {
-                let isUnlocked = false;
-                
-                if (previewMode) {
-                    isUnlocked = true; // Preview mode unlocks everything
-                } else {
-                    switch(index) {
-                        case 0: // Learn
-                            isUnlocked = true;
-                            break;
-                        case 1: // Explore
-                        case 2: // Millionaire
-                            isUnlocked = lessonCompleted;
-                            break;
-                        case 3: // Quiz
-                            isUnlocked = millionaireCompleted;
-                            break;
-                        case 4: // Escape Room
-                            isUnlocked = quizCompleted;
-                            break;
-                        case 5: // Bonus Games
-                            isUnlocked = escapeCompleted;
-                            break;
-                    }
-                }
-                
-                if (isUnlocked) {
-                    tab.classList.remove('locked');
-                    tab.style.opacity = '1';
-                    tab.style.cursor = 'pointer';
-                    tab.innerHTML = tab.innerHTML.replace('🔒 ', '');
-                } else {
-                    tab.classList.add('locked');
-                    tab.style.opacity = '0.5';
-                    tab.style.cursor = 'not-allowed';
-                    if (!tab.innerHTML.startsWith('🔒 ')) {
-                        tab.innerHTML = '🔒 ' + tab.innerHTML;
-                    }
-                }
-            });
+        function toCanvas(f, w) {
+            return { x: PAD + (f / maxF) * GW, y: H - PAD - (w / maxW) * GH };
+        }
+        function ppf(f) { return maxW * (1 - f / maxF); }
+        
+        // Grid
+        ctx.strokeStyle = '#1a3a3a';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 5; i++) {
+            const x = PAD + (GW / 5) * i;
+            ctx.beginPath(); ctx.moveTo(x, PAD); ctx.lineTo(x, H - PAD); ctx.stroke();
+            const y = PAD + (GH / 5) * i;
+            ctx.beginPath(); ctx.moveTo(PAD, y); ctx.lineTo(W - PAD, y); ctx.stroke();
         }
         
-        function unlockExploreAndMillionaire() {
-            lessonCompleted = true;
-            try {
-                localStorage.setItem('ppf_lesson_completed', 'true');
-            } catch(e) {}
-            updateTabLocks();
-            alert('🎉 Lesson complete! Explore and Millionaire unlocked!');
+        // Axes
+        ctx.strokeStyle = '#00ccff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(PAD, H - PAD); ctx.lineTo(PAD, PAD);
+        ctx.moveTo(PAD, H - PAD); ctx.lineTo(W - PAD, H - PAD);
+        ctx.stroke();
+        
+        // Labels
+        ctx.fillStyle = '#00ff88';
+        ctx.font = 'bold 15px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText('PRODUCTION: FISH', W / 2, H - 25);
+        ctx.save();
+        ctx.translate(25, H / 2); ctx.rotate(-Math.PI / 2);
+        ctx.fillText('PRODUCTION: WALLS', 0, 0);
+        ctx.restore();
+        
+        // Numbers
+        ctx.fillStyle = '#00ccff';
+        ctx.font = '12px Courier New';
+        for (let i = 0; i <= Math.ceil(maxF); i++) {
+            const x = PAD + (i / maxF) * GW;
+            ctx.textAlign = 'center';
+            ctx.fillText(i, x, H - PAD + 18);
+        }
+        for (let i = 0; i <= Math.ceil(maxW); i++) {
+            const y = H - PAD - (i / maxW) * GH;
+            ctx.textAlign = 'right';
+            ctx.fillText(i.toFixed(1), PAD - 12, y + 4);
         }
         
-        function unlockQuiz() {
-            millionaireCompleted = true;
-            try {
-                localStorage.setItem('ppf_millionaire_completed', 'true');
-            } catch(e) {}
-            updateTabLocks();
-            alert('💰 Great job! Quiz unlocked!');
-        }
-        
-        function unlockEscapeRoom() {
-            quizCompleted = true;
-            try {
-                localStorage.setItem('ppf_quiz_completed', 'true');
-            } catch(e) {}
-            updateTabLocks();
-        }
-        
-        function unlockBonusGames() {
-            escapeCompleted = true;
-            try {
-                localStorage.setItem('ppf_escape_completed', 'true');
-            } catch(e) {}
-            updateTabLocks();
-            alert('🎮 Bonus Games unlocked! Check out Space War and Dungeon Trader!');
-        }
-        
-        // ===========================================
-        // LESSON MODE
-        // ===========================================
-        
-        let currentSlide = 1;
-        const totalSlides = 10;
-        
-        function showSlide(slideNum) {
-            document.querySelectorAll('.lesson-slide').forEach(s => s.classList.remove('active'));
-            document.querySelector(`[data-slide="${slideNum}"]`).classList.add('active');
-            
-            currentSlide = slideNum;
-            
-            // Update buttons
-            document.getElementById('prev-btn').disabled = slideNum === 1;
-            document.getElementById('next-btn').textContent = slideNum === totalSlides ? 'Finish Lesson' : 'Next →';
-            
-            // Update progress
-            const progress = (slideNum / totalSlides) * 100;
-            document.getElementById('progress-fill').style.width = progress + '%';
-            
-            // Initialize slide-specific features
-            if (slideNum === 5) {
-                drawLessonPPF();
-            } else if (slideNum === 7) {
-                setTimeout(drawZonesCanvas, 100);
-            }
-        }
-        
-        function nextSlide() {
-            if (currentSlide < totalSlides) {
-                showSlide(currentSlide + 1);
-            } else {
-                // Lesson complete! Unlock Explore and Millionaire
-                unlockExploreAndMillionaire();
-                setTimeout(() => {
-                    switchTab('explore');
-                }, 1000);
-            }
-        }
-        
-        function prevSlide() {
-            if (currentSlide > 1) {
-                showSlide(currentSlide - 1);
-            }
-        }
-        
-        // Slide 1: Choice selection
-        
-        // Slide 3: Animated bars
-        let barAnimationRunning = false;
-        
-        function animateBars() {
-            if (barAnimationRunning) return;
-            
-            barAnimationRunning = true;
-            const btn = document.getElementById('animate-btn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Animating...';
-            
-            const steps = [
-                { pizzas: 10, tacos: 90 },
-                { pizzas: 20, tacos: 75 },
-                { pizzas: 30, tacos: 50 },
-                { pizzas: 35, tacos: 25 }
-            ];
-            
-            let currentStep = 0;
-            
-            function animateStep() {
-                if (currentStep >= steps.length) {
-                    btn.disabled = false;
-                    btn.textContent = '🔄 Play Again';
-                    barAnimationRunning = false;
-                    document.getElementById('slide-message').textContent = '↗️ See? Pizzas slide UP, Tacos slide DOWN!';
-                    return;
-                }
-                
-                const step = steps[currentStep];
-                
-                document.getElementById('pizza-count').textContent = step.pizzas;
-                document.getElementById('taco-count').textContent = step.tacos;
-                document.getElementById('pizza-bar').style.width = (step.pizzas / 40 * 100) + '%';
-                document.getElementById('pizza-bar').textContent = step.pizzas;
-                document.getElementById('taco-bar').style.width = (step.tacos / 100 * 100) + '%';
-                document.getElementById('taco-bar').textContent = step.tacos;
-                
-                currentStep++;
-                setTimeout(animateStep, 1000);
-            }
-            
-            document.getElementById('slide-message').textContent = 'Watch carefully...';
-            animateStep();
-        }
-        
-        // Slide 5: PPF drawing
-        function drawLessonPPF() {
-            const canvas = document.getElementById('lesson-ppf-canvas');
-            const ctx = canvas.getContext('2d');
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw axes
-            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        // Old curve (if tech upgrade)
+        if (showOld) {
+            ctx.strokeStyle = '#666';
             ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
             ctx.beginPath();
-            ctx.moveTo(100, 350);
-            ctx.lineTo(750, 350);
-            ctx.moveTo(100, 350);
-            ctx.lineTo(100, 50);
-            ctx.stroke();
-            
-            // Draw PPF curve
-            ctx.strokeStyle = '#14B8A6';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            for (let p = 0; p <= 40; p++) {
-                const t = calculatePPF(p);
-                const x = 100 + (p / 40) * 650;
-                const y = 350 - (t / 100) * 300;
-                if (p === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+            for (let f = 0; f <= 5; f += 0.1) {
+                const w = maxW * (1 - f / 5);
+                const p = toCanvas(f, w);
+                if (f === 0) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
             }
             ctx.stroke();
-            
-            // Labels
-            ctx.fillStyle = 'white';
-            ctx.font = '20px system-ui';
-            ctx.fillText('Pizzas →', 350, 385);
-            ctx.save();
-            ctx.translate(60, 200);
-            ctx.rotate(-Math.PI / 2);
-            ctx.fillText('Tacos →', 0, 0);
-            ctx.restore();
-            
-            // Animate a point moving along curve
-            let t = 0;
-            function animatePoint() {
-                t += 0.01;
-                if (t > 1) t = 0;
-                
-                const pizzas = Math.floor(t * 40);
-                const tacos = calculatePPF(pizzas);
-                const x = 100 + (pizzas / 40) * 650;
-                const y = 350 - (tacos / 100) * 300;
-                
-                // Redraw
-                drawLessonPPF();
-                
-                // Draw point
-                ctx.fillStyle = '#F59E0B';
-                ctx.beginPath();
-                ctx.arc(x, y, 10, 0, Math.PI * 2);
-                ctx.fill();
-                
-                if (currentSlide === 5) {
-                    requestAnimationFrame(animatePoint);
-                }
-            }
-            animatePoint();
+            ctx.setLineDash([]);
         }
         
-        // Slide 7: Draw zones canvas
-        function drawZonesCanvas() {
-            const canvas = document.getElementById('zones-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            
-            let dragPoint = { pizzas: 20, tacos: 75 };
-            let isDragging = false;
-            
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Draw axes
-                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(50, 300);
-                ctx.lineTo(350, 300);
-                ctx.moveTo(50, 300);
-                ctx.lineTo(50, 50);
-                ctx.stroke();
-                
-                // Draw PPF curve
-                ctx.strokeStyle = '#14B8A6';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                for (let p = 0; p <= 40; p++) {
-                    const t = calculatePPF(p);
-                    const x = 50 + (p / 40) * 300;
-                    const y = 300 - (t / 100) * 250;
-                    if (p === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.stroke();
-                
-                // Calculate position
-                const px = 50 + (dragPoint.pizzas / 40) * 300;
-                const py = 300 - (dragPoint.tacos / 100) * 250;
-                
-                // Determine zone
-                const expectedTacos = calculatePPF(dragPoint.pizzas);
-                let zone, color, zoneName;
-                
-                if (Math.abs(dragPoint.tacos - expectedTacos) < 3) {
-                    zone = 'efficient';
-                    color = '#10B981';
-                    zoneName = 'ON CURVE - EFFICIENT';
-                } else if (dragPoint.tacos < expectedTacos) {
-                    zone = 'inefficient';
-                    color = '#E8505B';
-                    zoneName = 'INSIDE - WASTED';
-                } else {
-                    zone = 'impossible';
-                    color = '#5B5EA6';
-                    zoneName = 'OUTSIDE - IMPOSSIBLE';
-                }
-                
-                // Draw draggable point
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.arc(px, py, 12, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Draw white ring to show it's draggable
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(px, py, 12, 0, Math.PI * 2);
-                ctx.stroke();
-                
-                // Draw status text above point
-                ctx.fillStyle = color;
-                ctx.font = 'bold 14px system-ui';
-                ctx.textAlign = 'center';
-                ctx.fillText(zoneName, px, py - 20);
-                
-                // Draw coordinates
-                ctx.fillStyle = 'white';
-                ctx.font = '12px system-ui';
-                ctx.fillText(`${Math.round(dragPoint.pizzas)} pizzas, ${Math.round(dragPoint.tacos)} tacos`, px, py + 30);
-                
-                // Labels
-                ctx.textAlign = 'left';
-                ctx.fillStyle = 'white';
-                ctx.font = '14px system-ui';
-                ctx.fillText('Pizzas →', 150, 330);
-                ctx.save();
-                ctx.translate(20, 180);
-                ctx.rotate(-Math.PI / 2);
-                ctx.fillText('Tacos →', 0, 0);
-                ctx.restore();
-                
-                // Instruction
-                ctx.textAlign = 'center';
-                ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.font = 'italic 12px system-ui';
-                ctx.fillText('👆 Drag the point to explore!', 200, 20);
-            }
-            
-            function getMousePos(e) {
-                const rect = canvas.getBoundingClientRect();
-                return {
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top
-                };
-            }
-            
-            function isPointInCircle(mx, my) {
-                const px = 50 + (dragPoint.pizzas / 40) * 300;
-                const py = 300 - (dragPoint.tacos / 100) * 250;
-                const dist = Math.sqrt((mx - px) ** 2 + (my - py) ** 2);
-                return dist <= 12;
-            }
-            
-            canvas.addEventListener('mousedown', function(e) {
-                const pos = getMousePos(e);
-                if (isPointInCircle(pos.x, pos.y)) {
-                    isDragging = true;
-                    canvas.style.cursor = 'grabbing';
-                }
-            });
-            
-            canvas.addEventListener('mousemove', function(e) {
-                const pos = getMousePos(e);
-                
-                if (isDragging) {
-                    // Update point position
-                    dragPoint.pizzas = Math.max(0, Math.min(40, ((pos.x - 50) / 300) * 40));
-                    dragPoint.tacos = Math.max(0, Math.min(100, (1 - (pos.y - 50) / 250) * 100));
-                    draw();
-                } else {
-                    // Change cursor if hovering over point
-                    canvas.style.cursor = isPointInCircle(pos.x, pos.y) ? 'grab' : 'default';
-                }
-            });
-            
-            canvas.addEventListener('mouseup', function() {
-                isDragging = false;
-                canvas.style.cursor = 'grab';
-            });
-            
-            canvas.addEventListener('mouseleave', function() {
-                isDragging = false;
-                canvas.style.cursor = 'default';
-            });
-            
-            draw();
+        // PPF curve
+        ctx.strokeStyle = '#00ff88';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let f = 0; f <= maxF; f += 0.05) {
+            const w = ppf(f);
+            const p = toCanvas(f, w);
+            if (f === 0) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
         }
+        ctx.stroke();
         
-        // Slide 6: Interactive slider
-        function updateSlider(pizzas) {
-            const tacos = calculatePPF(pizzas);
-            document.getElementById('slider-pizzas').textContent = pizzas;
-            document.getElementById('slider-tacos').textContent = tacos;
+        // Your point
+        if (yourFish > 0 || yourWalls > 0) {
+            const p = toCanvas(yourFish, yourWalls);
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath(); ctx.arc(p.x, p.y, 8, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#ff0000'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(p.x + 45, p.y - 35); ctx.lineTo(p.x + 12, p.y - 12); ctx.stroke();
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath(); ctx.moveTo(p.x + 12, p.y - 12); ctx.lineTo(p.x + 18, p.y - 16); ctx.lineTo(p.x + 15, p.y - 8); ctx.closePath(); ctx.fill();
+            ctx.font = 'bold 14px Courier New';
+            ctx.textAlign = 'left';
+            ctx.fillText('YOU!', p.x + 50, p.y - 38);
         }
-        
-        // Slide 9: Practice question
-        function checkPractice() {
-            const answer = document.getElementById('practice-answer').value.trim();
-            const feedback = document.getElementById('practice-feedback');
-            
-            if (answer === '2.5' || answer === '2' || answer === '3') {
-                feedback.textContent = '✓ Correct! 100 tacos ÷ 40 pizzas = 2.5 tacos per pizza';
-                feedback.style.color = 'var(--green)';
-                document.getElementById('practice-answer').parentElement.classList.add('correct');
-            } else {
-                feedback.textContent = '✗ Try again. Formula: What you give up ÷ What you gain';
-                feedback.style.color = 'var(--red)';
-                document.getElementById('practice-answer').parentElement.classList.add('incorrect');
-                setTimeout(() => {
-                    document.getElementById('practice-answer').parentElement.classList.remove('incorrect');
-                }, 500);
+    }, 100);
+}
+
+// UTILITY
+function print(text) {
+    const p = document.createElement('p');
+    p.innerHTML = text;
+    document.getElementById('output').appendChild(p);
+    document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
+}
+function clearScreen() { document.getElementById('output').innerHTML = ''; }
+function updateDisplay() {
+    document.getElementById('dayTracker').textContent = `DAY ${gameState.day} of 5`;
+    document.getElementById('timeFill').textContent = `⏰ ${gameState.hoursRemaining} HRS`;
+    document.getElementById('timeFill').style.width = (gameState.hoursRemaining / 10 * 100) + '%';
+    document.getElementById('fishCount').textContent = gameState.fish;
+    document.getElementById('woodCount').textContent = gameState.wood;
+    document.getElementById('fireCount').textContent = gameState.fires;
+    document.getElementById('wallsCount').textContent = gameState.walls.toFixed(1);
+}
+function showGameUI() {
+    document.getElementById('dayTracker').style.display = 'block';
+    document.querySelector('.time-bar').style.display = 'block';
+    document.getElementById('statsGrid').style.display = 'grid';
+}
+
+// GAME COMMANDS
+function processCommand() {
+    const input = document.getElementById('commandInput');
+    let cmd = input.value.trim().toUpperCase();
+    input.value = '';
+    
+    if (gameState.phase === 'intro') { runVocabTutorial(); return; }
+    if (gameState.phase === 'wait') {
+        if (cmd === '' || cmd === 'ENTER' || cmd === 'CONTINUE') {
+            if (gameState.nextPhase) {
+                gameState.phase = gameState.nextPhase;
+                gameState.nextPhase = null;
+                if (gameState.phase === 'playing') startDay();
+                else if (gameState.phase === 'lesson') showLesson();
+                else if (gameState.phase === 'quiz') showQuiz();
             }
         }
-        
-        // ===========================================
-        // TAB SWITCHING
-        // ===========================================
-        
-        function switchTab(tabName) {
-            // Check if tab is locked
-            if (!previewMode) {
-                if (tabName === 'explore' || tabName === 'millionaire') {
-                    if (!lessonCompleted) {
-                        alert('🔒 Complete the lesson first!');
-                        return;
-                    }
-                } else if (tabName === 'quiz') {
-                    if (!millionaireCompleted) {
-                        alert('🔒 Complete Millionaire first!');
-                        return;
-                    }
-                } else if (tabName === 'escape') {
-                    if (!quizCompleted) {
-                        alert('🔒 Complete the Quiz first!');
-                        return;
-                    }
-                } else if (tabName === 'bonus') {
-                    if (!escapeCompleted) {
-                        alert('🔒 Complete the Escape Room first!');
-                        return;
-                    }
-                }
-            }
-            
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            
-            document.getElementById(tabName + '-tab').classList.add('active');
-            event.target.classList.add('active');
-            
-            // Initialize tab if needed
-            if (tabName === 'explore' && !window.exploreInitialized) {
-                initExplore();
-            } else if (tabName === 'millionaire' && !window.millionaireInitialized) {
-                initMillionaire();
-            } else if (tabName === 'quiz' && !window.quizInitialized) {
-                initQuiz();
-            } else if (tabName === 'escape' && !window.escapeInitialized) {
-                initEscapeRoom();
-            }
-            // Bonus tab has no initialization - just links to external games
+        return;
+    }
+    if (gameState.phase === 'quiz') { checkAnswer(cmd); return; }
+    if (gameState.phase === 'playing') {
+        if (!cmd) return;
+        print(`<span style='color:#00ccff;'>></span> ${cmd}`);
+        const verb = cmd.split(' ')[0];
+        const arg = cmd.split(' ').slice(1).join(' ');
+        if (verb === 'HELP') showHelp();
+        else if (verb === 'LOOK' || verb === 'L') lookRoom();
+        else if (verb === 'GO' || ['CAMP', 'BEACH', 'FOREST', 'CLIFF'].includes(verb)) go(verb === 'GO' ? arg : verb);
+        else if (verb === 'FISH') doFish();
+        else if (verb === 'GATHER') doGather();
+        else if (verb === 'BUILD') doBuild();
+        else if (verb === 'FIRE') doFire();
+        else if (verb === 'STATUS' || verb === 'I') showStatus();
+        else if (verb === 'MAP') showMap();
+        else if (verb === 'SLEEP' || verb === 'END') endDay();
+        else print("<span class='danger'>? Type HELP</span>");
+    }
+}
+
+function startDay1() {
+    clearScreen();
+    showGameUI();
+    updateDisplay();
+    print("<span class='warning' style='font-size:1.3rem;'>☀️ DAY 1 of 5 ☀️</span>");
+    print("");
+    print("Now EXPERIENCE the vocabulary!");
+    print("You have <span class='warning'>10 hours</span> (SCARCITY).");
+    print("");
+    print("<span class='action'>GOAL: Survive 5 days. Build 3 walls by Day 5!</span>");
+    print("");
+    print("Type <span class='action'>LOOK</span>");
+    gameState.phase = 'playing';
+    document.getElementById('helpBox').innerHTML = 'LOOK | GO | FISH | GATHER | BUILD | FIRE | SLEEP';
+}
+
+function startDay() {
+    clearScreen();
+    showGameUI();
+    updateDisplay();
+    print(`<span class='warning' style='font-size:1.3rem;'>☀️ DAY ${gameState.day} of 5 ☀️</span>`);
+    print("");
+    if (gameState.day === 3 && gameState.walls < 3) print("<span class='danger'>⚠️ STORM WARNING! Need 3 walls by Day 5!</span>");
+    if (gameState.day === 4) print("<span class='warning'>💡 Explore the BEACH!</span>");
+    if (gameState.day === 5) print("<span class='danger'>⚠️ STORM TONIGHT! Final day!</span>");
+    print("");
+    print("Type LOOK");
+}
+
+function showHelp() {
+    print("");
+    print("MOVEMENT: GO CAMP | GO BEACH | GO FOREST | GO CLIFF");
+    print("ACTIONS: FISH (2hrs) | GATHER (1hr) | BUILD (3hrs) | FIRE (1hr)");
+    print("INFO: LOOK | STATUS | MAP | SLEEP");
+}
+
+function lookRoom() {
+    const loc = locations[gameState.currentLocation];
+    print("");
+    print(`<span class='location'>${loc.name}</span>`);
+    let d = loc.desc;
+    d = d.replace('${walls}', gameState.walls.toFixed(1));
+    d = d.replace('${fireDesc}', gameState.fires > 0 ? ` (${gameState.fires})` : '');
+    d = d.replace('${netDesc}', gameState.hasNet ? ' FISHING NET! ' : '');
+    print(d);
+    print(`<div class="exits">🧭 ${loc.exits.join(' | ')}</div>`);
+    if (loc.actions.length) print(`⚡ ${loc.actions.join(' | ')}`);
+}
+
+function go(dest) {
+    dest = dest.toLowerCase();
+    const valid = { camp: 'camp', beach: 'beach', forest: 'forest', cliff: 'cliff' };
+    if (!valid[dest]) { print("<span class='danger'>Where?</span>"); return; }
+    const loc = locations[gameState.currentLocation];
+    if (!loc.exits.map(e => e.toLowerCase()).includes(valid[dest])) {
+        print(`<span class='danger'>Can't go there</span>`); return;
+    }
+    gameState.currentLocation = valid[dest];
+    lookRoom();
+}
+
+function showMap() {
+    print(""); print("     CLIFF"); print("       |"); print("   FOREST--CAMP"); print("             |"); print("          BEACH");
+}
+
+function showStatus() {
+    print(`⏰ ${gameState.hoursRemaining}/10 | 🐟 ${gameState.fish} | 🪵 ${gameState.wood} | 🔥 ${gameState.fires} | 🛖 ${gameState.walls.toFixed(1)}/3`);
+}
+
+function doFish() {
+    if (gameState.currentLocation !== 'beach') { print("<span class='danger'>Go to BEACH</span>"); return; }
+    if (gameState.hoursRemaining < gameState.fishingRate) { print("<span class='danger'>Not enough time</span>"); return; }
+    gameState.hoursRemaining -= gameState.fishingRate;
+    gameState.fish += 1;
+    print(`<span class='success'>✓ Caught fish!</span> (${gameState.hoursRemaining} hrs left)`);
+    gameState.dayActions.push({ action: 'fishing', result: 1 });
+    updateDisplay();
+    if (gameState.day === 4 && !gameState.hasNet) {
+        print("<span class='warning'>⚡ Found FISHING NET! 2hrs→1hr</span>");
+        gameState.hasNet = true;
+        gameState.fishingRate = 1;
+    }
+}
+
+function doGather() {
+    if (gameState.currentLocation !== 'forest') { print("<span class='danger'>Go to FOREST</span>"); return; }
+    if (gameState.hoursRemaining < gameState.gatheringRate) { print("<span class='danger'>Not enough time</span>"); return; }
+    gameState.hoursRemaining -= gameState.gatheringRate;
+    gameState.wood += 1;
+    print(`<span class='success'>✓ Gathered wood!</span> (${gameState.hoursRemaining} hrs left)`);
+    gameState.dayActions.push({ action: 'gathering', result: 1 });
+    updateDisplay();
+}
+
+function doBuild() {
+    if (gameState.currentLocation !== 'camp') { print("<span class='danger'>Go to CAMP</span>"); return; }
+    if (gameState.hoursRemaining < gameState.buildingRate) { print("<span class='danger'>Not enough time</span>"); return; }
+    gameState.hoursRemaining -= gameState.buildingRate;
+    gameState.walls += 1;
+    print(`<span class='success'>✓ Built wall!</span> ${gameState.walls.toFixed(1)}/3 (${gameState.hoursRemaining} hrs left)`);
+    gameState.dayActions.push({ action: 'building', result: 1 });
+    updateDisplay();
+}
+
+function doFire() {
+    if (gameState.currentLocation !== 'camp') { print("<span class='danger'>Go to CAMP</span>"); return; }
+    if (gameState.wood === 0) { print("<span class='danger'>Need wood!</span>"); return; }
+    if (gameState.hoursRemaining < gameState.fireRate) { print("<span class='danger'>Not enough time</span>"); return; }
+    gameState.hoursRemaining -= gameState.fireRate;
+    gameState.wood -= 1;
+    gameState.fires += 1;
+    print(`<span class='success'>✓ Made fire!</span> (${gameState.hoursRemaining} hrs left)`);
+    gameState.dayActions.push({ action: 'fire', result: 1 });
+    updateDisplay();
+}
+
+function endDay() {
+    if (gameState.hoursRemaining === 10) { print("<span class='danger'>Do something first!</span>"); return; }
+    clearScreen();
+    print(`<span class='warning' style='font-size:1.3rem;'>☀️ DAY ${gameState.day} ENDS ☀️</span>`);
+    print("");
+    const used = 10 - gameState.hoursRemaining;
+    print(`You used ${used}/10 hours`);
+    if (gameState.hoursRemaining > 0) print(`<span class='danger'>Wasted ${gameState.hoursRemaining} hours!</span>`);
+    print(""); print("");
+    print("<span class='action'>Press ENTER for evening lesson...</span>");
+    gameState.phase = 'wait';
+    gameState.nextPhase = 'lesson';
+    document.getElementById('helpBox').innerHTML = 'Press ENTER';
+}
+
+function showLesson() {
+    clearScreen();
+    print("<div class='lesson-header'>📚 ECONOMICS LESSON</div>");
+    print("");
+    const fishProduced = gameState.dayActions.filter(a => a.action === 'fishing').length;
+    const wallsProduced = gameState.dayActions.filter(a => a.action === 'building').length;
+    print("<div class='lesson-content'>");
+    print("PPF = PRODUCTION POSSIBILITIES FRONTIER");
+    print("The LIMIT of what you can PRODUCE.");
+    print("</div>");
+    print("");
+    drawPPFGraph(fishProduced, wallsProduced, gameState.hasNet && gameState.day === 4);
+    print("");
+    print("<div class='lesson-content'>");
+    const used = 10 - gameState.hoursRemaining;
+    if (used === 10) {
+        print("<span class='success'>EFFICIENT!</span> You're ON the frontier.");
+    } else {
+        print("<span class='danger'>INEFFICIENT!</span> You're INSIDE the frontier.");
+        print(`Wasted ${gameState.hoursRemaining} hours.`);
+    }
+    if (gameState.hasNet && gameState.day === 4) {
+        print("");
+        print("<span class='success'>⚡ PPF shifted OUT! ECONOMIC GROWTH!</span>");
+    }
+    print("</div>");
+    print(""); print("");
+    print("<span class='action'>Press ENTER for quiz...</span>");
+    gameState.phase = 'wait';
+    gameState.nextPhase = 'quiz';
+}
+
+function showQuiz() {
+    clearScreen();
+    const q = quizQuestions[gameState.day - 1];
+    print("<div class='lesson-header'>✓ QUIZ - DAY " + gameState.day + "</div>");
+    print("");
+    print(q.question);
+    print("");
+    q.options.forEach(opt => print(opt));
+    print("");
+    print("Type your answer:");
+    gameState.phase = 'quiz';
+    gameState.currentLessonQuestion = q;
+}
+
+function checkAnswer(ans) {
+    const q = gameState.currentLessonQuestion;
+    gameState.quizAnswers.push({ day: gameState.day, answer: ans, correct: ans === q.correct });
+    if (ans === q.correct) {
+        print(""); print("<span class='success'>✓ CORRECT!</span>");
+        print(""); print(q.explanation);
+        if (gameState.day === 5) {
+            endGame();
+        } else {
+            print(""); print(""); print("<span class='action'>Press ENTER for next day...</span>");
+            gameState.phase = 'wait';
+            gameState.nextPhase = 'nextday';
         }
-        
-        // ===========================================
-        // PPF CALCULATION
-        // ===========================================
-        
-        function calculatePPF(pizzas) {
-            const maxPizzas = 40;
-            const maxTacos = 100;
-            return Math.round(maxTacos * (1 - Math.pow(pizzas / maxPizzas, 0.5)));
+    } else {
+        print(""); print("<span class='danger'>Try again.</span>");
+    }
+}
+
+function endGame() {
+    print(""); print("");
+    print("<div class='lesson-header'>🏆 GAME COMPLETE! 🏆</div>");
+    print("");
+    if (gameState.walls >= 3) {
+        print("<span class='success' style='font-size:1.3rem;'>✓ YOU WIN!</span>");
+        print("");
+        print("Your shelter survived the storm!");
+        print(`You built ${gameState.walls.toFixed(1)} walls.`);
+    } else {
+        print("<span class='danger' style='font-size:1.3rem;'>⚠️ STORM DAMAGE</span>");
+        print("");
+        print(`You only built ${gameState.walls.toFixed(1)} walls (needed 3).`);
+        print("Better efficiency next time!");
+    }
+    print("");
+    print("<div class='lesson-content'>");
+    print("<span class='success'>CONCEPTS MASTERED:</span>");
+    print("  ✓ SCARCITY - limited resources force choices");
+    print("  ✓ PPF - the limit of production possibilities");
+    print("  ✓ OPPORTUNITY COST - what you sacrifice");
+    print("  ✓ EFFICIENCY - using all resources wisely");
+    print("  ✓ ECONOMIC GROWTH - PPF shifts outward");
+    print("");
+    const correctQuizzes = gameState.quizAnswers.filter(a => a.correct).length;
+    print(`Quiz Score: ${correctQuizzes}/5`);
+    print("</div>");
+    gameState.phase = 'complete';
+}
+
+document.getElementById('commandInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        if (gameState.phase === 'wait' && gameState.nextPhase === 'nextday') {
+            gameState.day++;
+            gameState.hoursRemaining = 10;
+            gameState.dayActions = [];
+            gameState.phase = 'wait';
+            gameState.nextPhase = 'playing';
+            processCommand();
+        } else {
+            processCommand();
         }
-        
-        // ===========================================
-        // EXPLORE MODE
-        // ===========================================
-        
-        function initExplore() {
-            const canvas = document.getElementById('exploreCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            let currentPizzas = 20;
-            let currentTacos = 75;
-            
-            function drawGraph() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Draw axes
-                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(50, 400);
-                ctx.lineTo(450, 400);
-                ctx.moveTo(50, 400);
-                ctx.lineTo(50, 50);
-                ctx.stroke();
-                
-                // Draw PPF curve
-                ctx.strokeStyle = '#14B8A6';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                for (let p = 0; p <= 40; p++) {
-                    const t = calculatePPF(p);
-                    const x = 50 + (p / 40) * 400;
-                    const y = 400 - (t / 100) * 350;
-                    if (p === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.stroke();
-                
-                // Draw current point
-                const px = 50 + (currentPizzas / 40) * 400;
-                const py = 400 - (currentTacos / 100) * 350;
-                ctx.fillStyle = '#F59E0B';
-                ctx.beginPath();
-                ctx.arc(px, py, 8, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Labels
-                ctx.fillStyle = 'white';
-                ctx.font = '14px system-ui';
-                ctx.fillText('Pizzas →', 200, 430);
-                ctx.save();
-                ctx.translate(20, 250);
-                ctx.rotate(-Math.PI / 2);
-                ctx.fillText('Tacos →', 0, 0);
-                ctx.restore();
-            }
-            
-            function updateDisplay() {
-                document.getElementById('explore-pizza').textContent = currentPizzas;
-                document.getElementById('explore-taco').textContent = currentTacos;
-                
-                const oppCost = (100 / 40).toFixed(1);
-                document.getElementById('explore-cost').innerHTML = 
-                    `1 more pizza costs <span class="highlight">${oppCost} tacos</span>`;
-                
-                const expectedTacos = calculatePPF(currentPizzas);
-                const status = document.getElementById('explore-status');
-                
-                if (Math.abs(currentTacos - expectedTacos) < 3) {
-                    status.className = 'status-badge efficient';
-                    status.textContent = 'ON THE CURVE — Efficient!';
-                } else if (currentTacos < expectedTacos) {
-                    status.className = 'status-badge inefficient';
-                    status.textContent = 'INSIDE — Inefficient!';
-                } else {
-                    status.className = 'status-badge impossible';
-                    status.textContent = 'OUTSIDE — Impossible!';
-                }
-                
-                drawGraph();
-            }
-            
-            canvas.addEventListener('click', function(e) {
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                currentPizzas = Math.round(((x - 50) / 400) * 40);
-                currentTacos = Math.round((1 - (y - 50) / 350) * 100);
-                
-                currentPizzas = Math.max(0, Math.min(40, currentPizzas));
-                currentTacos = Math.max(0, Math.min(100, currentTacos));
-                
-                updateDisplay();
-            });
-            
-            window.exploreSet = function(p, t) {
-                currentPizzas = p;
-                currentTacos = t;
-                updateDisplay();
-            };
-            
-            updateDisplay();
-            window.exploreInitialized = true;
-        }
-        
-        // Initialize explore on load
-        initExplore();
-        
-        // ===========================================
-        // SPACE SHOOTER (Same as before)
-        // ===========================================
-        
-        function initSpaceShooter() {
-            const canvas = document.getElementById('space-canvas');
-            const ctx = canvas.getContext('2d');
-            
-            const vocab = [
-                { term: 'Opportunity Cost', definition: 'What you give up when making a choice' },
-                { term: 'Scarcity', definition: 'Limited resources vs unlimited wants' },
-                { term: 'Efficient', definition: 'Using all resources, on the curve' },
-                { term: 'Inefficient', definition: 'Wasted resources, inside the curve' },
-                { term: 'Impossible', definition: 'Outside the curve, cannot reach' },
-                { term: 'Trade-off', definition: 'Giving up one thing for another' },
-                { term: 'PPF', definition: 'Graph showing all production possibilities' },
-                { term: 'Economic Growth', definition: 'PPF shifts outward' },
-                { term: 'Production', definition: 'Making goods with limited resources' },
-                { term: 'Resources', definition: 'Inputs used to make goods' },
-                { term: 'Capital', definition: 'Tools and machines for production' },
-                { term: 'Specialization', definition: 'Focusing on what you do best' }
-            ];
-            
-            let level = 1;
-            let score = 0;
-            let lives = 3;
-            let selectedTerm = 0;
-            let ship = { x: 400, y: 300, angle: 0, vx: 0, vy: 0 };
-            let asteroids = [];
-            let bullets = [];
-            let keys = {};
-            let gameActive = false;
-            
-            function createTermSelector() {
-                const selector = document.getElementById('term-selector');
-                selector.innerHTML = '';
-                const termsThisLevel = vocab.slice((level - 1) * 4, level * 4);
-                termsThisLevel.forEach((v, i) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'term-btn' + (i === selectedTerm ? ' selected' : '');
-                    btn.textContent = `[${i + 1}] ${v.term}`;
-                    btn.onclick = () => {
-                        selectedTerm = i;
-                        createTermSelector();
-                    };
-                    selector.appendChild(btn);
-                });
-            }
-            
-            function startLevel() {
-                asteroids = [];
-                const termsThisLevel = vocab.slice((level - 1) * 4, level * 4);
-                const speed = 0.3 + (level - 1) * 0.3;
-                
-                for (let i = 0; i < 4; i++) {
-                    asteroids.push({
-                        x: Math.random() * 700 + 50,
-                        y: Math.random() * 500 + 50,
-                        vx: (Math.random() - 0.5) * speed,
-                        vy: (Math.random() - 0.5) * speed,
-                        radius: 40,
-                        definition: termsThisLevel[i].definition,
-                        correctTerm: termsThisLevel[i].term
-                    });
-                }
-                
-                ship = { x: 400, y: 300, angle: 0, vx: 0, vy: 0 };
-                bullets = [];
-                gameActive = true;
-                createTermSelector();
-                gameLoop();
-            }
-            
-            function gameLoop() {
-                if (!gameActive) return;
-                
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Update ship
-                if (keys['ArrowLeft']) ship.angle -= 0.1;
-                if (keys['ArrowRight']) ship.angle += 0.1;
-                if (keys['ArrowUp']) {
-                    ship.vx += Math.cos(ship.angle) * 0.1;
-                    ship.vy += Math.sin(ship.angle) * 0.1;
-                }
-                
-                ship.vx *= 0.99;
-                ship.vy *= 0.99;
-                ship.x += ship.vx;
-                ship.y += ship.vy;
-                
-                // Wrap ship
-                if (ship.x < 0) ship.x = canvas.width;
-                if (ship.x > canvas.width) ship.x = 0;
-                if (ship.y < 0) ship.y = canvas.height;
-                if (ship.y > canvas.height) ship.y = 0;
-                
-                // Draw ship
-                ctx.save();
-                ctx.translate(ship.x, ship.y);
-                ctx.rotate(ship.angle);
-                ctx.strokeStyle = '#14B8A6';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(10, 0);
-                ctx.lineTo(-8, -6);
-                ctx.lineTo(-5, 0);
-                ctx.lineTo(-8, 6);
-                ctx.closePath();
-                ctx.stroke();
-                ctx.restore();
-                
-                // Update asteroids
-                asteroids.forEach((ast, i) => {
-                    ast.x += ast.vx;
-                    ast.y += ast.vy;
-                    
-                    if (ast.x < 0) ast.x = canvas.width;
-                    if (ast.x > canvas.width) ast.x = 0;
-                    if (ast.y < 0) ast.y = canvas.height;
-                    if (ast.y > canvas.height) ast.y = 0;
-                    
-                    ctx.fillStyle = '#555';
-                    ctx.beginPath();
-                    ctx.arc(ast.x, ast.y, ast.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    ctx.fillStyle = 'white';
-                    ctx.font = '11px Arial';
-                    ctx.textAlign = 'center';
-                    const words = ast.definition.split(' ');
-                    let line = '';
-                    let y = ast.y - 10;
-                    words.forEach(word => {
-                        const testLine = line + word + ' ';
-                        const metrics = ctx.measureText(testLine);
-                        if (metrics.width > ast.radius * 1.5) {
-                            ctx.fillText(line, ast.x, y);
-                            line = word + ' ';
-                            y += 12;
-                        } else {
-                            line = testLine;
-                        }
-                    });
-                    ctx.fillText(line, ast.x, y);
-                    
-                    const dx = ship.x - ast.x;
-                    const dy = ship.y - ast.y;
-                    if (Math.sqrt(dx * dx + dy * dy) < ast.radius) {
-                        lives--;
-                        updateHUD();
-                        if (lives <= 0) {
-                            endGame();
-                            return;
-                        }
-                        asteroids.splice(i, 1);
-                    }
-                });
-                
-                // Update bullets
-                bullets.forEach((b, i) => {
-                    b.x += b.vx;
-                    b.y += b.vy;
-                    b.life--;
-                    
-                    if (b.life <= 0) {
-                        bullets.splice(i, 1);
-                        return;
-                    }
-                    
-                    ctx.fillStyle = '#F59E0B';
-                    ctx.beginPath();
-                    ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    asteroids.forEach((ast, ai) => {
-                        const dx = b.x - ast.x;
-                        const dy = b.y - ast.y;
-                        if (Math.sqrt(dx * dx + dy * dy) < ast.radius) {
-                            bullets.splice(i, 1);
-                            
-                            const termsThisLevel = vocab.slice((level - 1) * 4, level * 4);
-                            if (b.term === ast.correctTerm) {
-                                score += 100;
-                                asteroids.splice(ai, 1);
-                                
-                                if (asteroids.length === 0) {
-                                    nextLevel();
-                                }
-                            } else {
-                                score = Math.max(0, score - 25);
-                            }
-                            updateHUD();
-                        }
-                    });
-                });
-                
-                requestAnimationFrame(gameLoop);
-            }
-            
-            function updateHUD() {
-                document.getElementById('space-score').textContent = score;
-                document.getElementById('space-level').textContent = level;
-                document.getElementById('space-lives').textContent = '❤️'.repeat(lives);
-                document.getElementById('space-asteroids').textContent = asteroids.length;
-            }
-            
-            function nextLevel() {
-                if (level >= 3) {
-                    gameActive = false;
-                    endGame();
-                } else {
-                    level++;
-                    startLevel();
-                }
-            }
-            
-            function endGame() {
-                gameActive = false;
-                document.getElementById('space-final-score').textContent = score;
-                document.getElementById('space-levels-cleared').textContent = level;
-                document.getElementById('space-gameover').classList.add('active');
-            }
-            
-            document.addEventListener('keydown', (e) => {
-                if (!gameActive) return;
-                keys[e.key] = true;
-                
-                if (e.key === ' ') {
-                    e.preventDefault();
-                    const termsThisLevel = vocab.slice((level - 1) * 4, level * 4);
-                    bullets.push({
-                        x: ship.x,
-                        y: ship.y,
-                        vx: Math.cos(ship.angle) * 5,
-                        vy: Math.sin(ship.angle) * 5,
-                        life: 60,
-                        term: termsThisLevel[selectedTerm].term
-                    });
-                } else if (e.key >= '1' && e.key <= '4') {
-                    selectedTerm = parseInt(e.key) - 1;
-                    createTermSelector();
-                }
-            });
-            
-            document.addEventListener('keyup', (e) => {
-                keys[e.key] = false;
-            });
-            
-            window.initSpaceShooter = function() {
-                level = 1;
-                score = 0;
-                lives = 3;
-                selectedTerm = 0;
-                document.getElementById('space-gameover').classList.remove('active');
-                updateHUD();
-                startLevel();
-            };
-            
-            startLevel();
-            window.spaceInitialized = true;
-        }
-        
-        // ===========================================
-        // ESCAPE ROOM (Same as before)
-        // ===========================================
-        
-        function initEscapeRoom() {
-            const output = document.getElementById('escape-output');
-            const input = document.getElementById('escape-input');
-            
-            const rooms = [
-                {
-                    name: 'MACHINE ROOM',
-                    description: 'You are in the MACHINE ROOM. Conveyor belts stretch endlessly. A locked DOOR leads NORTH. A computer terminal displays a production problem.',
-                    puzzle: 'Factory data: Max 40 pizzas OR 100 tacos. If you make 20 pizzas, what is the opportunity cost of making 1 MORE pizza? (Calculate tacos lost)',
-                    answer: '2.5',
-                    hint: 'Opportunity cost = What you give up ÷ What you gain. At 40 pizzas you give up 100 tacos. Per pizza = 100÷40 = 2.5 tacos.'
-                },
-                {
-                    name: 'PRODUCTION FLOOR',
-                    description: 'The PRODUCTION FLOOR buzzes with dormant machinery. A control panel shows three production points. One is EFFICIENT. Which one?',
-                    puzzle: 'Choose efficient point: A) 15 pizzas, 80 tacos  B) 20 pizzas, 50 tacos  C) 10 pizzas, 40 tacos',
-                    answer: 'B',
-                    hint: 'Efficient means using 100% of capacity. Calculate: (pizzas÷40) + (tacos÷100) should equal 1.0 (or 100%). Only B works: (20÷40)+(50÷100) = 0.5+0.5 = 1.0 ✓'
-                },
-                {
-                    name: 'GROWTH LAB',
-                    description: 'The GROWTH LAB contains research data. A scientist left a question: What shifts the PPF OUTWARD?',
-                    puzzle: 'What causes economic growth? A) Using less resources  B) Better technology  C) Working inefficiently',
-                    answer: 'B',
-                    hint: 'Economic growth = more production capacity. Technology, more workers, better education all help!'
-                },
-                {
-                    name: 'EXIT',
-                    description: 'You solved all puzzles! The exit door opens. You mastered the PPF!',
-                    isFinal: true
-                }
-            ];
-            
-            let currentRoom = 0;
-            
-            function print(text, color = '#0f0') {
-                const div = document.createElement('div');
-                div.style.color = color;
-                div.textContent = text;
-                output.appendChild(div);
-                output.scrollTop = output.scrollHeight;
-            }
-            
-            function showRoom() {
-                const room = rooms[currentRoom];
-                print('');
-                print('═══════════════════════════════════════', '#14B8A6');
-                print(`  ${room.name}`, '#F59E0B');
-                print('═══════════════════════════════════════', '#14B8A6');
-                print('');
-                print(room.description);
-                
-                if (!room.isFinal) {
-                    print('');
-                    print(room.puzzle, '#fff');
-                    print('');
-                    print('Commands: CALCULATE [answer], HINT, HELP, LOOK');
-                } else {
-                    print('');
-                    print('🎉 Congratulations! You escaped!', '#F59E0B');
-                }
-            }
-            
-            window.escapeCommand = function() {
-                const cmd = input.value.trim().toUpperCase();
-                input.value = '';
-                
-                print('> ' + cmd, '#14B8A6');
-                
-                const room = rooms[currentRoom];
-                
-                if (cmd === 'HELP') {
-                    print('Available commands: CALCULATE [answer], HINT, LOOK, NORTH');
-                } else if (cmd === 'LOOK') {
-                    showRoom();
-                } else if (cmd === 'HINT') {
-                    print(room.hint, '#FBBF24');
-                } else if (cmd.startsWith('CALCULATE ')) {
-                    const answer = cmd.replace('CALCULATE ', '').trim();
-                    if (answer === room.answer || answer === room.answer.toLowerCase()) {
-                        print('✓ CORRECT! Door unlocked!', '#22C55E');
-                        currentRoom++;
-                        
-                        // Check if they reached the final room (escaped)
-                        if (currentRoom >= rooms.length - 1 && !escapeCompleted) {
-                            setTimeout(() => unlockBonusGames(), 2000);
-                        }
-                        
-                        setTimeout(showRoom, 1000);
-                    } else {
-                        print('✗ Incorrect. Try again or type HINT.', '#EF4444');
-                    }
-                } else if (cmd === 'NORTH') {
-                    if (currentRoom === rooms.length - 1) {
-                        print('You already escaped!', '#F59E0B');
-                    } else {
-                        print('The door is locked. Solve the puzzle first!', '#EF4444');
-                    }
-                } else {
-                    print('Unknown command. Type HELP for commands.');
-                }
-            };
-            
-            print('INITIALIZING FACTORY TERMINAL...', '#14B8A6');
-            print('SYSTEM READY', '#22C55E');
-            print('');
-            print('Welcome to FACTORY ESCAPE. Solve PPF puzzles to escape!');
-            showRoom();
-            
-            window.escapeInitialized = true;
-        }
-        
-        // ===========================================
-        // QUIZ (Same as before)
-        // ===========================================
-        
-        function initQuiz() {
-            const questions = [
-                {
-                    q: 'What is opportunity cost?',
-                    options: [
-                        'The money you pay for something',
-                        'What you give up when making a choice',
-                        'The total cost of production',
-                        'The price of goods'
-                    ],
-                    correct: 1
-                },
-                {
-                    q: 'What does the PPF show?',
-                    options: [
-                        'Only inefficient production',
-                        'All possible production combinations',
-                        'Just the maximum output',
-                        'Future economic predictions'
-                    ],
-                    correct: 1
-                },
-                {
-                    q: 'A point INSIDE the PPF curve means:',
-                    options: [
-                        'Efficient production',
-                        'Impossible to reach',
-                        'Inefficient/wasted resources',
-                        'Economic growth'
-                    ],
-                    correct: 2
-                },
-                {
-                    q: 'A point ON the PPF curve means:',
-                    options: [
-                        'Wasting resources',
-                        'Using all resources efficiently',
-                        'Impossible production',
-                        'Economic decline'
-                    ],
-                    correct: 1
-                },
-                {
-                    q: 'What shifts the PPF outward?',
-                    options: [
-                        'Using fewer resources',
-                        'Economic growth (new tech, workers)',
-                        'Producing less efficiently',
-                        'Reducing production'
-                    ],
-                    correct: 1
-                },
-                {
-                    q: 'Factory max: 50 cars OR 100 bikes. Opportunity cost of 1 car?',
-                    options: [
-                        '0.5 bikes',
-                        '2 bikes',
-                        '50 bikes',
-                        '100 bikes'
-                    ],
-                    correct: 1
-                },
-                {
-                    q: 'Moving along the PPF curve shows:',
-                    options: [
-                        'Wasted resources',
-                        'Economic growth',
-                        'Trade-offs between goods',
-                        'Impossible choices'
-                    ],
-                    correct: 2
-                },
-                {
-                    q: 'Scarcity means:',
-                    options: [
-                        'Everything is expensive',
-                        'Limited resources vs unlimited wants',
-                        'Nobody has enough money',
-                        'Shortage of one specific good'
-                    ],
-                    correct: 1
-                },
-                {
-                    q: 'Why is the PPF curved (bowed out)?',
-                    options: [
-                        'Random design choice',
-                        'Resources not equally good at making both goods',
-                        'It should be a straight line',
-                        'To make it look nice'
-                    ],
-                    correct: 1
-                },
-                {
-                    q: 'A country produces OUTSIDE its PPF. This is:',
-                    options: [
-                        'Efficient',
-                        'Inefficient',
-                        'Impossible with current resources',
-                        'The goal'
-                    ],
-                    correct: 2
-                }
-            ];
-            
-            let currentQ = 0;
-            let answers = new Array(questions.length).fill(null);
-            let showingReview = false;
-            
-            function renderQuestion() {
-                const container = document.getElementById('quiz-questions');
-                container.innerHTML = '';
-                
-                const q = questions[currentQ];
-                const qDiv = document.createElement('div');
-                qDiv.className = 'quiz-question';
-                
-                const title = document.createElement('h3');
-                title.textContent = `Question ${currentQ + 1}`;
-                qDiv.appendChild(title);
-                
-                const text = document.createElement('p');
-                text.textContent = q.q;
-                qDiv.appendChild(text);
-                
-                const optionsDiv = document.createElement('div');
-                optionsDiv.className = 'quiz-options';
-                
-                q.options.forEach((opt, i) => {
-                    const optDiv = document.createElement('div');
-                    optDiv.className = 'quiz-option';
-                    if (answers[currentQ] === i) optDiv.classList.add('selected');
-                    if (showingReview) {
-                        if (i === q.correct) optDiv.classList.add('correct');
-                        if (answers[currentQ] === i && i !== q.correct) optDiv.classList.add('incorrect');
-                    }
-                    optDiv.textContent = opt;
-                    optDiv.onclick = () => {
-                        if (!showingReview) {
-                            answers[currentQ] = i;
-                            renderQuestion();
-                        }
-                    };
-                    optionsDiv.appendChild(optDiv);
-                });
-                
-                qDiv.appendChild(optionsDiv);
-                container.appendChild(qDiv);
-                
-                document.getElementById('quiz-current').textContent = currentQ + 1;
-                document.getElementById('quiz-total').textContent = questions.length;
-                
-                document.getElementById('quiz-prev').disabled = currentQ === 0;
-                document.getElementById('quiz-next').style.display = currentQ === questions.length - 1 ? 'none' : 'block';
-                document.getElementById('quiz-submit').style.display = currentQ === questions.length - 1 && !showingReview ? 'block' : 'none';
-            }
-            
-            window.nextQuizQuestion = function() {
-                if (currentQ < questions.length - 1) {
-                    currentQ++;
-                    renderQuestion();
-                }
-            };
-            
-            window.prevQuizQuestion = function() {
-                if (currentQ > 0) {
-                    currentQ--;
-                    renderQuestion();
-                }
-            };
-            
-            window.submitQuiz = function() {
-                let correct = 0;
-                questions.forEach((q, i) => {
-                    if (answers[i] === q.correct) correct++;
-                });
-                
-                document.getElementById('quiz-container').style.display = 'none';
-                document.getElementById('quiz-results').style.display = 'block';
-                document.getElementById('quiz-score-percent').textContent = Math.round((correct / questions.length) * 100) + '%';
-                document.getElementById('quiz-correct').textContent = correct;
-                document.getElementById('quiz-total-score').textContent = questions.length;
-            };
-            
-            window.reviewQuiz = function() {
-                showingReview = true;
-                currentQ = 0;
-                document.getElementById('quiz-container').style.display = 'block';
-                document.getElementById('quiz-results').style.display = 'none';
-                renderQuestion();
-            };
-            
-            window.resetQuiz = function() {
-                currentQ = 0;
-                answers = new Array(questions.length).fill(null);
-                showingReview = false;
-                document.getElementById('quiz-container').style.display = 'block';
-                document.getElementById('quiz-results').style.display = 'none';
-                renderQuestion();
-            };
-            
-            renderQuestion();
-            window.quizInitialized = true;
-        }
-        
-        // ===========================================
-        // MILLIONAIRE GAME
-        // ===========================================
-        
-        function initMillionaire() {
-            const questions = [
-                {
-                    q: "What does PPF stand for?",
-                    a: ["Pretty Fun Forecast", "Production Possibilities Frontier", "Pizza Productivity Factor", "Price Point Finder"],
-                    correct: 1
-                },
-                {
-                    q: "What is opportunity cost?",
-                    a: ["The price you pay at the store", "What you give up when making a choice", "The total cost of production", "A discount opportunity"],
-                    correct: 1
-                },
-                {
-                    q: "A point ON the PPF curve means production is:",
-                    a: ["Wasting resources", "Using all resources efficiently", "Impossible to reach", "Losing money"],
-                    correct: 1
-                },
-                {
-                    q: "A point INSIDE the PPF curve means:",
-                    a: ["Maximum efficiency", "Wasted or unused resources", "Economic growth", "Perfect production"],
-                    correct: 1
-                },
-                {
-                    q: "What does scarcity mean in economics?",
-                    a: ["Everything is expensive", "Limited resources vs unlimited wants", "Running out of one product", "A temporary shortage"],
-                    correct: 1
-                },
-                {
-                    q: "What shifts the PPF curve OUTWARD?",
-                    a: ["Using fewer resources", "Economic growth (new tech/workers)", "Making fewer products", "Reducing efficiency"],
-                    correct: 1
-                },
-                {
-                    q: "If max production is 40 pizzas OR 100 tacos, what's the opportunity cost of 1 pizza?",
-                    a: ["1 taco", "2.5 tacos", "40 tacos", "100 tacos"],
-                    correct: 1
-                },
-                {
-                    q: "Moving along the PPF curve shows:",
-                    a: ["Economic growth", "Trade-offs between goods", "Wasted resources", "Impossible choices"],
-                    correct: 1
-                },
-                {
-                    q: "A point OUTSIDE the PPF is:",
-                    a: ["The goal to reach", "Efficient production", "Impossible with current resources", "Wasting money"],
-                    correct: 2
-                },
-                {
-                    q: "What does 'efficient production' mean?",
-                    a: ["Making products quickly", "Using all available resources", "Producing the cheapest goods", "Hiring more workers"],
-                    correct: 1
-                }
-            ];
-            
-            const moneyLadder = [
-                "$100", "$200", "$500", "$1,000", "$2,000", 
-                "$4,000", "$8,000", "$16,000", "$32,000", "$1,000,000"
-            ];
-            
-            let currentQuestion = 0;
-            let moneyWon = 0;
-            let lifelines = {
-                fiftyFifty: true,
-                audience: true,
-                phone: true
-            };
-            let selectedAnswer = null;
-            let answersRevealed = false;
-            
-            function buildMoneyLadder() {
-                const ladder = document.getElementById('money-ladder');
-                ladder.innerHTML = '<h3 style="text-align:center;margin-bottom:16px;color:var(--gold);">💰 PRIZE</h3>';
-                
-                for (let i = moneyLadder.length - 1; i >= 0; i--) {
-                    const step = document.createElement('div');
-                    step.className = 'money-step';
-                    step.textContent = (i + 1) + ". " + moneyLadder[i];
-                    
-                    if (i === currentQuestion) {
-                        step.classList.add('current');
-                    } else if (i < currentQuestion) {
-                        step.classList.add('won');
-                    }
-                    
-                    ladder.appendChild(step);
-                }
-            }
-            
-            function showQuestion() {
-                answersRevealed = false;
-                selectedAnswer = null;
-                
-                const q = questions[currentQuestion];
-                
-                document.getElementById('mill-question-num').textContent = currentQuestion + 1;
-                document.getElementById('mill-question').textContent = q.q;
-                
-                const answersGrid = document.getElementById('mill-answers');
-                answersGrid.innerHTML = '';
-                
-                const letters = ['A', 'B', 'C', 'D'];
-                q.a.forEach((answer, i) => {
-                    const option = document.createElement('div');
-                    option.className = 'answer-option';
-                    option.innerHTML = `<span class="letter">${letters[i]}</span>${answer}`;
-                    option.onclick = () => selectAnswer(i);
-                    option.dataset.index = i;
-                    answersGrid.appendChild(option);
-                });
-                
-                buildMoneyLadder();
-                
-                document.getElementById('fifty-fifty').disabled = !lifelines.fiftyFifty;
-                document.getElementById('audience').disabled = !lifelines.audience;
-                document.getElementById('phone').disabled = !lifelines.phone;
-                
-                document.getElementById('question-area').style.display = 'block';
-                document.getElementById('mill-result').style.display = 'none';
-            }
-            
-            function selectAnswer(index) {
-                if (answersRevealed) return;
-                
-                const options = document.querySelectorAll('.answer-option');
-                options.forEach(opt => opt.classList.remove('selected'));
-                options[index].classList.add('selected');
-                selectedAnswer = index;
-                
-                setTimeout(() => revealAnswer(), 1000);
-            }
-            
-            function revealAnswer() {
-                if (selectedAnswer === null) return;
-                
-                answersRevealed = true;
-                const q = questions[currentQuestion];
-                const options = document.querySelectorAll('.answer-option');
-                
-                options.forEach((opt, i) => {
-                    opt.classList.add('disabled');
-                    if (i === q.correct) {
-                        opt.classList.add('correct');
-                    }
-                    if (i === selectedAnswer && i !== q.correct) {
-                        opt.classList.add('incorrect');
-                    }
-                });
-                
-                if (selectedAnswer === q.correct) {
-                    setTimeout(() => {
-                        currentQuestion++;
-                        moneyWon = currentQuestion;
-                        
-                        if (currentQuestion >= questions.length) {
-                            showFinalResult(true);
-                        } else {
-                            showQuestion();
-                        }
-                    }, 2000);
-                } else {
-                    setTimeout(() => {
-                        showFinalResult(false);
-                    }, 2000);
-                }
-            }
-            
-            window.useFiftyFifty = function() {
-                if (!lifelines.fiftyFifty || answersRevealed) return;
-                
-                lifelines.fiftyFifty = false;
-                document.getElementById('fifty-fifty').disabled = true;
-                
-                const q = questions[currentQuestion];
-                const options = document.querySelectorAll('.answer-option');
-                
-                let removed = 0;
-                options.forEach((opt, i) => {
-                    if (i !== q.correct && removed < 2) {
-                        opt.classList.add('disabled');
-                        opt.style.opacity = '0.2';
-                        removed++;
-                    }
-                });
-            };
-            
-            window.useAudience = function() {
-                if (!lifelines.audience || answersRevealed) return;
-                
-                lifelines.audience = false;
-                document.getElementById('audience').disabled = true;
-                
-                const q = questions[currentQuestion];
-                
-                const questionArea = document.getElementById('question-area');
-                const existingPoll = document.querySelector('.audience-poll');
-                if (existingPoll) existingPoll.remove();
-                
-                const poll = document.createElement('div');
-                poll.className = 'audience-poll';
-                
-                const letters = ['A', 'B', 'C', 'D'];
-                const percentages = [0, 0, 0, 0];
-                
-                percentages[q.correct] = 60 + Math.random() * 20;
-                
-                let remaining = 100 - percentages[q.correct];
-                for (let i = 0; i < 4; i++) {
-                    if (i !== q.correct) {
-                        const share = Math.random() * remaining;
-                        percentages[i] = share;
-                        remaining -= share;
-                    }
-                }
-                
-                percentages.forEach((pct, i) => {
-                    const barDiv = document.createElement('div');
-                    barDiv.className = 'poll-bar';
-                    barDiv.innerHTML = `
-                        <div class="poll-letter">${letters[i]}</div>
-                        <div class="poll-bar-fill">
-                            <div class="poll-bar-inner" style="height: ${pct}%"></div>
-                        </div>
-                        <div class="poll-percent">${Math.round(pct)}%</div>
-                    `;
-                    poll.appendChild(barDiv);
-                });
-                
-                questionArea.insertBefore(poll, document.getElementById('mill-answers'));
-            };
-            
-            window.usePhone = function() {
-                if (!lifelines.phone || answersRevealed) return;
-                
-                lifelines.phone = false;
-                document.getElementById('phone').disabled = true;
-                
-                const q = questions[currentQuestion];
-                const letters = ['A', 'B', 'C', 'D'];
-                
-                let advice = Math.random() < 0.8 
-                    ? `I'm pretty sure it's ${letters[q.correct]}!`
-                    : `Hmm, I think it's either ${letters[q.correct]} or ${letters[(q.correct + 1) % 4]}...`;
-                
-                alert(`📞 Your friend says: "${advice}"`);
-            };
-            
-            window.walkAway = function() {
-                showFinalResult(false, true);
-            };
-            
-            function showFinalResult(won, walkedAway = false) {
-                document.getElementById('question-area').style.display = 'none';
-                document.getElementById('mill-result').style.display = 'block';
-                
-                const title = document.getElementById('mill-result-title');
-                const amount = document.getElementById('mill-final-amount');
-                const message = document.getElementById('mill-result-message');
-                
-                const finalMoney = moneyWon > 0 ? moneyLadder[moneyWon - 1] : "$0";
-                
-                if (won && currentQuestion >= questions.length) {
-                    title.textContent = "🎉 MILLIONAIRE! 🎉";
-                    amount.textContent = "$1,000,000";
-                    message.textContent = "You answered all 10 questions correctly! You're a PPF expert!";
-                    
-                    // Unlock Quiz
-                    if (!millionaireCompleted) {
-                        setTimeout(() => unlockQuiz(), 1500);
-                    }
-                } else if (walkedAway) {
-                    title.textContent = "You Walked Away";
-                    amount.textContent = finalMoney;
-                    message.textContent = `Smart move! You're taking home ${finalMoney}`;
-                } else {
-                    title.textContent = "Game Over";
-                    amount.textContent = finalMoney;
-                    message.textContent = moneyWon > 0 
-                        ? `You got ${moneyWon} question${moneyWon === 1 ? '' : 's'} correct and won ${finalMoney}!`
-                        : "Better luck next time!";
-                }
-            }
-            
-            currentQuestion = 0;
-            moneyWon = 0;
-            lifelines = { fiftyFifty: true, audience: true, phone: true };
-            showQuestion();
-            
-            window.millionaireInitialized = true;
-        }
-        
-        // ===========================================
-        // QUIZ GAME
-        // ===========================================
-        
-        function initQuiz() {
-            const questions = [
-                {
-                    q: "The PPF shows all possible combinations of two goods that can be produced with:",
-                    options: ["Unlimited resources", "Fixed resources", "Increasing resources", "Decreasing resources"],
-                    correct: 1
-                },
-                {
-                    q: "Opportunity cost is:",
-                    options: ["The money you pay for something", "What you give up to get something", "The total cost of production", "The price at the store"],
-                    correct: 1
-                },
-                {
-                    q: "A point ON the PPF curve represents:",
-                    options: ["Inefficient production", "Efficient production", "Impossible production", "Future production"],
-                    correct: 1
-                },
-                {
-                    q: "A point INSIDE the PPF curve means:",
-                    options: ["All resources are being used", "Resources are being wasted", "Production is impossible", "The economy is growing"],
-                    correct: 1
-                },
-                {
-                    q: "What does scarcity mean in economics?",
-                    options: ["Everything is expensive", "Limited resources vs unlimited wants", "Temporary shortage", "Government restrictions"],
-                    correct: 1
-                },
-                {
-                    q: "What shifts the PPF curve OUTWARD?",
-                    options: ["Using fewer workers", "Economic growth", "Production decreases", "Higher prices"],
-                    correct: 1
-                },
-                {
-                    q: "If a factory can make 40 pizzas OR 100 tacos, the opportunity cost of 1 pizza is:",
-                    options: ["1 taco", "2.5 tacos", "40 tacos", "100 tacos"],
-                    correct: 1
-                },
-                {
-                    q: "Moving along the PPF shows:",
-                    options: ["Economic growth", "Trade-offs between goods", "Inflation", "Unemployment"],
-                    correct: 1
-                },
-                {
-                    q: "The slope of the PPF represents:",
-                    options: ["Total production", "Opportunity cost", "Market price", "Profit margin"],
-                    correct: 1
-                },
-                {
-                    q: "What best describes 'efficient production'?",
-                    options: ["Making products quickly", "Using all available resources", "Producing at lowest cost", "Maximum profit"],
-                    correct: 1
-                }
-            ];
-            
-            let currentQ = 0;
-            let score = 0;
-            let selectedAnswer = null;
-            
-            function showQuestion() {
-                const container = document.getElementById('quiz-questions');
-                const q = questions[currentQ];
-                
-                container.innerHTML = `
-                    <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 16px; border: 2px solid var(--teal);">
-                        <h3 style="color: var(--teal); margin-bottom: 30px;">Question ${currentQ + 1} of 10</h3>
-                        <p style="font-size: 1.2rem; margin-bottom: 30px; line-height: 1.6;">${q.q}</p>
-                        
-                        <div style="display: grid; gap: 12px;">
-                            ${q.options.map((opt, i) => `
-                                <button class="quiz-option" data-index="${i}" onclick="selectQuizAnswer(${i})" 
-                                    style="padding: 16px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); 
-                                    border-radius: 12px; cursor: pointer; text-align: left; transition: all 0.3s; font-size: 1rem;">
-                                    <span style="display: inline-block; width: 30px; height: 30px; background: var(--gold); color: #1a1b2e; 
-                                        border-radius: 50%; text-align: center; line-height: 30px; font-weight: bold; margin-right: 12px;">
-                                        ${String.fromCharCode(65 + i)}
-                                    </span>
-                                    ${opt}
-                                </button>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-                
-                document.getElementById('quiz-nav').style.display = 'block';
-                document.getElementById('quiz-current-num').textContent = currentQ + 1;
-                document.getElementById('quiz-submit-btn').disabled = true;
-                selectedAnswer = null;
-            }
-            
-            window.selectQuizAnswer = function(index) {
-                selectedAnswer = index;
-                
-                document.querySelectorAll('.quiz-option').forEach(opt => {
-                    opt.style.borderColor = 'rgba(255,255,255,0.2)';
-                    opt.style.background = 'rgba(255,255,255,0.05)';
-                });
-                
-                const selected = document.querySelector(`[data-index="${index}"]`);
-                selected.style.borderColor = 'var(--gold)';
-                selected.style.background = 'rgba(245,158,11,0.2)';
-                
-                document.getElementById('quiz-submit-btn').disabled = false;
-            };
-            
-            window.submitQuizAnswer = function() {
-                if (selectedAnswer === null) return;
-                
-                const q = questions[currentQ];
-                const options = document.querySelectorAll('.quiz-option');
-                
-                // Show correct/incorrect
-                options.forEach((opt, i) => {
-                    opt.style.pointerEvents = 'none';
-                    if (i === q.correct) {
-                        opt.style.borderColor = 'var(--green)';
-                        opt.style.background = 'rgba(16,185,129,0.2)';
-                    }
-                    if (i === selectedAnswer && i !== q.correct) {
-                        opt.style.borderColor = 'var(--red)';
-                        opt.style.background = 'rgba(232,80,91,0.2)';
-                    }
-                });
-                
-                if (selectedAnswer === q.correct) {
-                    score++;
-                }
-                
-                setTimeout(() => {
-                    currentQ++;
-                    if (currentQ < questions.length) {
-                        showQuestion();
-                    } else {
-                        showCertificate();
-                    }
-                }, 2000);
-            };
-            
-            function showCertificate() {
-                document.getElementById('quiz-questions').style.display = 'none';
-                document.getElementById('quiz-nav').style.display = 'none';
-                document.getElementById('quiz-certificate').style.display = 'block';
-                
-                const percentage = (score / questions.length) * 100;
-                let grade, gradeColor, gradeMessage;
-                
-                if (percentage >= 90) {
-                    grade = 'A';
-                    gradeColor = '#10B981';
-                    gradeMessage = 'Outstanding! You have mastered PPF concepts!';
-                } else if (percentage >= 80) {
-                    grade = 'B';
-                    gradeColor = '#14B8A6';
-                    gradeMessage = 'Great job! You have a strong understanding of PPF!';
-                } else if (percentage >= 70) {
-                    grade = 'C';
-                    gradeColor = '#F59E0B';
-                    gradeMessage = 'Good work! You understand the basics of PPF!';
-                } else if (percentage >= 60) {
-                    grade = 'D';
-                    gradeColor = '#F97316';
-                    gradeMessage = 'You passed, but consider reviewing the material.';
-                } else {
-                    grade = 'F';
-                    gradeColor = '#E8505B';
-                    gradeMessage = 'Please review the lesson and try again.';
-                }
-                
-                const circle = document.getElementById('quiz-grade-circle');
-                circle.textContent = grade;
-                circle.style.borderColor = gradeColor;
-                circle.style.color = gradeColor;
-                circle.style.background = `${gradeColor}22`;
-                
-                document.getElementById('quiz-final-score').textContent = `${score}/${questions.length} (${Math.round(percentage)}%)`;
-                document.getElementById('quiz-grade-message').textContent = gradeMessage;
-                
-                const now = new Date();
-                document.getElementById('quiz-date').textContent = now.toLocaleDateString('en-US', { 
-                    year: 'numeric', month: 'long', day: 'numeric' 
-                });
-                
-                // Show continue button if passing grade
-                if (percentage >= 60) {
-                    document.getElementById('continue-escape-btn').style.display = 'inline-block';
-                    if (!quizCompleted) {
-                        unlockEscapeRoom();
-                    }
-                }
-            }
-            
-            window.retakeQuiz = function() {
-                currentQ = 0;
-                score = 0;
-                selectedAnswer = null;
-                document.getElementById('quiz-certificate').style.display = 'none';
-                document.getElementById('quiz-questions').style.display = 'block';
-                showQuestion();
-            };
-            
-            window.continueToEscape = function() {
-                switchTab('escape');
-            };
-            
-            showQuestion();
-            window.quizInitialized = true;
-        }
-        
-        // ===========================================
-        // INITIALIZE ON PAGE LOAD
-        // ===========================================
-        
-        // Set initial lock states
-        updateTabLocks();
-        
-        // Show preview banner if in preview mode
-        if (previewMode) {
-            const banner = document.createElement('div');
-            banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,#EF4444,#DC2626);color:white;padding:12px;text-align:center;font-weight:bold;z-index:10000;box-shadow:0 4px 6px rgba(0,0,0,0.3);';
-            banner.textContent = '🎓 TEACHER PREVIEW MODE — All activities unlocked';
-            document.body.insertBefore(banner, document.body.firstChild);
-        }
-    </script>
+    }
+});
+
+runVocabTutorial();
+</script>
 </body>
 </html>
