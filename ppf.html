@@ -327,10 +327,10 @@ let gameState = {
 };
 
 const locations = {
-    camp: { name: "CAMP", desc: "Your shelter (${walls} walls). Fire pit${fireDesc}.", exits: ['BEACH', 'FOREST', 'CLIFF'], actions: ['BUILD', 'FIRE'] },
-    beach: { name: "BEACH", desc: "Waves crash. Fish swim.${netDesc}", exits: ['CAMP'], actions: ['FISH'] },
-    forest: { name: "FOREST", desc: "Dense trees. Wood everywhere.", exits: ['CAMP', 'CLIFF'], actions: ['GATHER'] },
-    cliff: { name: "CLIFF", desc: "High overlook. Your journal.", exits: ['CAMP', 'FOREST'], actions: ['MAP'] }
+    camp: { name: "CAMP", desc: "Your makeshift shelter (${walls} walls complete). Fire pit${fireDesc}. Tarp strung between palms. Safety. For now.", exits: ['BEACH', 'FOREST', 'CLIFF'], actions: ['BUILD', 'FIRE'] },
+    beach: { name: "BEACH", desc: "White sand. Turquoise water. Plane wreckage offshore.${netDesc} Old footprints leading to surf - washed away by tide.", exits: ['CAMP'], actions: ['FISH'] },
+    forest: { name: "FOREST", desc: "Dense jungle. Coconut palms. Bamboo. Wood everywhere. Something moved in the shadows - just a crab. Probably.", exits: ['CAMP', 'CLIFF'], actions: ['GATHER'] },
+    cliff: { name: "CLIFF", desc: "Rocky outcrop overlooking ocean. Carved into stone: '47 DAYS'. Someone counted. Your journal rests here. How long did they wait?", exits: ['CAMP', 'FOREST'], actions: ['MAP'] }
 };
 
 // QUIZ QUESTIONS (Answer Key: B, B, C, B, A)
@@ -378,9 +378,18 @@ const vocabSteps = [
         clearScreen();
         print("<span class='success' style='font-size:1.5rem;'>ISLAND ECONOMIST</span>");
         print("");
-        print("Welcome! You'll survive on a desert island for 5 days.");
+        print("<span class='danger'>⚠️ TRANSMISSION INTERCEPTED ⚠️</span>");
         print("");
-        print("But first, let's learn the VOCABULARY.");
+        print("Dr. Sarah Chen. Economics professor. En route to research conference.");
+        print("Plane went down in storm. Mayday. Coordinates: unknown.");
+        print("Washed ashore on small island. Wreckage offshore.");
+        print("");
+        print("<span class='warning'>RESCUE ETA: 5 days if signal received.</span>");
+        print("");
+        print("You have your journal. Your knowledge. Limited time.");
+        print("You'll survive on this island for 5 days.");
+        print("");
+        print("But first, let's review the VOCABULARY you'll need...");
         print("");
         print("<span class='action'>Press ENTER...</span>");
     },
@@ -659,8 +668,15 @@ function startDay1() {
     updateDisplay();
     print("<span class='warning' style='font-size:1.3rem;'>☀️ DAY 1 of 5 ☀️</span>");
     print("");
-    print("Now EXPERIENCE the vocabulary!");
-    print("You have <span class='warning'>10 hours</span> (SCARCITY).");
+    print("<span class='danger'>You wake on the beach, coughing salt water.</span>");
+    print("Plane wreckage floats in the distance. No sign of other survivors.");
+    print("Your journal survived. You're trained for this - economics is about scarcity.");
+    print("<span class='action'>Survive. Build shelter. Wait for rescue.</span>");
+    print("");
+    print("Now EXPERIENCE the vocabulary you reviewed!");
+    print("You have <span class='warning'>10 hours of daylight</span> (SCARCITY).");
+    print("Every choice has an <span class='warning'>OPPORTUNITY COST</span>.");
+    print("Your production is limited by the <span class='warning'>PPF</span>.");
     print("");
     print("<span class='action'>GOAL: Survive 5 days. Build 3 walls by Day 5!</span>");
     print("");
@@ -675,9 +691,38 @@ function startDay() {
     updateDisplay();
     print(`<span class='warning' style='font-size:1.3rem;'>☀️ DAY ${gameState.day} of 5 ☀️</span>`);
     print("");
-    if (gameState.day === 3 && gameState.walls < 3) print("<span class='danger'>⚠️ STORM WARNING! Need 3 walls by Day 5!</span>");
-    if (gameState.day === 4) print("<span class='warning'>💡 Explore the BEACH!</span>");
-    if (gameState.day === 5) print("<span class='danger'>⚠️ STORM TONIGHT! Final day!</span>");
+    
+    // Daily story narratives
+    if (gameState.day === 1) {
+        print("<span class='danger'>You wake on the beach, coughing salt water.</span>");
+        print("Plane wreckage floats in the distance. No sign of other survivors.");
+        print("Your journal survived. You're trained for this - economics is about scarcity.");
+        print("<span class='action'>Survive. Build shelter. Wait for rescue.</span>");
+    }
+    else if (gameState.day === 2) {
+        print("Dawn breaks. You slept restlessly.");
+        print("Found footprints near camp this morning. Old. Weathered.");
+        print("<span class='warning'>Someone else was here once.</span>");
+    }
+    else if (gameState.day === 3) {
+        print("Third day. Body aches from labor.");
+        print("Radio crackle from wreckage - garbled rescue transmission.");
+        print("<span class='danger'>⚠️ STORM WARNING! Need 3 walls by Day 5!</span>");
+        print("Five days. They said five days. Two more to go.");
+    }
+    else if (gameState.day === 4) {
+        print("Day four. Clouds gathering on horizon.");
+        print("Found an old SOS flag near the beach. Faded. How long was it there?");
+        print("<span class='warning'>💡 Explore the BEACH for supplies!</span>");
+        print("Tomorrow the storm hits. Are you ready?");
+    }
+    else if (gameState.day === 5) {
+        print("<span class='danger'>FINAL DAY. Storm clouds black overhead.</span>");
+        print("Wind picking up. Waves crashing harder.");
+        print("<span class='danger'>⚠️ STORM TONIGHT! This is it!</span>");
+        print("By dawn, either rescue arrives... or you face another week alone.");
+    }
+    
     print("");
     print("Type LOOK");
 }
@@ -731,7 +776,13 @@ function doFish() {
     gameState.dayActions.push({ action: 'fishing', result: 1 });
     updateDisplay();
     if (gameState.day === 4 && !gameState.hasNet) {
-        print("<span class='warning'>⚡ Found FISHING NET! 2hrs→1hr</span>");
+        print("");
+        print("<span class='success'>⚡ DISCOVERY! ⚡</span>");
+        print("Tangled in debris - a professional fishing net!");
+        print("Still intact. Industrial grade. Someone prepared for this.");
+        print("<span class='warning'>Your fishing improved: 2hrs → 1hr per fish</span>");
+        print("<span class='action'>PPF shifts OUTWARD - this is ECONOMIC GROWTH!</span>");
+        print("");
         gameState.hasNet = true;
         gameState.fishingRate = 1;
     }
@@ -850,31 +901,79 @@ function checkAnswer(ans) {
 
 function endGame() {
     print(""); print("");
-    print("<div class='lesson-header'>🏆 GAME COMPLETE! 🏆</div>");
+    print("<div class='lesson-header'>⛈️ NIGHT 5 - THE STORM ⛈️</div>");
     print("");
+    
+    // Calculate survival score
+    const survivalScore = gameState.walls + (gameState.fish/10) + (gameState.fires/5);
+    const correctQuizzes = gameState.quizAnswers.filter(a => a.correct).length;
+    
+    // Storm narrative
+    print("<span class='danger'>Wind howls. Rain hammers. Thunder cracks.</span>");
+    print("You huddle in your shelter as the island rages.");
+    print("");
+    
+    // Multiple endings based on walls built
     if (gameState.walls >= 3) {
-        print("<span class='success' style='font-size:1.3rem;'>✓ YOU WIN!</span>");
+        print("<span class='success' style='font-size:1.3rem;'>✓ YOUR SHELTER HOLDS!</span>");
         print("");
-        print("Your shelter survived the storm!");
-        print(`You built ${gameState.walls.toFixed(1)} walls.`);
+        print(`Your ${gameState.walls.toFixed(1)} walls stand firm against the storm.`);
+        print("Water leaks through gaps, but the structure is solid.");
+        print("Hours pass. The storm subsides.");
+        print("");
+        print("<span class='warning'>DAWN - DAY 6</span>");
+        print("");
+        print("Chopper blades in the distance. Growing louder.");
+        print("COAST GUARD emblazoned on the side. They found you!");
+        print("");
+        if (survivalScore >= 5) {
+            print("<span class='success'>⭐ PERFECT SURVIVAL ⭐</span>");
+            print("Paramedic: 'Remarkable condition for 5 days alone.'");
+            print("You hand them your journal - detailed economic analysis.");
+            print("'Doctor Chen, you turned scarcity into success.'");
+        } else {
+            print("Paramedic: 'You made it. Tough five days.'");
+            print("You're exhausted but alive. The rescue team lifts you out.");
+        }
     } else {
-        print("<span class='danger' style='font-size:1.3rem;'>⚠️ STORM DAMAGE</span>");
+        print("<span class='danger' style='font-size:1.3rem;'>⚠️ YOUR SHELTER COLLAPSES!</span>");
         print("");
-        print(`You only built ${gameState.walls.toFixed(1)} walls (needed 3).`);
-        print("Better efficiency next time!");
+        print(`Only ${gameState.walls.toFixed(1)} walls... not enough.`);
+        print("The storm rips through your camp. You take cover under debris.");
+        print("Cold. Wet. Terrified.");
+        print("");
+        print("<span class='warning'>DAWN - DAY 6</span>");
+        print("");
+        print("Chopper arrives. You're found alive, but hypothermic.");
+        print("Paramedic: 'Close call. Another night might have been different.'");
+        print("");
+        print("<span class='danger'>You survived, but inefficiency cost you.</span>");
     }
+    
     print("");
     print("<div class='lesson-content'>");
-    print("<span class='success'>CONCEPTS MASTERED:</span>");
-    print("  ✓ SCARCITY - limited resources force choices");
-    print("  ✓ PPF - the limit of production possibilities");
-    print("  ✓ OPPORTUNITY COST - what you sacrifice");
-    print("  ✓ EFFICIENCY - using all resources wisely");
-    print("  ✓ ECONOMIC GROWTH - PPF shifts outward");
+    print("<span class='success'>━━━ ECONOMIC CONCEPTS MASTERED ━━━</span>");
     print("");
-    const correctQuizzes = gameState.quizAnswers.filter(a => a.correct).length;
-    print(`Quiz Score: ${correctQuizzes}/5`);
+    print("  ✓ SCARCITY - 10 hours/day forced choices");
+    print("  ✓ PPF - the boundary of possible production");  
+    print("  ✓ OPPORTUNITY COST - every choice had trade-offs");
+    print("  ✓ EFFICIENCY - points inside vs on the frontier");
+    print("  ✓ ECONOMIC GROWTH - fishing net shifted your PPF");
+    print("");
+    print(`<span class='warning'>Quiz Score: ${correctQuizzes}/5 correct</span>`);
+    print(`<span class='action'>Survival Rating: ${survivalScore.toFixed(1)}/10</span>`);
+    print("");
+    if (correctQuizzes >= 4 && gameState.walls >= 3) {
+        print("<span class='success'>⭐ MASTER ECONOMIST - You understand PPF perfectly! ⭐</span>");
+    } else if (correctQuizzes >= 3) {
+        print("Good economic thinking! Review missed concepts.");
+    } else {
+        print("Keep studying! Economics is about making choices under scarcity.");
+    }
     print("</div>");
+    print("");
+    print("<span class='action'>Debrief complete. Journal archived. Welcome home, Dr. Chen.</span>");
+    
     gameState.phase = 'complete';
 }
 
