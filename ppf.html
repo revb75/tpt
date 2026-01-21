@@ -1138,16 +1138,22 @@ function endGame() {
 
 document.getElementById('commandInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
+        const input = document.getElementById('commandInput');
+        const currentValue = input.value.trim().toUpperCase();
+        
+        // Special handling for day advancement
         if (gameState.phase === 'wait' && gameState.nextPhase === 'nextday') {
+            input.value = '';
             gameState.day++;
             gameState.hoursRemaining = 10;
             gameState.dayActions = [];
-            gameState.phase = 'wait';
-            gameState.nextPhase = 'playing';
-            processCommand();
-        } else {
-            processCommand();
+            gameState.phase = 'playing';
+            gameState.nextPhase = null;
+            startDay();
+            return;
         }
+        
+        processCommand();
     }
 });
 
