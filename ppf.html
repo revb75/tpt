@@ -70,6 +70,47 @@
             font-size: 1.1rem;
         }
         
+        .health-bar {
+            background: #1a1a1a;
+            border: 2px solid #ff3366;
+            height: 35px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .health-fill {
+            background: linear-gradient(90deg, #ff3366, #cc0033);
+            height: 100%;
+            width: 100%;
+            transition: width 0.5s, background 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            text-shadow: 0 0 5px #000;
+        }
+        
+        .health-fill.healthy {
+            background: linear-gradient(90deg, #00ff88, #00cc66);
+        }
+        
+        .health-fill.warning {
+            background: linear-gradient(90deg, #ffcc00, #ff8800);
+        }
+        
+        .health-fill.critical {
+            background: linear-gradient(90deg, #ff3366, #cc0033);
+            animation: pulse-health 1s infinite;
+        }
+        
+        @keyframes pulse-health {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
         .output {
             min-height: 500px;
             max-height: 500px;
@@ -281,6 +322,10 @@
             <div class="time-fill" id="timeFill">⏰ 10 HOURS</div>
         </div>
         
+        <div class="health-bar" style="display:none;">
+            <div class="health-fill healthy" id="healthFill">❤️ 100% HEALTH</div>
+        </div>
+        
         <div class="stats-grid" id="statsGrid" style="display:none;">
             <div class="stat-box">
                 <div class="stat-label">🐟 FISH</div>
@@ -319,6 +364,9 @@ let gameState = {
     hoursRemaining: 10,
     currentLocation: 'camp',
     fish: 0, wood: 0, fires: 0, walls: 0,
+    health: 100, // NEW: Health system (0-100)
+    fishEatenToday: 0, // Track daily food
+    hadFireToday: false, // Track daily warmth
     fishingRate: 2, gatheringRate: 1, fireRate: 1, buildingRate: 3,
     hasNet: false,
     dayActions: [],
@@ -612,6 +660,19 @@ function updateDisplay() {
     document.getElementById('dayTracker').textContent = `DAY ${gameState.day} of 5`;
     document.getElementById('timeFill').textContent = `⏰ ${gameState.hoursRemaining} HRS`;
     document.getElementById('timeFill').style.width = (gameState.hoursRemaining / 10 * 100) + '%';
+    
+    // Update health bar
+    const healthPercent = Math.max(0, Math.min(100, Math.round(gameState.health)));
+    document.getElementById('healthFill').textContent = `❤️ ${healthPercent}% HEALTH`;
+    document.getElementById('healthFill').style.width = (healthPercent) + '%';
+    
+    // Change health bar color based on health level
+    const healthFill = document.getElementById('healthFill');
+    healthFill.className = 'health-fill';
+    if (healthPercent >= 70) healthFill.classList.add('healthy');
+    else if (healthPercent >= 40) healthFill.classList.add('warning');
+    else healthFill.classList.add('critical');
+    
     document.getElementById('fishCount').textContent = gameState.fish;
     document.getElementById('woodCount').textContent = gameState.wood;
     document.getElementById('fireCount').textContent = gameState.fires;
@@ -620,6 +681,7 @@ function updateDisplay() {
 function showGameUI() {
     document.getElementById('dayTracker').style.display = 'block';
     document.querySelector('.time-bar').style.display = 'block';
+    document.querySelector('.health-bar').style.display = 'block';
     document.getElementById('statsGrid').style.display = 'grid';
 }
 
@@ -655,6 +717,7 @@ function processCommand() {
         else if (verb === 'GATHER') doGather();
         else if (verb === 'BUILD') doBuild();
         else if (verb === 'FIRE') doFire();
+        else if (verb === 'EAT') doEat();
         else if (verb === 'STATUS' || verb === 'I') showStatus();
         else if (verb === 'MAP') showMap();
         else if (verb === 'SLEEP' || verb === 'END') endDay();
@@ -682,7 +745,7 @@ function startDay1() {
     print("");
     print("Type <span class='action'>LOOK</span>");
     gameState.phase = 'playing';
-    document.getElementById('helpBox').innerHTML = 'LOOK | GO | FISH | GATHER | BUILD | FIRE | SLEEP';
+    document.getElementById('helpBox').innerHTML = 'LOOK | GO | FISH | GATHER | BUILD | FIRE | EAT | SLEEP';
 }
 
 function startDay() {
@@ -731,6 +794,8 @@ function showHelp() {
     print("");
     print("MOVEMENT: GO CAMP | GO BEACH | GO FOREST | GO CLIFF");
     print("ACTIONS: FISH (2hrs) | GATHER (1hr) | BUILD (3hrs) | FIRE (1hr)");
+    print("SURVIVAL: EAT (consume fish, restore health +15%)");
+    print("<span class='warning'>⚠️ Health drops without food & warmth!</span>");
     print("INFO: LOOK | STATUS | MAP | SLEEP");
 }
 
@@ -815,8 +880,32 @@ function doFire() {
     gameState.hoursRemaining -= gameState.fireRate;
     gameState.wood -= 1;
     gameState.fires += 1;
-    print(`<span class='success'>✓ Made fire!</span> (${gameState.hoursRemaining} hrs left)`);
+    gameState.hadFireToday = true; // Track warmth for health
+    print(`<span class='success'>✓ Made fire! Warmth surrounds you.</span> (${gameState.hoursRemaining} hrs left)`);
     gameState.dayActions.push({ action: 'fire', result: 1 });
+    updateDisplay();
+}
+
+function doEat() {
+    if (gameState.fish === 0) { 
+        print("<span class='danger'>No fish to eat! Catch some first.</span>"); 
+        return; 
+    }
+    gameState.fish -= 1;
+    gameState.fishEatenToday++;
+    
+    // Restore health
+    const healthGain = 15;
+    const oldHealth = gameState.health;
+    gameState.health = Math.min(100, gameState.health + healthGain);
+    const actualGain = gameState.health - oldHealth;
+    
+    print(`<span class='success'>✓ Ate fish! +${Math.round(actualGain)}% health → ${Math.round(gameState.health)}%</span>`);
+    if (gameState.health < 70) {
+        print("<span style='color:#ffcc00'>You feel slightly better. Need more food...</span>");
+    } else {
+        print("<span style='color:#00ff88'>Energy restored. You feel stronger!</span>");
+    }
     updateDisplay();
 }
 
@@ -828,6 +917,66 @@ function endDay() {
     const used = 10 - gameState.hoursRemaining;
     print(`You used ${used}/10 hours`);
     if (gameState.hoursRemaining > 0) print(`<span class='danger'>Wasted ${gameState.hoursRemaining} hours!</span>`);
+    
+    // HEALTH SYSTEM - Daily penalties
+    print(""); print("");
+    print("<div style='border:2px solid #ff3366; padding:10px; background:#1a0a0a;'>");
+    print("<span style='color:#ff3366; font-weight:bold;'>🏥 HEALTH CHECK</span>");
+    
+    let healthChange = 0;
+    
+    // Food penalty/bonus
+    if (gameState.fishEatenToday === 0) {
+        healthChange -= 20;
+        print("<span class='danger'>- No food eaten: -20% health</span>");
+    } else if (gameState.fishEatenToday === 1) {
+        print("<span style='color:#ffcc00'>⚠ Barely ate (1 fish)</span>");
+    } else {
+        healthChange += 5;
+        print(`<span class='success'>✓ Well-fed (${gameState.fishEatenToday} fish): +5% health</span>`);
+    }
+    
+    // Warmth penalty
+    if (!gameState.hadFireToday) {
+        healthChange -= 10;
+        print("<span class='danger'>- No warmth: -10% health</span>");
+    } else {
+        print("<span class='success'>✓ Had fire for warmth</span>");
+    }
+    
+    // Apply health change
+    const oldHealth = gameState.health;
+    gameState.health = Math.max(0, Math.min(100, gameState.health + healthChange));
+    
+    print("");
+    if (healthChange < 0) {
+        print(`<span class='danger'>Health: ${Math.round(oldHealth)}% → ${Math.round(gameState.health)}% (${healthChange}%)</span>`);
+    } else if (healthChange > 0) {
+        print(`<span class='success'>Health: ${Math.round(oldHealth)}% → ${Math.round(gameState.health)}% (+${healthChange}%)</span>`);
+    } else {
+        print(`<span style='color:#ffcc00'>Health: ${Math.round(gameState.health)}% (no change)</span>`);
+    }
+    
+    print("</div>");
+    updateDisplay();
+    
+    // Check for death
+    if (gameState.health <= 0) {
+        print(""); print("");
+        print("<span class='danger' style='font-size:1.5rem;'>💀 YOU DIED 💀</span>");
+        print("");
+        print("Your health reached zero. The island claimed another victim.");
+        print("Economics lesson: SURVIVAL is a prerequisite for all production!");
+        print("");
+        print("<span class='action'>Refresh to try again</span>");
+        gameState.phase = 'complete';
+        return;
+    }
+    
+    // Reset daily trackers for next day
+    gameState.fishEatenToday = 0;
+    gameState.hadFireToday = false;
+    
     print(""); print("");
     print("<span class='action'>Press ENTER for evening lesson...</span>");
     gameState.phase = 'wait';
