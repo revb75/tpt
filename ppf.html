@@ -900,11 +900,21 @@ function doEat() {
     gameState.health = Math.min(100, gameState.health + healthGain);
     const actualGain = gameState.health - oldHealth;
     
-    print(`<span class='success'>✓ Ate fish! +${Math.round(actualGain)}% health → ${Math.round(gameState.health)}%</span>`);
-    if (gameState.health < 70) {
-        print("<span style='color:#ffcc00'>You feel slightly better. Need more food...</span>");
+    // Flavor text based on fire availability
+    if (gameState.fires > 0) {
+        print(`<span class='success'>✓ Cooked fish over the fire! +${Math.round(actualGain)}% health → ${Math.round(gameState.health)}%</span>`);
+        if (gameState.health < 70) {
+            print("<span style='color:#ffcc00'>The warm meal helps. Still need more nutrition...</span>");
+        } else {
+            print("<span style='color:#00ff88'>Hot meal restores your energy. You feel stronger!</span>");
+        }
     } else {
-        print("<span style='color:#00ff88'>Energy restored. You feel stronger!</span>");
+        print(`<span class='success'>✓ Ate raw fish. +${Math.round(actualGain)}% health → ${Math.round(gameState.health)}%</span>`);
+        if (gameState.health < 70) {
+            print("<span style='color:#ffcc00'>You grimace. Should cook this next time...</span>");
+        } else {
+            print("<span style='color:#00ff88'>Not ideal, but it works. Energy restored.</span>");
+        }
     }
     updateDisplay();
 }
