@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ER Trauma - Text Adventure Diagnostics</title>
+    <style>
+        /* ========================================
+           MEDICAL TRAINING SIMULATOR - PROFESSIONAL STYLE
+           ======================================== */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #1a2332;
+            --bg-secondary: #243447;
+            --bg-panel: #2a3f5f;
+            --accent-blue: #4a9eff;
+            --accent-cyan: #00d9ff;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --success: #00c896;
+            --warning: #ffb84d;
+            --error: #ff6b6b;
+            --border: #3d5a80;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0f1923 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+        }
+        
+        /* ========================================
+           HUD - HEADS UP DISPLAY
+           ======================================== */
+        #hud {
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--border);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .hud-item {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        
+        .hud-item span {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            font-size: 16px;
+            margin-left: 5px;
+        }
+        
+        #timer {
+            color: var(--success);
+            font-weight: 700;
+        }
+        
+        #timer.warning {
+            color: var(--warning);
+        }
+        
+        #timer.critical {
+            color: var(--error);
+            animation: pulse 0.8s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+        
+        /* ========================================
+           GAME CONTAINER
+           ======================================== */
+        #game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            padding-right: 330px;
+            overflow: hidden;
+        }
+        
+        /* ========================================
+           OUTPUT TERMINAL
+           ======================================== */
+        #output {
+            flex: 1;
+            background: var(--bg-panel);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+        }
+        
+        #output::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        #output::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 5px;
+        }
+        
+        #output::-webkit-scrollbar-thumb {
+            background: var(--accent-blue);
+            border-radius: 5px;
+        }
+        
+        .output-line {
+            margin-bottom: 8px;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .success {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .error {
+            color: var(--error);
+            font-weight: 600;
+        }
+        
+        .info {
+            color: var(--accent-cyan);
+        }
+        
+        .warning {
+            color: var(--warning);
+        }
+        
+        /* ========================================
+           INPUT AREA
+           ======================================== */
+        #input-container {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 15px;
+            gap: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        #input-prompt {
+            color: var(--accent-cyan);
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        #command-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            outline: none;
+            padding: 5px;
+        }
+        
+        #command-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+        
+        #submit-btn {
+            display: none;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        #submit-btn:hover {
+            background: var(--accent-cyan);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 158, 255, 0.4);
+        }
+        
+        #submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* ========================================
+           MOBILE RESPONSIVE
+           ======================================== */
+        @media (max-width: 900px) {
+            #submit-btn {
+                display: block !important;
+            }
+            
+            body {
+                font-size: 14px;
+            }
+            
+            #hud {
+                padding: 12px 15px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .hud-item {
+                font-size: 13px;
+            }
+            
+            .hud-item span {
+                font-size: 14px;
+            }
+            
+            #game-container {
+                padding: 15px;
+                padding-right: 15px;
+            }
+            
+            #output {
+                font-size: 14px;
+                padding: 15px;
+            }
+            
+            #input-container {
+                padding: 10px 12px;
+            }
+            
+            #command-input {
+                font-size: 14px;
+            }
+        }
+        
+        /* ========================================
+           RESOURCE PANEL
+           ======================================== */
+        #resource-panel {
+            position: fixed;
+            top: 63px;
+            right: 25px;
+            background: var(--bg-panel);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            width: 280px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        
+        #resource-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #resource-panel::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+        
+        #resource-panel::-webkit-scrollbar-thumb {
+            background: var(--accent-blue);
+            border-radius: 4px;
+        }
+        
+        .panel-section {
+            margin-bottom: 20px;
+        }
+        
+        .panel-section h3 {
+            color: var(--accent-cyan);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            user-select: none;
+            padding: 8px 0;
+            border-bottom: 2px solid var(--border);
+            transition: all 0.2s;
+        }
+        
+        .panel-section h3:hover {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+        
+        .panel-content {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .panel-content.hidden {
+            display: none;
+        }
+        
+        .resource-item {
+            margin: 8px 0;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .resource-item:hover {
+            background: var(--bg-primary);
+            border-left-color: var(--accent-cyan);
+            transform: translateX(3px);
+        }
+        
+        .answer-item {
+            margin: 6px 0;
+            padding: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .panel-note {
+            margin-top: 10px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            font-style: italic;
+        }
+        
+        /* Dropdown styling */
+        /* Dropdown styling */
+        .answer-dropdown {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .answer-dropdown:hover {
+            border-color: var(--accent-blue);
+        }
+        
+        .answer-dropdown:focus {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+            border-color: var(--accent-cyan);
+        }
+        
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position-x: 98%;
+            background-position-y: 50%;
+            padding-right: 30px;
+        }
+        
+        .use-answer-btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(74, 158, 255, 0.3);
+        }
+        
+        .use-answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(74, 158, 255, 0.5);
+        }
+        
+        .use-answer-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Answer Bank - Always Visible */
+        .answer-bank-section {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.2);
+        }
+        
+        .answer-bank-header {
+            color: var(--accent-cyan) !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px !important;
+            padding-bottom: 8px !important;
+            border-bottom: 2px solid var(--accent-cyan) !important;
+            cursor: default !important;
+        }
+        
+        .panel-always-visible {
+            display: block !important;
+            opacity: 1 !important;
+            max-height: none !important;
+        }
+        
+        /* ========================================
+           MOBILE FLOATING ANSWER BANK
+           ======================================== */
+        .mobile-answer-fab {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: white;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(74, 158, 255, 0.6);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+        
+        .mobile-answer-fab:active {
+            transform: scale(0.95);
+        }
+        
+        .mobile-answer-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        
+        .mobile-answer-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .mobile-answer-content {
+            background: var(--bg-panel);
+            border: 3px solid var(--accent-cyan);
+            border-radius: 12px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 217, 255, 0.4);
+            animation: slideUp 0.3s;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .mobile-answer-header {
+            color: var(--accent-cyan);
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .mobile-answer-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* ========================================
+           START SCREEN
+           ======================================== */
+        #start-screen {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0f1923 100%);
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .start-content {
+            max-width: 700px;
+            width: 100%;
+        }
+        
+        .start-title {
+            font-size: 42px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+        
+        .start-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+        
+        .start-section {
+            background: var(--bg-panel);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        
+        .start-section h3 {
+            color: var(--accent-cyan);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        
+        .timer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .timer-btn {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border: none;
+            color: white;
+            padding: 18px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(74, 158, 255, 0.3);
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .timer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.5);
+        }
+        
+        .timer-btn:active {
+            transform: translateY(0);
+        }
+        
+        .start-info {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        
+        .start-info ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        
+        .start-info li {
+            margin: 8px 0;
+        }
+        
+        .start-info strong {
+            color: var(--accent-cyan);
+        }
+        
+        /* ========================================
+           MOBILE ADJUSTMENTS FOR START SCREEN
+           ======================================== */
+        @media (max-width: 900px) {
+            #start-screen {
+                padding: 25px 20px;
+            }
+            
+            .start-title {
+                font-size: 32px;
+            }
+            
+            .start-section {
+                padding: 20px;
+            }
+            
+            .timer-btn {
+                font-size: 14px;
+                padding: 16px;
+                min-height: 50px;
+            }
+            
+            #resource-panel {
+                display: none !important;
+            }
+            
+            /* Show floating button on mobile */
+            .mobile-answer-fab {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Mobile modal adjustments */
+            .mobile-answer-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .answer-dropdown {
+                font-size: 16px;
+                padding: 15px;
+                min-height: 50px;
+            }
+            
+            .use-answer-btn {
+                font-size: 16px;
+                padding: 15px;
+                min-height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Start Screen -->
+    <div id="start-screen" style="display: block;">
+        <div class="start-content">
+            <div class="start-title">⚕️ ER TRAUMA</div>
+            <div class="start-subtitle">Medical Training Simulation • Neuroanatomy Diagnostics</div>
+            
+            <div class="start-section">
+                <h3>⏱️ SELECT TIMER MODE:</h3>
+                <div class="timer-options">
+                <button class="timer-btn" data-timer="60">⚡ 1 MINUTE - Hardcore Mode</button>
+                <button class="timer-btn" data-timer="120">⏱️ 2 MINUTES - Challenge Mode</button>
+                <button class="timer-btn" data-timer="180">🕐 3 MINUTES - Standard Mode</button>
+                <button class="timer-btn" data-timer="300">🕔 5 MINUTES - Learning Mode</button>
+                <button class="timer-btn" data-timer="-1">∞ NO TIMER - Practice Mode</button>
+            </div>
+        </div>
+        
+        <div class="start-section">
+            <div class="start-info">
+                <strong style="color: #00ffff;">HOW TO PLAY:</strong><br>
+                • Type commands to examine evidence<br>
+                • Use external resources to learn brain structures<br>
+                • Type DIAGNOSE [structure] to submit<br>
+                • Wrong answers lose points (no hints!)<br>
+                • First try = max points + time bonus<br><br>
+                
+                <strong style="color: #00ffff;">AVAILABLE COMMANDS:</strong><br>
+                LOOK, EXAMINE PATIENT, READ CHART, CHECK CT SCAN<br>
+                DIAGNOSE [structure name], HELP, NEXT, RESTART<br><br>
+                
+                <strong>⚠️ Answer bank available in right panel!</strong>
+            </div>
+        </div>
+        </div>
+    </div>
+    
+    <!-- HUD -->
+    <div id="hud">
+        <div class="hud-item">CASE: <span id="case-number">1/5</span></div>
+        <div class="hud-item">SCORE: <span id="score">0</span></div>
+        <div class="hud-item">ATTEMPTS: <span id="attempts">0</span></div>
+        <div class="hud-item" id="timer">TIME: 60s</div>
+    </div>
+    
+    <!-- Resource Panel -->
+    <div id="resource-panel">
+        <div class="panel-section">
+            <h3 class="toggle-header" data-section="resources">📚 EXTERNAL RESOURCES ▼</h3>
+            <div id="resources-content" class="panel-content hidden">
+                <div class="resource-item" data-resource="brain3d">🧠 3D Brain Atlas</div>
+                <div class="resource-item" data-resource="anatomy">📖 Neuroanatomy Reference</div>
+                <div class="resource-item" data-resource="structures">🔬 Brain Structures List</div>
+                <div class="panel-note">Click to open in new tab</div>
+            </div>
+        </div>
+        
+        <div class="panel-section answer-bank-section">
+            <h3 class="answer-bank-header">🧠 ANSWER BANK</h3>
+            <div id="answers-content" class="panel-content panel-always-visible">
+                <select id="answer-dropdown" class="answer-dropdown">
+                    <option value="">-- Select Structure --</option>
+                    <option value="amygdala">Amygdala</option>
+                    <option value="basal ganglia">Basal Ganglia</option>
+                    <option value="broca's area">Broca's Area</option>
+                    <option value="cerebellum">Cerebellum</option>
+                    <option value="corpus callosum">Corpus Callosum</option>
+                    <option value="frontal lobe">Frontal Lobe</option>
+                    <option value="hippocampus">Hippocampus</option>
+                    <option value="hypothalamus">Hypothalamus</option>
+                    <option value="medulla oblongata">Medulla Oblongata</option>
+                    <option value="occipital lobe">Occipital Lobe</option>
+                    <option value="pons">Pons</option>
+                    <option value="reticular formation">Reticular Formation</option>
+                    <option value="spinal cord">Spinal Cord</option>
+                    <option value="thalamus">Thalamus</option>
+                    <option value="wernicke's area">Wernicke's Area</option>
+                </select>
+                <button id="use-answer-btn" class="use-answer-btn">USE SELECTED</button>
+                <div class="panel-note">Select structure and click USE</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Game Container -->
+    <div id="game-container">
+        <!-- Output Terminal -->
+        <div id="output"></div>
+        
+        <!-- Input -->
+        <div id="input-container">
+            <span id="input-prompt">&gt;</span>
+            <input type="text" id="command-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="text" placeholder="Type command...">
+            <button id="submit-btn" style="display:none;">GO</button>
+        </div>
+    </div>
+    
+    <!-- Mobile Answer Bank - Floating Button -->
+    <button class="mobile-answer-fab" id="mobile-answer-fab" aria-label="Open Answer Bank">
+        🧠
+    </button>
+    
+    <!-- Mobile Answer Bank - Modal Overlay -->
+    <div class="mobile-answer-modal" id="mobile-answer-modal">
+        <div class="mobile-answer-content">
+            <button class="mobile-answer-close" id="mobile-answer-close" aria-label="Close">×</button>
+            <div class="mobile-answer-header">🧠 SELECT BRAIN STRUCTURE</div>
+            <select id="mobile-answer-dropdown" class="answer-dropdown">
+                <option value="">-- Select Structure --</option>
+                <option value="amygdala">Amygdala</option>
+                <option value="basal ganglia">Basal Ganglia</option>
+                <option value="broca's area">Broca's Area</option>
+                <option value="cerebellum">Cerebellum</option>
+                <option value="corpus callosum">Corpus Callosum</option>
+                <option value="frontal lobe">Frontal Lobe</option>
+                <option value="hippocampus">Hippocampus</option>
+                <option value="hypothalamus">Hypothalamus</option>
+                <option value="medulla oblongata">Medulla Oblongata</option>
+                <option value="occipital lobe">Occipital Lobe</option>
+                <option value="pons">Pons</option>
+                <option value="reticular formation">Reticular Formation</option>
+                <option value="spinal cord">Spinal Cord</option>
+                <option value="thalamus">Thalamus</option>
+                <option value="wernicke's area">Wernicke's Area</option>
+            </select>
+            <button id="mobile-use-answer-btn" class="use-answer-btn">USE SELECTED</button>
+            <div class="panel-note">Tap to fill in your answer</div>
+        </div>
+    </div>
+    
+    <script>
+        console.log('Script started loading...');
+        
+        // ==============================================
+        // GLOBAL FUNCTIONS (Must be defined first for onclick handlers)
+        // ==============================================
+        
+        function toggleSection(sectionId) {
+            console.log('toggleSection called for:', sectionId);
+            const content = document.getElementById(sectionId + '-content');
+            if (!content) {
+                console.error('Could not find content for:', sectionId);
+                return;
+            }
+            const header = content.previousElementSibling;
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                if (header) header.textContent = header.textContent.replace('▼', '▲');
+                console.log('Section expanded:', sectionId);
+            } else {
+                content.classList.add('hidden');
+                if (header) header.textContent = header.textContent.replace('▲', '▼');
+                console.log('Section collapsed:', sectionId);
+            }
+        }
+        
+        function openResource(type) {
+            console.log('openResource called for:', type);
+            const urls = {
+                'brain3d': 'https://www.brainfacts.org/3d-brain',
+                'anatomy': 'https://www.ncbi.nlm.nih.gov/books/NBK234/',
+                'structures': 'https://teachmeanatomy.info/neuroanatomy/structures/'
+            };
+            if (urls[type]) {
+                window.open(urls[type], '_blank');
+            }
+        }
+        
+        function startGame(seconds) {
+            console.log('=== START GAME CALLED ===');
+            console.log('Timer seconds:', seconds);
+            
+            gameState.timerSeconds = seconds;
+            gameState.timerEnabled = seconds !== -1;
+            
+            // Remove start screen
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen) {
+                startScreen.remove();
+                console.log('Start screen removed');
+            }
+            
+            // Show game elements
+            const hud = document.getElementById('hud');
+            const gameContainer = document.getElementById('game-container');
+            const resourcePanel = document.getElementById('resource-panel');
+            
+            if (hud) hud.style.display = 'flex';
+            if (gameContainer) gameContainer.style.display = 'flex';
+            if (resourcePanel) resourcePanel.style.display = 'block';
+            
+            console.log('Game elements visible');
+            
+            // Initialize game
+            initGame();
+            
+            // Focus input
+            setTimeout(() => {
+                const input = document.getElementById('command-input');
+                if (input) input.focus();
+            }, 100);
+        }
+        
+        // ==============================================
+        // GAME DATA AND STATE
+        // ==============================================
+        
+        // CASE DATABASE
+        const ALL_CASES = [
+            {
+                id: 1,
+                structure: 'medulla oblongata',
+                patientName: 'Rodriguez, Marcus',
+                age: '38M',
+                patientDesc: 'Male patient lying unconscious on gurney. Multiple trauma injuries visible. On ventilator with external pacemaker attached.',
+                chartText: 'PATIENT CHART - Rodriguez, Marcus (38M)\n\nINCIDENT: Motorcycle vs truck collision at highway speed\nARRIVAL TIME: 23:47\nGCS: 3 (unresponsive)\n\nVITALS:\n- BP: 85/50 (unstable)\n- HR: Irregular (arrhythmia)\n- RR: 0 (on ventilator)\n- SpO2: 92% (mechanically ventilated)\n\nPRESENTING SYMPTOMS:\n- Apneic - cannot breathe independently\n- Severe cardiac arrhythmia - external pacemaker required\n- Complete loss of vital autonomic functions\n- Unresponsive to all stimuli',
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT with contrast\nTIME: 23:52\n\nFINDINGS:\n- Massive hemorrhage visible at BASE of brainstem\n- Damage concentrated at MOST INFERIOR brainstem region\n- Location: Junction between brain and spinal cord\n- Bilateral involvement of vital centers\n- No damage to higher brain structures\n\nRADIOLOGIST NOTES:\n"Critical injury to lowest brainstem structure. Both respiratory and cardiac control centers appear compromised."',
+                diagnosis: 'medulla oblongata',
+                alternateNames: ['medulla', 'medullaoblongata']
+            },
+            {
+                id: 2,
+                structure: 'cerebellum',
+                patientName: 'Chen, Lisa',
+                age: '52F',
+                patientDesc: 'Female patient sitting upright but visibly unsteady. Tremors noticeable when attempting to reach for objects. Speech is slurred.',
+                chartText: 'PATIENT CHART - Chen, Lisa (52F)\n\nINCIDENT: Fall down 12 stairs\nARRIVAL TIME: 14:23\nGCS: 14 (confused but responsive)\n\nVITALS:\n- BP: 128/82 (normal)\n- HR: 76 (normal)\n- RR: 16 (normal)\n- SpO2: 98%\n\nPRESENTING SYMPTOMS:\n- Severe ataxia - cannot walk straight line\n- Intention tremors when reaching for objects\n- Dysarthria - slurred speech\n- Loss of fine motor coordination\n- Difficulty maintaining balance\n- Nystagmus (rapid eye movements)',
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT\nTIME: 14:35\n\nFINDINGS:\n- Large lesion in POSTERIOR FOSSA\n- Damage to structure POSTERIOR to brainstem\n- Located INFERIOR to occipital lobe\n- No damage to brainstem structures\n- No damage to cerebral cortex\n\nRADIOLOGIST NOTES:\n"Significant trauma to motor coordination center. Structure responsible for balance and fine motor control shows extensive damage."',
+                diagnosis: 'cerebellum',
+                alternateNames: []
+            },
+            {
+                id: 3,
+                structure: 'hippocampus',
+                patientName: 'Williams, James',
+                age: '67M',
+                patientDesc: 'Male patient alert and conversational but asks the same questions repeatedly. Seems unaware he is repeating himself.',
+                chartText: 'PATIENT CHART - Williams, James (67M)\n\nINCIDENT: Bilateral temporal lobe stroke\nARRIVAL TIME: 09:15\nGCS: 15 (fully alert)\n\nVITALS:\n- BP: 142/88\n- HR: 82\n- RR: 14\n- SpO2: 97%\n\nPRESENTING SYMPTOMS:\n- Cannot form new memories (anterograde amnesia)\n- Repeats same questions every few minutes\n- Remembers childhood and distant past clearly\n- Cannot remember recent events (breakfast, arrival)\n- No motor deficits\n- No speech problems\n- Fully conscious and coherent',
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT with contrast\nTIME: 09:28\n\nFINDINGS:\n- Bilateral damage to MEDIAL TEMPORAL LOBE structures\n- Located DEEP within temporal lobes\n- Seahorse-shaped structures affected bilaterally\n- No cortical damage\n- No other brain regions involved\n\nRADIOLOGIST NOTES:\n"Classic presentation of bilateral damage to memory consolidation structures. Long-term memory storage and retrieval pathways disrupted."',
+                diagnosis: 'hippocampus',
+                alternateNames: []
+            },
+            {
+                id: 4,
+                structure: 'amygdala',
+                patientName: 'Patel, Riya',
+                age: '29F',
+                patientDesc: 'Female patient calm and pleasant. Nursing staff reports patient attempted to pet a hospital therapy dog known to be aggressive.',
+                chartText: 'PATIENT CHART - Patel, Riya (29F)\n\nINCIDENT: Bilateral temporal lobe injury\nARRIVAL TIME: 16:42\nGCS: 15 (fully alert)\n\nVITALS:\n- All vitals normal\n\nPRESENTING SYMPTOMS:\n- Complete absence of fear response\n- Approached dangerous animal without hesitation\n- Cannot recognize fearful facial expressions\n- No emotional response to threats\n- Overly trusting of strangers\n- Inappropriate social behavior\n- Kluver-Bucy syndrome symptoms',
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT\nTIME: 16:55\n\nFINDINGS:\n- Bilateral lesions in ANTERIOR MEDIAL TEMPORAL LOBE\n- Almond-shaped structures damaged\n- Located near hippocampus structures\n- Emotional processing centers affected\n- Fear response pathways destroyed\n\nRADIOLOGIST NOTES:\n"Damage to emotional processing and fear response centers. Patient shows classic signs of bilateral damage to threat detection structures."',
+                diagnosis: 'amygdala',
+                alternateNames: []
+            },
+            {
+                id: 5,
+                structure: 'frontal lobe',
+                patientName: 'Thompson, Alex',
+                age: '41M',
+                patientDesc: 'Male patient alert but making inappropriate jokes. Family reports complete personality change since accident.',
+                chartText: 'PATIENT CHART - Thompson, Alex (41M)\n\nINCIDENT: Frontal impact car accident\nARRIVAL TIME: 11:30\nGCS: 15 (alert but behaviorally abnormal)\n\nVITALS:\n- All vitals stable\n\nPRESENTING SYMPTOMS:\n- Extreme personality change per family\n- Impulsive behavior\n- Loss of social inhibition\n- Inappropriate comments to staff\n- Cannot plan or organize thoughts\n- Poor judgment\n- Confabulation\n- Executive function deficits',
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT\nTIME: 11:45\n\nFINDINGS:\n- Severe damage to ANTERIOR cerebral cortex\n- Location: Behind forehead region\n- Executive function areas destroyed\n- Personality centers affected\n- No damage to posterior brain regions\n\nRADIOLOGIST NOTES:\n"Extensive damage to decision-making and personality control centers. Classic presentation of anterior brain damage with preserved motor and sensory function."',
+                diagnosis: 'frontal lobe',
+                alternateNames: ['frontallobe']
+            },
+            {
+                id: 6,
+                structure: 'pons',
+                patientName: 'Martinez, Carmen',
+                age: '55F',
+                patientDesc: 'Female patient conscious with eyes open. Can blink and move eyes up/down. Cannot move any other body part or speak.',
+                chartText: 'PATIENT CHART - Martinez, Carmen (55F)\n\nINCIDENT: Brainstem stroke\nARRIVAL TIME: 08:12\nGCS: Cannot assess normally\n\nVITALS:\n- Breathing supported\n- Cardiac function normal\n\nPRESENTING SYMPTOMS:\n- Locked-in syndrome\n- Fully conscious and aware\n- Cannot move or speak\n- Can blink voluntarily\n- Can move eyes vertically\n- Complete motor paralysis\n- Sensation intact (can feel touch)',
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT with contrast\nTIME: 08:25\n\nFINDINGS:\n- Hemorrhage in MIDDLE section of brainstem\n- Location: Between medulla and midbrain\n- Motor pathway severely damaged\n- Consciousness pathways preserved\n- Sensory pathways partially intact\n\nRADIOLOGIST NOTES:\n"Classic locked-in syndrome presentation. Damage to motor pathways in central brainstem while consciousness remains intact."',
+                diagnosis: 'pons',
+                alternateNames: []
+            },
+            {
+                id: 7,
+                structure: 'occipital lobe',
+                patientName: 'Anderson, Kyle',
+                age: '33M',
+                patientDesc: 'Male patient alert and responsive. Eyes are open but patient reports complete inability to see anything.',
+                chartText: 'PATIENT CHART - Anderson, Kyle (33M)\n\nINCIDENT: Posterior head trauma\nARRIVAL TIME: 19:45\nGCS: 15 (alert)\n\nVITALS:\n- All vitals stable\n\nPRESENTING SYMPTOMS:\n- Cortical blindness\n- Pupils reactive to light (eyes functional)\n- Cannot see or process visual information\n- Can describe objects by touch/sound\n- No visual awareness\n- Can navigate by memory\n- Complete vision loss despite healthy eyes',
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT\nTIME: 20:00\n\nFINDINGS:\n- Bilateral damage to POSTERIOR cerebral cortex\n- Location: Back of brain\n- Visual processing areas destroyed\n- Optic nerves intact\n- Eyes structurally normal\n\nRADIOLOGIST NOTES:\n"Bilateral destruction of visual processing centers. Eyes and optic pathways intact but brain cannot process visual signals."',
+                diagnosis: 'occipital lobe',
+                alternateNames: ['occipitallobe']
+            },
+            {
+                id: 8,
+                structure: 'thalamus',
+                patientName: 'Kim, Sarah',
+                age: '48F',
+                patientDesc: 'Female patient alert. Right side of body shows no response to touch, temperature, or pain stimuli.',
+                chartText: 'PATIENT CHART - Kim, Sarah (48F)\n\nINCIDENT: Deep brain stroke\nARRIVAL TIME: 13:20\nGCS: 15 (alert)\n\nVITALS:\n- Stable\n\nPRESENTING SYMPTOMS:\n- Loss of ALL sensation on right side\n- Cannot feel touch, temperature, pain\n- Visual field loss on right\n- Hearing diminished on right\n- Motor function PRESERVED\n- All sensory modalities affected\n- Left side completely normal',
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT with contrast\nTIME: 13:35\n\nFINDINGS:\n- Lesion in CENTRAL relay station\n- Location: Deep in center of brain\n- All sensory pathways disrupted on one side\n- Motor pathways preserved\n- Egg-shaped structure damaged\n\nRADIOLOGIST NOTES:\n"Damage to central sensory relay hub. All sensory information from right side of body blocked at this relay point."',
+                diagnosis: 'thalamus',
+                alternateNames: []
+            },
+            {
+                id: 9,
+                structure: "wernicke's area",
+                patientName: 'Brown, David',
+                age: '61M',
+                patientDesc: 'Male patient speaking fluently in grammatically correct sentences, but words are nonsensical. Does not understand questions.',
+                chartText: "PATIENT CHART - Brown, David (61M)\n\nINCIDENT: Posterior temporal stroke\nARRIVAL TIME: 10:15\nGCS: 15 (alert)\n\nVITALS:\n- Stable\n\nPRESENTING SYMPTOMS:\n- Fluent but nonsensical speech\n- Cannot understand spoken language\n- Grammatically correct sentences\n- Words make no sense ('The floor needs my yesterday')\n- Cannot comprehend questions\n- Unaware speech is nonsensical\n- Receptive aphasia",
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT\nTIME: 10:30\n\nFINDINGS:\n- Damage to POSTERIOR SUPERIOR TEMPORAL GYRUS\n- Location: Back of temporal lobe (LEFT hemisphere)\n- Language comprehension area affected\n- Speech production area INTACT\n- No motor deficits\n\nRADIOLOGIST NOTES:\n"Classic presentation of damage to language comprehension center. Patient can produce speech but cannot understand language input."',
+                diagnosis: "wernicke's area",
+                alternateNames: ['wernickes area', 'wernicke area', 'wernickes']
+            },
+            {
+                id: 10,
+                structure: "broca's area",
+                patientName: 'Garcia, Maria',
+                age: '58F',
+                patientDesc: 'Female patient alert and frustrated. Understands everything but cannot speak. Can write coherently.',
+                chartText: "PATIENT CHART - Garcia, Maria (58F)\n\nINCIDENT: Inferior frontal stroke\nARRIVAL TIME: 15:40\nGCS: 15 (alert)\n\nVITALS:\n- Stable\n\nPRESENTING SYMPTOMS:\n- Understands language perfectly\n- Cannot speak\n- Can write normally\n- Expressive aphasia\n- Frustrated by inability to talk\n- Can read and comprehend\n- No motor deficits in limbs\n- Facial weakness on right",
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT\nTIME: 15:55\n\nFINDINGS:\n- Lesion in INFERIOR FRONTAL GYRUS\n- Location: Lower front of brain (LEFT hemisphere)\n- Speech production area damaged\n- Comprehension areas INTACT\n- Motor cortex partially affected\n\nRADIOLOGIST NOTES:\n"Damage to speech production center. Patient maintains full language comprehension but cannot produce spoken words."',
+                diagnosis: "broca's area",
+                alternateNames: ['brocas area', 'broca area', 'brocas']
+            },
+            {
+                id: 11,
+                structure: 'corpus callosum',
+                patientName: 'Chen, David',
+                age: '34M',
+                patientDesc: 'Male patient alert. When shown object to left visual field, cannot name it but can point to it. Right hand cannot describe what left hand is holding.',
+                chartText: "PATIENT CHART - Chen, David (34M)\n\nINCIDENT: Surgical severing of corpus callosum (split-brain procedure for severe epilepsy)\nPOST-OP DAY: 7\nARRIVAL TIME: 10:15\nGCS: 15 (alert)\n\nVITALS:\n- All stable\n\nPRESENTING SYMPTOMS:\n- Cannot verbally identify objects in left visual field\n- Can point to objects in left visual field with left hand\n- Right hand cannot describe what left hand touches\n- Left hemisphere unaware of right hemisphere information\n- No seizures since surgery\n- Otherwise neurologically intact",
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT post-surgical\nTIME: 10:30\n\nFINDINGS:\n- Surgical separation of interhemispheric connection\n- Complete severing of fiber bundle connecting hemispheres\n- No damage to individual hemispheres\n- Both hemispheres intact and functional\n- No hemorrhage or complications\n\nRADIOLOGIST NOTES:\n"Successful surgical transection of major fiber tract connecting left and right cerebral hemispheres. Classic split-brain presentation. Left hemisphere (language) cannot access right hemisphere (left visual field) information."',
+                diagnosis: 'corpus callosum',
+                alternateNames: ['corpus', 'callosum']
+            },
+            {
+                id: 12,
+                structure: 'basal ganglia',
+                patientName: 'Robinson, Margaret',
+                age: '66F',
+                patientDesc: 'Female patient with masked facial expression, slow movements, resting tremor in right hand. Shuffling gait observed.',
+                chartText: "PATIENT CHART - Robinson, Margaret (66F)\n\nINCIDENT: Progressive movement disorder, sudden worsening\nARRIVAL TIME: 14:20\nGCS: 15 (alert, slow to respond)\n\nVITALS:\n- All stable\n\nPRESENTING SYMPTOMS:\n- Bradykinesia (slowness of movement)\n- Resting tremor, right hand (pill-rolling)\n- Rigidity (cogwheel rigidity on exam)\n- Masked facies (reduced facial expression)\n- Shuffling gait, reduced arm swing\n- Difficulty initiating movements\n- Postural instability\n- No cognitive impairment",
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT\nTIME: 14:35\n\nFINDINGS:\n- Bilateral damage to SUBCORTICAL NUCLEI\n- Location: Deep gray matter structures\n- Damage to structures involved in movement control\n- Specifically: putamen, caudate, globus pallidus affected\n- Substantia nigra degeneration visible\n- Cerebral cortex intact\n\nRADIOLOGIST NOTES:\n"Extensive damage to subcortical motor control centers. Classic presentation of movement disorder affecting voluntary motor function. Dopamine-producing neurons in substantia nigra severely affected."',
+                diagnosis: 'basal ganglia',
+                alternateNames: ['basal', 'ganglia']
+            },
+            {
+                id: 13,
+                structure: 'hypothalamus',
+                patientName: 'Peters, Sarah',
+                age: '29F',
+                patientDesc: 'Female patient with abnormal body temperature regulation. Constantly drinking water. Reports insatiable hunger. Sleep-wake cycle severely disrupted.',
+                chartText: "PATIENT CHART - Peters, Sarah (29F)\n\nINCIDENT: Small tumor discovered in brain\nARRIVAL TIME: 09:45\nGCS: 15 (alert)\n\nVITALS:\n- Body temperature: 95.2°F (HYPOTHERMIA)\n- BP: 88/52 (LOW)\n- HR: 58 (bradycardia)\n- Dehydrated despite excessive water intake\n\nPRESENTING SYMPTOMS:\n- Cannot regulate body temperature\n- Extreme thirst (polydipsia) - drinks 8+ liters daily\n- Excessive urination (diabetes insipidus)\n- Insatiable hunger, weight gain (30 lbs in 2 months)\n- Severely disrupted sleep-wake cycle\n- Temperature fluctuates wildly\n- Hormonal imbalances (thyroid, growth hormone affected)\n- Emotional dysregulation",
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT with contrast\nTIME: 10:00\n\nFINDINGS:\n- Small tumor in CENTRAL BRAIN region\n- Location: At base of brain, above pituitary gland\n- Master control center for homeostasis affected\n- Controls: temperature, thirst, hunger, sleep, hormones\n- Pituitary connection disrupted\n- Size: 1.2 cm mass compressing critical regulatory center\n\nRADIOLOGIST NOTES:\n"Mass lesion affecting master homeostatic control center. All autonomic regulatory functions compromised. Temperature regulation, fluid balance, appetite control, circadian rhythms, and endocrine function all affected."',
+                diagnosis: 'hypothalamus',
+                alternateNames: ['hypothalamic', 'hypothalmic']
+            },
+            {
+                id: 14,
+                structure: 'reticular formation',
+                patientName: 'Taylor, James',
+                age: '41M',
+                patientDesc: 'Male patient unconscious, unresponsive. Eyes do not open to stimuli. Breathing independently but no wakefulness observed.',
+                chartText: "PATIENT CHART - Taylor, James (41M)\n\nINCIDENT: Brainstem stroke 48 hours ago\nARRIVAL TIME: Transferred from ICU for evaluation\nGCS: 3-6 (variable, no eye opening)\n\nVITALS:\n- All vital functions stable\n- Breathing independently\n- Cardiovascular function normal\n- No sedation\n\nPRESENTING SYMPTOMS:\n- Persistent coma (no arousal for 48 hours)\n- No sleep-wake cycle\n- No eye opening to any stimulus\n- Cannot be awakened\n- All brainstem reflexes present (breathing, heart rate)\n- No cortical damage on imaging\n- Locked-in syndrome ruled out (no voluntary movement)\n- Persistent vegetative state",
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: Head CT\nTIME: Multiple scans over 48 hours\n\nFINDINGS:\n- Damage to BRAINSTEM AROUSAL SYSTEM\n- Location: Network running through brainstem core\n- Cerebral cortex completely intact\n- All higher brain functions preserved\n- Damage to consciousness/arousal pathway\n- Ascending pathway to cortex disrupted\n- Thalamus intact\n- Midbrain, pons structures affected\n\nRADIOLOGIST NOTES:\n"Critical damage to brainstem arousal system - the network responsible for consciousness and wakefulness. Patient\'s cortex is intact and functional, but arousal pathway is severed. Cannot wake up despite intact higher brain functions."',
+                diagnosis: 'reticular formation',
+                alternateNames: ['reticular', 'reticular activating system', 'ras']
+            },
+            {
+                id: 15,
+                structure: 'spinal cord',
+                patientName: 'Washington, Marcus',
+                age: '28M',
+                patientDesc: 'Male patient with right-sided paralysis and loss of fine touch. Left side has normal motor function but cannot feel pain or temperature.',
+                chartText: "PATIENT CHART - Washington, Marcus (28M)\n\nINCIDENT: Penetrating knife wound to neck\nARRIVAL TIME: 18:30\nGCS: 15 (alert, cooperative)\n\nVITALS:\n- All stable\n- No respiratory compromise\n\nPRESENTING SYMPTOMS:\n- RIGHT SIDE: Paralysis, loss of fine touch and proprioception\n- LEFT SIDE: Normal strength, loss of pain and temperature sensation\n- Asymmetric sensory and motor deficits\n- Brown-Séquard syndrome pattern\n- Injury at C5 level\n- Ipsilateral motor loss below injury\n- Contralateral pain/temperature loss below injury",
+                ctScanText: 'CT SCAN RESULTS\n\nSCAN TYPE: CT and MRI of cervical spine\nTIME: 18:45\n\nFINDINGS:\n- Hemisection (partial cut) of SPINAL CORD at C5\n- Right half of spinal cord damaged\n- Descending motor tracts (RIGHT side) severed\n- Ascending touch/proprioception tracts (RIGHT) severed\n- Pain/temperature tracts cross before injury (LEFT side affected)\n- Classic hemisection pattern\n- Vertebrae intact, no instability\n\nRADIOLOGIST NOTES:\n"Right hemisection of cervical spinal cord. Causes ipsilateral motor paralysis (right side) and ipsilateral loss of fine touch (right). Contralateral loss of pain/temperature (left) because these tracts decussate below the injury. Classic Brown-Séquard presentation."',
+                diagnosis: 'spinal cord',
+                alternateNames: ['spinal', 'cord', 'spine']
+            }
+        ];
+        
+        // Game state
+        let gameState = {
+            currentCaseIndex: 0,
+            selectedCases: [],
+            timeRemaining: 60,
+            timerSeconds: 60, // Selected timer duration
+            totalScore: 0,
+            attempts: 0,
+            timerActive: false,
+            timerEnabled: true, // Whether timer is enabled at all
+            examinedItems: {
+                patient: false,
+                chart: false,
+                ctscan: false
+            }
+        };
+        
+        // Fisher-Yates shuffle algorithm (truly random)
+        function fisherYatesShuffle(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        function initGame() {
+            // Select 5 random cases using proper randomization
+            const shuffled = fisherYatesShuffle(ALL_CASES);
+            gameState.selectedCases = shuffled.slice(0, 5);
+            
+            // Log selected cases for debugging
+            console.log('Cases for this game:', gameState.selectedCases.map(c => c.structure));
+            
+            loadCase(0);
+        }
+        
+        function loadCase(index) {
+            if (index >= gameState.selectedCases.length) {
+                gameState.timerActive = false;
+                printLine('');
+                printLine('═══════════════════════════════════════', 'success');
+                printLine('🏆 ALL CASES COMPLETE!', 'success');
+                printLine('═══════════════════════════════════════', 'success');
+                printLine('');
+                printLine(`FINAL SCORE: ${gameState.totalScore} points`, 'success');
+                printLine(`Cases solved: ${index}/5`, 'info');
+                printLine('');
+                printLine('Type RESTART to play again.', 'info');
+                return;
+            }
+            
+            gameState.currentCaseIndex = index;
+            gameState.timeRemaining = gameState.timerSeconds;
+            gameState.timerActive = gameState.timerEnabled;
+            gameState.attempts = 0;
+            gameState.examinedItems = { patient: false, chart: false, ctscan: false };
+            
+            document.getElementById('case-number').textContent = `${index + 1}/5`;
+            document.getElementById('attempts').textContent = '0';
+            
+            // Update timer display
+            const timerEl = document.getElementById('timer');
+            if (gameState.timerEnabled) {
+                const minutes = Math.floor(gameState.timeRemaining / 60);
+                const seconds = gameState.timeRemaining % 60;
+                timerEl.textContent = `TIME: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                timerEl.className = 'hud-item';
+            } else {
+                timerEl.textContent = 'TIME: ∞';
+                timerEl.className = 'hud-item';
+            }
+            
+            const currentCase = gameState.selectedCases[index];
+            
+            printLine('');
+            printLine('═══════════════════════════════════════', 'info');
+            printLine(`⚕️  NEW TRAUMA CASE - ${currentCase.patientName}`, 'info');
+            printLine('═══════════════════════════════════════', 'info');
+            printLine('');
+            if (gameState.timerEnabled) {
+                const mins = Math.floor(gameState.timeRemaining / 60);
+                printLine(`A patient has just arrived in the ER. You have ${mins} minute${mins !== 1 ? 's' : ''} to diagnose.`, 'info');
+            } else {
+                printLine('A patient has just arrived in the ER. Take your time to diagnose.', 'info');
+            }
+            printLine('');
+            printLine('AVAILABLE COMMANDS:', 'info');
+            printLine('  LOOK - Examine the room', 'commands-list');
+            printLine('  EXAMINE PATIENT - Check the patient', 'commands-list');
+            printLine('  READ CHART - View patient chart', 'commands-list');
+            printLine('  CHECK CT SCAN - Review imaging results', 'commands-list');
+            printLine('  DIAGNOSE [structure] - Submit your diagnosis', 'commands-list');
+            printLine('  HELP - Show all commands', 'commands-list');
+            printLine('');
+            printLine('Type LOOK to begin.', 'prompt');
+            printLine('');
+            
+            if (gameState.timerEnabled) {
+                startTimer();
+            }
+        }
+        
+        function startTimer() {
+            const timerInterval = setInterval(() => {
+                if (gameState.timerActive && gameState.timerEnabled) {
+                    gameState.timeRemaining--;
+                    
+                    const timerEl = document.getElementById('timer');
+                    const minutes = Math.floor(gameState.timeRemaining / 60);
+                    const seconds = gameState.timeRemaining % 60;
+                    timerEl.textContent = `TIME: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    if (gameState.timeRemaining <= 10) {
+                        timerEl.className = 'hud-item critical';
+                    } else if (gameState.timeRemaining <= 30) {
+                        timerEl.className = 'hud-item warning';
+                    }
+                    
+                    if (gameState.timeRemaining <= 0) {
+                        gameState.timerActive = false;
+                        clearInterval(timerInterval);
+                        printLine('');
+                        printLine('⏰ TIME EXPIRED!', 'error');
+                        printLine('The patient needed immediate diagnosis. Case failed.', 'error');
+                        printLine('');
+                        printLine('Type NEXT to continue to next case.', 'info');
+                    }
+                }
+            }, 1000);
+        }
+        
+        function processCommand(cmd) {
+            const command = cmd.toLowerCase().trim();
+            const currentCase = gameState.selectedCases[gameState.currentCaseIndex];
+            
+            printLine(`> ${cmd}`, 'prompt');
+            
+            if (command === 'look') {
+                printLine('');
+                printLine('═══ ER TRAUMA BAY ═══', 'info');
+                printLine('');
+                printLine(currentCase.patientDesc);
+                printLine('');
+                printLine('You can see:', 'info');
+                printLine('  - PATIENT on gurney', 'commands-list');
+                printLine('  - CHART on clipboard', 'commands-list');
+                printLine('  - CT SCAN viewer on wall', 'commands-list');
+                printLine('');
+                
+            } else if (command === 'examine patient' || command === 'check patient' || command === 'look at patient') {
+                gameState.examinedItems.patient = true;
+                printLine('');
+                printLine(currentCase.patientDesc);
+                printLine('');
+                printLine('Read the CHART and check the CT SCAN for more information.', 'info');
+                printLine('');
+                
+            } else if (command === 'read chart' || command === 'check chart' || command === 'look at chart') {
+                gameState.examinedItems.chart = true;
+                printLine('');
+                printLine('═══════════════════════════════════════');
+                printLine(currentCase.chartText);
+                printLine('═══════════════════════════════════════');
+                printLine('');
+                
+            } else if (command === 'check ct scan' || command === 'read ct scan' || command === 'check ct' || command === 'look at ct scan' || command === 'examine ct scan') {
+                gameState.examinedItems.ctscan = true;
+                printLine('');
+                printLine('═══════════════════════════════════════');
+                printLine(currentCase.ctScanText);
+                printLine('═══════════════════════════════════════');
+                printLine('');
+                
+            } else if (command.startsWith('diagnose ')) {
+                const diagnosis = command.replace('diagnose ', '').trim();
+                submitDiagnosis(diagnosis);
+                
+            } else if (command === 'cases') {
+                printLine('');
+                printLine('═══ CASES IN THIS GAME ═══', 'info');
+                printLine('');
+                for (let i = 0; i < gameState.selectedCases.length; i++) {
+                    const caseInfo = gameState.selectedCases[i];
+                    const status = i < gameState.currentCaseIndex ? '✓ Completed' : 
+                                   i === gameState.currentCaseIndex ? '← Current' : 
+                                   'Not yet';
+                    printLine(`${i + 1}. ${caseInfo.patientName} (${caseInfo.age}) - ${status}`);
+                }
+                printLine('');
+                printLine('Note: Brain structure is not shown to prevent spoilers!', 'info');
+                printLine('');
+                
+            } else if (command === 'help') {
+                printLine('');
+                printLine('═══ AVAILABLE COMMANDS ═══', 'info');
+                printLine('');
+                printLine('LOOK - Examine the room');
+                printLine('EXAMINE PATIENT - Check the patient');
+                printLine('READ CHART - View patient chart');
+                printLine('CHECK CT SCAN - Review CT imaging');
+                printLine('DIAGNOSE [structure] - Submit diagnosis');
+                printLine('  Example: DIAGNOSE MEDULLA OBLONGATA');
+                printLine('CASES - Show which cases are in this game');
+                printLine('NEXT - Skip to next case');
+                printLine('RESTART - Start over');
+                printLine('');
+                printLine('📚 Use external resources (right panel) to learn!', 'info');
+                printLine('❌ Wrong answers lose points. No in-game hints!', 'warning');
+                printLine('');
+                
+            } else if (command === 'next') {
+                gameState.timerActive = false;
+                loadCase(gameState.currentCaseIndex + 1);
+                
+            } else if (command === 'restart') {
+                location.reload();
+                
+            } else {
+                printLine('');
+                printLine('Unknown command. Type HELP for available commands.', 'error');
+                printLine('');
+            }
+        }
+        
+        function submitDiagnosis(diagnosis) {
+            const currentCase = gameState.selectedCases[gameState.currentCaseIndex];
+            
+            // Check if diagnosis is correct (including alternate names)
+            const isCorrect = diagnosis === currentCase.diagnosis || 
+                             currentCase.alternateNames.includes(diagnosis);
+            
+            if (isCorrect) {
+                // CORRECT!
+                gameState.timerActive = false;
+                
+                let points = 0;
+                let timeBonus = 0;
+                
+                if (gameState.attempts === 0) {
+                    // First try - full points
+                    points = 100;
+                    if (gameState.timerEnabled && gameState.timeRemaining > 0) {
+                        timeBonus = gameState.timeRemaining * 2;
+                        points += timeBonus;
+                    }
+                } else if (gameState.attempts === 1) {
+                    // Second try - half points, no time bonus
+                    points = 50;
+                } else if (gameState.attempts === 2) {
+                    // Third try - minimal points
+                    points = 25;
+                } else {
+                    // Fourth+ try - no points
+                    points = 0;
+                }
+                
+                gameState.totalScore += points;
+                document.getElementById('score').textContent = gameState.totalScore;
+                
+                printLine('');
+                printLine('═══════════════════════════════════════', 'success');
+                printLine('✅ CORRECT DIAGNOSIS!', 'success');
+                printLine('═══════════════════════════════════════', 'success');
+                printLine('');
+                printLine(`Patient saved! +${points} points`, 'success');
+                if (timeBonus > 0) {
+                    printLine(`Time bonus: +${timeBonus} points`, 'success');
+                }
+                printLine(`Total score: ${gameState.totalScore}`, 'info');
+                printLine('');
+                printLine('Type NEXT to continue to next case.', 'info');
+                printLine('');
+                
+            } else {
+                // WRONG!
+                gameState.attempts++;
+                document.getElementById('attempts').textContent = gameState.attempts;
+                
+                // Point penalties
+                if (gameState.attempts === 1) {
+                    gameState.totalScore = Math.max(0, gameState.totalScore - 50);
+                } else if (gameState.attempts === 2) {
+                    gameState.totalScore = Math.max(0, gameState.totalScore - 25);
+                } else {
+                    gameState.totalScore = Math.max(0, gameState.totalScore - 10);
+                }
+                
+                document.getElementById('score').textContent = gameState.totalScore;
+                
+                printLine('');
+                printLine('❌ INCORRECT DIAGNOSIS!', 'error');
+                printLine('');
+                printLine(`Wrong answer. -${gameState.attempts === 1 ? 50 : gameState.attempts === 2 ? 25 : 10} points`, 'error');
+                printLine(`Current score: ${gameState.totalScore}`, 'warning');
+                printLine('');
+                printLine('⚠️  NO HINTS PROVIDED. Use external resources to learn!', 'warning');
+                printLine('    Check the 3D Brain Atlas or anatomy references (right panel).', 'info');
+                printLine('');
+                printLine(`Attempts: ${gameState.attempts}. Try again or type NEXT to skip.`, 'info');
+                printLine('');
+            }
+        }
+        
+        function printLine(text, className = '') {
+            const line = document.createElement('div');
+            line.className = `output-line ${className}`;
+            line.textContent = text;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        // ==============================================
+        // INITIALIZATION (Wait for DOM)
+        // ==============================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM ready, setting up event listeners...');
+            
+            const output = document.getElementById('output');
+            const input = document.getElementById('command-input');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            if (!output || !input) {
+                console.error('Critical elements missing!');
+                return;
+            }
+            
+            // ========================================
+            // TIMER BUTTONS
+            // ========================================
+            const timerButtons = document.querySelectorAll('.timer-btn');
+            console.log('Found', timerButtons.length, 'timer buttons');
+            
+            timerButtons.forEach((btn) => {
+                btn.addEventListener('click', function() {
+                    const seconds = parseInt(this.getAttribute('data-timer'));
+                    console.log('Timer button clicked:', seconds);
+                    startGame(seconds);
+                });
+                
+                // Also handle touch for mobile
+                btn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    const seconds = parseInt(this.getAttribute('data-timer'));
+                    console.log('Timer button touched:', seconds);
+                    startGame(seconds);
+                });
+            });
+            
+            // ========================================
+            // TOGGLE HEADERS (for collapsible sections)
+            // ========================================
+            const toggleHeaders = document.querySelectorAll('.toggle-header');
+            console.log('Found', toggleHeaders.length, 'toggle headers');
+            
+            toggleHeaders.forEach((header) => {
+                header.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    console.log('Toggle header clicked:', sectionId);
+                    toggleSection(sectionId);
+                });
+            });
+            
+            // ========================================
+            // RESOURCE LINKS
+            // ========================================
+            const resourceItems = document.querySelectorAll('.resource-item');
+            console.log('Found', resourceItems.length, 'resource items');
+            
+            resourceItems.forEach((item) => {
+                item.addEventListener('click', function() {
+                    const resourceType = this.getAttribute('data-resource');
+                    console.log('Resource clicked:', resourceType);
+                    openResource(resourceType);
+                });
+            });
+            
+            // ========================================
+            // ANSWER BANK DROPDOWN
+            // ========================================
+            const answerDropdown = document.getElementById('answer-dropdown');
+            const useAnswerBtn = document.getElementById('use-answer-btn');
+            
+            if (useAnswerBtn && answerDropdown) {
+                useAnswerBtn.addEventListener('click', function() {
+                    const selected = answerDropdown.value;
+                    if (selected) {
+                        console.log('Answer selected:', selected);
+                        input.value = 'DIAGNOSE ' + selected;
+                        input.focus();
+                        // Scroll to input on mobile
+                        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        alert('Please select a structure first!');
+                    }
+                });
+                
+                // Also allow Enter key in dropdown
+                answerDropdown.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && this.value) {
+                        input.value = 'DIAGNOSE ' + this.value;
+                        input.focus();
+                    }
+                });
+                
+                console.log('Answer bank dropdown ready');
+            }
+            
+            // ========================================
+            // MOBILE ANSWER BANK MODAL
+            // ========================================
+            const mobileFab = document.getElementById('mobile-answer-fab');
+            const mobileModal = document.getElementById('mobile-answer-modal');
+            const mobileClose = document.getElementById('mobile-answer-close');
+            const mobileDropdown = document.getElementById('mobile-answer-dropdown');
+            const mobileUseBtn = document.getElementById('mobile-use-answer-btn');
+            
+            if (mobileFab && mobileModal) {
+                // Open modal
+                mobileFab.addEventListener('click', function() {
+                    mobileModal.classList.add('active');
+                    console.log('Mobile answer modal opened');
+                });
+                
+                // Close modal - X button
+                if (mobileClose) {
+                    mobileClose.addEventListener('click', function() {
+                        mobileModal.classList.remove('active');
+                        console.log('Mobile answer modal closed');
+                    });
+                }
+                
+                // Close modal - tap outside
+                mobileModal.addEventListener('click', function(e) {
+                    if (e.target === mobileModal) {
+                        mobileModal.classList.remove('active');
+                    }
+                });
+                
+                // Use selected answer
+                if (mobileUseBtn && mobileDropdown) {
+                    mobileUseBtn.addEventListener('click', function() {
+                        const selected = mobileDropdown.value;
+                        if (selected) {
+                            console.log('Mobile answer selected:', selected);
+                            input.value = 'DIAGNOSE ' + selected;
+                            mobileModal.classList.remove('active');
+                            input.focus();
+                            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        } else {
+                            alert('Please select a structure first!');
+                        }
+                    });
+                    
+                    // Enter key in dropdown
+                    mobileDropdown.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' && this.value) {
+                            input.value = 'DIAGNOSE ' + this.value;
+                            mobileModal.classList.remove('active');
+                            input.focus();
+                        }
+                    });
+                }
+                
+                console.log('Mobile answer bank ready');
+            }
+            
+            // ========================================
+            // INPUT HANDLING
+            // ========================================
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && input.value.trim()) {
+                    processCommand(input.value);
+                    input.value = '';
+                    setTimeout(() => input.focus(), 100);
+                }
+            });
+            
+            // Mobile submit button
+            if (submitBtn) {
+                submitBtn.addEventListener('click', () => {
+                    if (input.value.trim()) {
+                        processCommand(input.value);
+                        input.value = '';
+                        setTimeout(() => input.focus(), 100);
+                    }
+                });
+            }
+            
+            // Ensure input stays focused on mobile
+            input.addEventListener('blur', () => {
+                if (window.innerWidth <= 900) {
+                    setTimeout(() => {
+                        if (document.activeElement !== input) {
+                            input.focus();
+                        }
+                    }, 100);
+                }
+            });
+            
+            console.log('Game ready! Click a timer button to start.');
+        });
+    </script>
+</body>
+</html>
