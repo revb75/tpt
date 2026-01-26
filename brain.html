@@ -97,7 +97,6 @@
             display: flex;
             flex-direction: column;
             padding: 25px;
-            padding-right: 330px;
             overflow: hidden;
         }
         
@@ -265,101 +264,6 @@
             #command-input {
                 font-size: 14px;
             }
-        }
-        
-        /* ========================================
-           RESOURCE PANEL
-           ======================================== */
-        #resource-panel {
-            position: fixed;
-            top: 63px;
-            right: 25px;
-            background: var(--bg-panel);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            width: 280px;
-            max-height: calc(100vh - 100px);
-            overflow-y: auto;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-        }
-        
-        #resource-panel::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        #resource-panel::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-            border-radius: 4px;
-        }
-        
-        #resource-panel::-webkit-scrollbar-thumb {
-            background: var(--accent-blue);
-            border-radius: 4px;
-        }
-        
-        .panel-section {
-            margin-bottom: 20px;
-        }
-        
-        .panel-section h3 {
-            color: var(--accent-cyan);
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            user-select: none;
-            padding: 8px 0;
-            border-bottom: 2px solid var(--border);
-            transition: all 0.2s;
-        }
-        
-        .panel-section h3:hover {
-            color: var(--accent-blue);
-            border-bottom-color: var(--accent-blue);
-        }
-        
-        .panel-content {
-            font-size: 13px;
-            line-height: 1.6;
-        }
-        
-        .panel-content.hidden {
-            display: none;
-        }
-        
-        .resource-item {
-            margin: 8px 0;
-            padding: 10px;
-            background: var(--bg-secondary);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-        }
-        
-        .resource-item:hover {
-            background: var(--bg-primary);
-            border-left-color: var(--accent-cyan);
-            transform: translateX(3px);
-        }
-        
-        .answer-item {
-            margin: 6px 0;
-            padding: 8px;
-            background: var(--bg-secondary);
-            border-radius: 4px;
-            font-size: 12px;
-        }
-        
-        .panel-note {
-            margin-top: 10px;
-            font-size: 11px;
-            color: var(--text-secondary);
-            opacity: 0.7;
-            font-style: italic;
         }
         
         /* ========================================
@@ -554,10 +458,6 @@
                 min-height: 50px;
             }
             
-            #resource-panel {
-                display: none;
-            }
-            
             #structures-reference {
                 font-size: 10px;
                 padding: 8px 10px;
@@ -617,19 +517,6 @@
         <div class="hud-item" id="timer">TIME: 60s</div>
     </div>
     
-    <!-- Resource Panel -->
-    <div id="resource-panel">
-        <div class="panel-section">
-            <h3 class="toggle-header" data-section="resources">📚 EXTERNAL RESOURCES ▼</h3>
-            <div id="resources-content" class="panel-content hidden">
-                <div class="resource-item" data-resource="brain3d">🧠 3D Brain Atlas</div>
-                <div class="resource-item" data-resource="anatomy">📖 Neuroanatomy Reference</div>
-                <div class="resource-item" data-resource="structures">🔬 Brain Structures List</div>
-                <div class="panel-note">Click to open in new tab</div>
-            </div>
-        </div>
-    </div>
-    
     <!-- Game Container -->
     <div id="game-container">
         <!-- Output Terminal -->
@@ -670,38 +557,6 @@
         // GLOBAL FUNCTIONS (Must be defined first for onclick handlers)
         // ==============================================
         
-        function toggleSection(sectionId) {
-            console.log('toggleSection called for:', sectionId);
-            const content = document.getElementById(sectionId + '-content');
-            if (!content) {
-                console.error('Could not find content for:', sectionId);
-                return;
-            }
-            const header = content.previousElementSibling;
-            
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                if (header) header.textContent = header.textContent.replace('▼', '▲');
-                console.log('Section expanded:', sectionId);
-            } else {
-                content.classList.add('hidden');
-                if (header) header.textContent = header.textContent.replace('▲', '▼');
-                console.log('Section collapsed:', sectionId);
-            }
-        }
-        
-        function openResource(type) {
-            console.log('openResource called for:', type);
-            const urls = {
-                'brain3d': 'https://www.brainfacts.org/3d-brain',
-                'anatomy': 'https://www.ncbi.nlm.nih.gov/books/NBK234/',
-                'structures': 'https://teachmeanatomy.info/neuroanatomy/structures/'
-            };
-            if (urls[type]) {
-                window.open(urls[type], '_blank');
-            }
-        }
-        
         function startGame(seconds) {
             console.log('=== START GAME CALLED ===');
             console.log('Timer seconds:', seconds);
@@ -719,11 +574,9 @@
             // Show game elements
             const hud = document.getElementById('hud');
             const gameContainer = document.getElementById('game-container');
-            const resourcePanel = document.getElementById('resource-panel');
             
             if (hud) hud.style.display = 'flex';
             if (gameContainer) gameContainer.style.display = 'flex';
-            if (resourcePanel) resourcePanel.style.display = 'block';
             
             console.log('Game elements visible');
             
@@ -1258,34 +1111,6 @@
                     const seconds = parseInt(this.getAttribute('data-timer'));
                     console.log('Timer button touched:', seconds);
                     startGame(seconds);
-                });
-            });
-            
-            // ========================================
-            // TOGGLE HEADERS (for collapsible sections)
-            // ========================================
-            const toggleHeaders = document.querySelectorAll('.toggle-header');
-            console.log('Found', toggleHeaders.length, 'toggle headers');
-            
-            toggleHeaders.forEach((header) => {
-                header.addEventListener('click', function() {
-                    const sectionId = this.getAttribute('data-section');
-                    console.log('Toggle header clicked:', sectionId);
-                    toggleSection(sectionId);
-                });
-            });
-            
-            // ========================================
-            // RESOURCE LINKS
-            // ========================================
-            const resourceItems = document.querySelectorAll('.resource-item');
-            console.log('Found', resourceItems.length, 'resource items');
-            
-            resourceItems.forEach((item) => {
-                item.addEventListener('click', function() {
-                    const resourceType = this.getAttribute('data-resource');
-                    console.log('Resource clicked:', resourceType);
-                    openResource(resourceType);
                 });
             });
             
