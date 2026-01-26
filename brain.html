@@ -47,6 +47,7 @@
            HUD - HEADS UP DISPLAY
            ======================================== */
         #hud {
+            display: none;
             background: var(--bg-secondary);
             border-bottom: 2px solid var(--border);
             padding: 15px 30px;
@@ -93,8 +94,8 @@
            GAME CONTAINER
            ======================================== */
         #game-container {
+            display: none;
             flex: 1;
-            display: flex;
             flex-direction: column;
             padding: 25px;
             padding-bottom: 60px;
@@ -308,6 +309,7 @@
            BRAIN STRUCTURES REFERENCE BAR
            ======================================== */
         #structures-reference {
+            display: none;
             background: var(--bg-secondary);
             border-top: 2px solid var(--border);
             padding: 10px 20px;
@@ -364,7 +366,6 @@
            START SCREEN
            ======================================== */
         #start-screen {
-            display: block;
             position: fixed;
             top: 0;
             left: 0;
@@ -376,6 +377,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1000;
         }
         
         .start-content {
@@ -534,16 +536,16 @@
             <div class="start-info">
                 <strong style="color: #00ffff;">HOW TO PLAY:</strong><br>
                 • Type commands to examine evidence<br>
-                • Use external resources to learn brain structures<br>
+                • Use CHOICES or HINT if you need help<br>
                 • Type DIAGNOSE [structure] to submit<br>
-                • Wrong answers lose points (no hints!)<br>
+                • You get 3 attempts per case<br>
                 • First try = max points + time bonus<br><br>
                 
                 <strong style="color: #00ffff;">AVAILABLE COMMANDS:</strong><br>
                 LOOK, EXAMINE PATIENT, READ CHART, CHECK CT SCAN<br>
-                DIAGNOSE [structure name], HELP, NEXT, RESTART<br><br>
+                DIAGNOSE [structure], CHOICES, HINT, HELP<br><br>
                 
-                <strong>⚠️ Answer bank available in right panel!</strong>
+                <strong>📋 All brain structure names shown at bottom!</strong>
             </div>
         </div>
         </div>
@@ -614,9 +616,11 @@
             // Show game elements
             const hud = document.getElementById('hud');
             const gameContainer = document.getElementById('game-container');
+            const refBar = document.getElementById('structures-reference');
             
             if (hud) hud.style.display = 'flex';
             if (gameContainer) gameContainer.style.display = 'flex';
+            if (refBar) refBar.style.display = 'block';
             
             console.log('Game elements visible');
             
