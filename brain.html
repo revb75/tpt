@@ -224,6 +224,102 @@
         }
         
         /* ========================================
+           INSTRUCTION POPUP
+           ======================================== */
+        #instruction-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .popup-content {
+            background: var(--bg-panel);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        .popup-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(74, 158, 255, 0.5);
+        }
+        
+        .popup-section {
+            margin-bottom: 20px;
+        }
+        
+        .popup-section h3 {
+            font-size: 18px;
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .popup-section p, .popup-section ul {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+        
+        .popup-section ul {
+            margin-left: 20px;
+            list-style-type: disc;
+        }
+        
+        .popup-section li {
+            margin-bottom: 8px;
+        }
+        
+        .standards-box {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        
+        .standards-box strong {
+            color: var(--accent-cyan);
+        }
+        
+        #got-it-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        #got-it-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 158, 255, 0.4);
+        }
+        
+        /* ========================================
            MOBILE RESPONSIVE
            ======================================== */
         @media (max-width: 900px) {
@@ -278,6 +374,29 @@
                 display: inline-block !important;
                 padding: 12px 24px;
                 margin-left: 10px;
+            }
+            
+            .popup-content {
+                max-width: 95%;
+                padding: 20px;
+                max-height: 80vh;
+            }
+            
+            .popup-title {
+                font-size: 22px;
+            }
+            
+            .popup-section h3 {
+                font-size: 16px;
+            }
+            
+            .popup-section p, .popup-section ul {
+                font-size: 14px;
+            }
+            
+            #got-it-btn {
+                font-size: 16px;
+                padding: 12px;
             }
         }
         
@@ -568,6 +687,56 @@
         <span class="structure-name">Wernicke's Area</span>
     </div>
     
+    <!-- Instruction Popup -->
+    <div id="instruction-popup">
+        <div class="popup-content">
+            <div class="popup-title">⚕️ ER TRAUMA DIAGNOSTICS ⚕️</div>
+            
+            <div class="popup-section">
+                <h3>🎯 What You'll Learn</h3>
+                <p>Diagnose brain injuries by examining patients and identifying which brain structure is damaged based on symptoms. Master neuroanatomy through realistic clinical scenarios!</p>
+            </div>
+            
+            <div class="popup-section">
+                <h3>📚 Standards Covered</h3>
+                <div class="standards-box">
+                    <strong>AP Psychology:</strong> Unit 2 - Biological Bases of Behavior<br>
+                    • Brain structure locations and functions<br>
+                    • Effects of brain damage on behavior and cognition<br>
+                    • Neuroanatomy and nervous system organization
+                </div>
+                <div class="standards-box">
+                    <strong>Texas Dual Credit (TEKS 130.283):</strong><br>
+                    • (c)(3) Biological bases of behavior<br>
+                    • All 15 major brain structures: Medulla, Cerebellum, Hippocampus, Amygdala, Hypothalamus, Thalamus, Frontal Lobe, Occipital Lobe, Pons, Corpus Callosum, Basal Ganglia, Reticular Formation, Spinal Cord, Broca's Area, Wernicke's Area
+                </div>
+            </div>
+            
+            <div class="popup-section">
+                <h3>🎮 How to Play</h3>
+                <ul>
+                    <li><strong>Examine evidence:</strong> LOOK, EXAMINE PATIENT, READ CHART, CHECK CT SCAN</li>
+                    <li><strong>Submit diagnosis:</strong> Type DIAGNOSE [structure name]</li>
+                    <li><strong>Need help?</strong> CHOICES (3 options) or HINT (50 pts max)</li>
+                    <li><strong>3 attempts per case</strong> - First try = 100 points + time bonus!</li>
+                    <li><strong>Structure names shown at top</strong> for easy reference</li>
+                </ul>
+            </div>
+            
+            <div class="popup-section">
+                <h3>💡 Pro Tips</h3>
+                <ul>
+                    <li>Read ALL symptoms carefully before diagnosing</li>
+                    <li>Check BOTH the chart AND CT scan for clues</li>
+                    <li>Use CHOICES if unsure - no point penalty!</li>
+                    <li>Type HELP anytime to see all commands</li>
+                </ul>
+            </div>
+            
+            <button id="got-it-btn">LET'S START! 🚀</button>
+        </div>
+    </div>
+    
     <script>
         console.log('Script started loading...');
         
@@ -589,25 +758,51 @@
                 console.log('Start screen removed');
             }
             
-            // Show game elements
-            const hud = document.getElementById('hud');
-            const gameContainer = document.getElementById('game-container');
-            const refBar = document.getElementById('structures-reference');
+            // Show instruction popup FIRST
+            const popup = document.getElementById('instruction-popup');
+            if (popup) {
+                popup.style.display = 'flex';
+            }
             
-            if (hud) hud.style.display = 'flex';
-            if (gameContainer) gameContainer.style.display = 'flex';
-            if (refBar) refBar.style.display = 'block';
-            
-            console.log('Game elements visible');
-            
-            // Initialize game
-            initGame();
-            
-            // Focus input
-            setTimeout(() => {
-                const input = document.getElementById('command-input');
-                if (input) input.focus();
-            }, 100);
+            // Set up the "Got it!" button
+            const gotItBtn = document.getElementById('got-it-btn');
+            if (gotItBtn) {
+                gotItBtn.onclick = function() {
+                    // Hide popup
+                    popup.style.display = 'none';
+                    
+                    // Show game elements
+                    const hud = document.getElementById('hud');
+                    const gameContainer = document.getElementById('game-container');
+                    const refBar = document.getElementById('structures-reference');
+                    
+                    if (hud) hud.style.display = 'flex';
+                    if (gameContainer) gameContainer.style.display = 'flex';
+                    if (refBar) refBar.style.display = 'block';
+                    
+                    console.log('Game elements visible');
+                    
+                    // Initialize game
+                    initGame();
+                    
+                    // Focus input aggressively (especially for mobile)
+                    setTimeout(() => {
+                        const input = document.getElementById('command-input');
+                        if (input) {
+                            input.focus();
+                            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 300);
+                    
+                    // Keep focusing on mobile
+                    setTimeout(() => {
+                        const input = document.getElementById('command-input');
+                        if (input && window.innerWidth <= 900) {
+                            input.focus();
+                        }
+                    }, 800);
+                };
+            }
         }
         
         // ==============================================
@@ -820,6 +1015,7 @@
             // Log selected cases for debugging
             console.log('Cases for this game:', gameState.selectedCases.map(c => c.structure));
             
+            // Load first case
             loadCase(0);
         }
         
