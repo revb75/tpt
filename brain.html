@@ -231,10 +231,14 @@
                 font-size: 14px;
             }
             
+            /* HUD - stays at top */
             #hud {
+                position: sticky;
+                top: 0;
                 padding: 10px 15px;
                 flex-wrap: wrap;
                 gap: 8px;
+                z-index: 100;
             }
             
             .hud-item {
@@ -245,24 +249,37 @@
                 font-size: 14px;
             }
             
+            /* Game container - fills space */
             #game-container {
                 padding: 15px;
-                padding-bottom: 90px;
+                padding-bottom: 150px; /* Space for input + ref bar */
+                min-height: calc(100vh - 60px);
             }
             
+            /* Terminal - scrolls naturally */
             #output {
                 font-size: 14px;
                 padding: 15px;
-                margin-bottom: 10px;
+                margin-bottom: 15px;
             }
             
+            /* Input - FIXED at bottom, ALWAYS VISIBLE */
             #input-container {
-                padding: 12px;
-                margin-bottom: 10px;
+                position: fixed;
+                bottom: 45px; /* Above ref bar */
+                left: 0;
+                right: 0;
+                padding: 12px 15px;
+                background: var(--bg-secondary);
+                border-top: 2px solid var(--border);
+                border-radius: 0;
+                z-index: 90;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
             }
             
             #command-input {
                 font-size: 16px;
+                flex: 1;
             }
             
             #submit-btn {
@@ -274,12 +291,19 @@
                 border-radius: 5px;
                 font-weight: 600;
                 margin-left: 10px;
+                font-size: 14px;
             }
             
+            /* Reference bar - FIXED at very bottom */
             #structures-reference {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
                 font-size: 10px;
                 padding: 8px 10px;
                 overflow-x: auto;
+                z-index: 80;
             }
             
             .structure-name {
