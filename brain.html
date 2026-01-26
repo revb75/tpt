@@ -229,16 +229,14 @@
         @media (max-width: 900px) {
             body {
                 font-size: 14px;
+                overflow: hidden;
             }
             
-            /* HUD - stays at top */
+            /* HUD - normal at top */
             #hud {
-                position: sticky;
-                top: 0;
                 padding: 10px 15px;
                 flex-wrap: wrap;
                 gap: 8px;
-                z-index: 100;
             }
             
             .hud-item {
@@ -249,18 +247,23 @@
                 font-size: 14px;
             }
             
-            /* Game container - fills space */
+            /* Game container - SCROLLABLE area between HUD and fixed input */
             #game-container {
-                padding: 15px;
-                padding-bottom: 150px; /* Space for input + ref bar */
-                min-height: calc(100vh - 60px);
+                position: fixed;
+                top: 60px; /* Below HUD */
+                left: 0;
+                right: 0;
+                bottom: 110px; /* Above input + ref bar */
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 0;
             }
             
-            /* Terminal - scrolls naturally */
+            /* Terminal - fills container, starts at top */
             #output {
                 font-size: 14px;
                 padding: 15px;
-                margin-bottom: 15px;
+                min-height: 100%;
             }
             
             /* Input - FIXED at bottom, ALWAYS VISIBLE */
