@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 3: Shortages & Surpluses | ClassClick</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+            min-height: 100vh; 
+            color: #333;
+        }
+        
+        .header { 
+            background: #2B2D42; 
+            color: white; 
+            padding: 20px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap;
+        }
+        .header h1 { font-size: 1.8rem; margin-bottom: 5px; }
+        .header span { color: #14B8A6; }
+        
+        .progress-bar { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            margin-top: 10px;
+        }
+        .progress-step { 
+            padding: 8px 16px; 
+            background: #555; 
+            border-radius: 20px; 
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .progress-step.complete { background: #10B981; }
+        .progress-step.active { background: #F59E0B; box-shadow: 0 0 15px #F59E0B; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px; }
+        
+        .banner {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            text-align: center;
+        }
+        .banner h2 { margin: 0 0 10px 0; font-size: 1.5rem; }
+        .banner p { margin: 0; font-size: 1.05rem; }
+        
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { 
+            padding: 14px 28px; 
+            background: #2B2D42; 
+            color: #888; 
+            border: none; 
+            border-radius: 10px 10px 0 0; 
+            cursor: pointer; 
+            font-size: 1.05rem; 
+            transition: all 0.3s; 
+            font-weight: 600;
+        }
+        .tab:hover { background: #3B3D52; }
+        .tab.active { background: white; color: #2B2D42; }
+        .tab:disabled { opacity: 0.4; cursor: not-allowed; }
+        .tab.locked::before { content: "🔒 "; }
+        
+        .panel { 
+            display: none; 
+            background: white; 
+            border-radius: 0 15px 15px 15px; 
+            padding: 40px; 
+            min-height: 600px; 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4); 
+        }
+        .panel.active { display: block; animation: slideIn 0.4s ease-out; }
+        
+        @keyframes slideIn { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .lesson-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .slide-counter {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        
+        .slide-title {
+            text-align: center;
+            color: #2B2D42;
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+        
+        .slide-content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 1.2rem;
+            line-height: 2;
+        }
+        
+        .notes-reminder {
+            margin-top: 30px;
+            padding: 20px;
+            background: #E0F2FE;
+            border-left: 5px solid #0EA5E9;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #0C4A6E;
+        }
+        
+        canvas {
+            display: block;
+            margin: 30px auto;
+            border: 3px solid #E5E7EB;
+            border-radius: 12px;
+            background: white;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: #14B8A6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0D9488;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+        .btn-secondary {
+            background: #E5E7EB;
+            color: #374151;
+        }
+        .btn-secondary:hover {
+            background: #D1D5DB;
+        }
+        
+        .question-counter {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #64748B;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        .question-counter .current { color: #14B8A6; font-size: 1.6rem; }
+        
+        .scenario-box {
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            padding: 30px;
+            border-radius: 12px;
+            border: 3px solid #818CF8;
+            margin-bottom: 30px;
+        }
+        .scenario-box h3 {
+            color: #3730A3;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .scenario-text {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #1F2937;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .question-box {
+            background: #F8FAFC;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #14B8A6;
+            margin: 25px 0;
+        }
+        .question-box h4 {
+            color: #2B2D42;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+        
+        .graph-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .graph-option {
+            background: white;
+            border: 3px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .graph-option:hover {
+            border-color: #14B8A6;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.2);
+        }
+        .graph-option.selected {
+            border-color: #14B8A6;
+            background: #F0FDF4;
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.3);
+        }
+        .graph-option.correct {
+            border-color: #10B981;
+            background: #D1FAE5;
+        }
+        .graph-option.incorrect {
+            border-color: #EF4444;
+            background: #FEE2E2;
+        }
+        
+        .option-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #2B2D42;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .graph-canvas-small {
+            width: 100%;
+            height: 280px;
+            margin: 10px 0;
+        }
+        
+        .graph-description {
+            text-align: center;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 10px;
+            font-size: 1.05rem;
+        }
+        
+        .feedback {
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-size: 1.15rem;
+            font-weight: 500;
+            display: none;
+            line-height: 1.6;
+        }
+        .feedback.show { display: block; animation: slideIn 0.4s ease-out; }
+        .feedback.correct {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 3px solid #10B981;
+        }
+        .feedback.incorrect {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 3px solid #EF4444;
+        }
+        
+        .completion-badge {
+            background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+            color: white;
+            padding: 50px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
+        }
+        .completion-badge h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .score-display {
+            background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .score-big {
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .graph-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>📊 Lesson 3: <span>Shortages & Surpluses</span></h1>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-step active" id="step-lesson">Lesson</div>
+            <div class="progress-step" id="step-practice">Practice</div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="banner">
+            <h2>📝 Have Your Notes Worksheet Ready!</h2>
+            <p>Fill in Part 3 as you go through this lesson</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('lesson')">📖 Lesson</button>
+            <button class="tab locked" id="tab-practice" onclick="showTab('practice')" disabled>⚠️ Practice (8)</button>
+        </div>
+        
+        <!-- LESSON PANEL -->
+        <div class="panel active" id="panel-lesson">
+            <div id="lesson-content"></div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="lesson-prev" onclick="previousSlide()" style="display: none;">← Previous</button>
+                <button class="btn btn-primary" id="lesson-next" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+        
+        <!-- PRACTICE PANEL -->
+        <div class="panel" id="panel-practice">
+            <div class="question-counter">
+                Question <span class="current" id="practice-number">1</span> of 8
+            </div>
+            
+            <div id="practice-content"></div>
+            
+            <div class="feedback" id="practice-feedback"></div>
+            
+            <div class="nav-buttons">
+                <div></div>
+                <button class="btn btn-primary" id="practice-next" onclick="nextPractice()" style="display: none;">Next Question →</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const state = {
+            lessonSlide: 0,
+            practiceIndex: 0,
+            practiceScore: 0
+        };
+        
+        const lessonSlides = [
+            {
+                title: "When Markets Don't Clear",
+                content: `
+                    <p>In Lesson 2, you learned about <strong>equilibrium</strong> - the perfect balance where Qs = Qd.</p>
+                    <p style="margin-top: 20px;">But what happens when price is NOT at equilibrium?</p>
+                    <div style="margin: 30px 0;">
+                        <div style="padding: 25px; background: #FEF3C7; border-radius: 12px; margin-bottom: 15px;">
+                            <h4 style="color: #92400E; font-size: 1.4rem;">⬇️ Price BELOW equilibrium = SHORTAGE</h4>
+                        </div>
+                        <div style="padding: 25px; background: #F3E8FF; border-radius: 12px;">
+                            <h4 style="color: #6B21A8; font-size: 1.4rem;">⬆️ Price ABOVE equilibrium = SURPLUS</h4>
+                        </div>
+                    </div>
+                    <p style="margin-top: 20px;">These market imbalances are everywhere in the real world!</p>
+                `,
+                notes: "📝 Have Part 3 of your notes ready",
+                graph: null
+            },
+            {
+                title: "What is a Shortage?",
+                content: `
+                    <p><strong style="font-size: 1.4rem; color: #F59E0B;">SHORTAGE (Excess Demand):</strong></p>
+                    <div style="margin: 20px 0; padding: 25px; background: #FEF3C7; border-left: 5px solid #F59E0B; border-radius: 8px;">
+                        <p style="font-size: 1.3rem; margin-bottom: 10px;">Occurs when price is <strong>BELOW</strong> equilibrium</p>
+                        <p style="font-size: 1.3rem;"><strong>Qd > Qs</strong> (Quantity demanded exceeds quantity supplied)</p>
+                    </div>
+                    <p><strong>What happens in the market:</strong></p>
+                    <ul style="margin-left: 40px; margin-top: 15px;">
+                        <li>Consumers want to buy MORE (low prices are attractive)</li>
+                        <li>Producers want to supply LESS (low profits aren't worth it)</li>
+                        <li>Not enough goods to satisfy all buyers</li>
+                        <li>Long lines, empty shelves, waiting lists</li>
+                    </ul>
+                `,
+                notes: "📝 Fill in: Shortage definition (price below equilibrium, Qd > Qs)",
+                graph: 'shortage-shown'
+            },
+            {
+                title: "Real-World Shortages",
+                content: `
+                    <p><strong>Examples of shortages you might have experienced:</strong></p>
+                    <div style="margin: 30px 0;">
+                        <div style="padding: 20px; background: #FEF3C7; border-radius: 8px; margin-bottom: 15px;">
+                            <p><strong>Concert tickets:</strong> Priced at $50 when people would pay $200 → instant sellout, scalpers, long waitlists</p>
+                        </div>
+                        <div style="padding: 20px; background: #FEF3C7; border-radius: 8px; margin-bottom: 15px;">
+                            <p><strong>New gaming consoles:</strong> Launch price too low → stores run out immediately, online queues, bots buying them up</p>
+                        </div>
+                        <div style="padding: 20px; background: #FEF3C7; border-radius: 8px;">
+                            <p><strong>Rent control apartments:</strong> City caps rent below market rate → huge waiting lists, people searching for years</p>
+                        </div>
+                    </div>
+                    <p><strong>Key insight:</strong> Shortages happen when sellers can't/won't raise prices to equilibrium.</p>
+                `,
+                notes: "📝 Add shortage examples to your notes",
+                graph: 'shortage-shown'
+            },
+            {
+                title: "What is a Surplus?",
+                content: `
+                    <p><strong style="font-size: 1.4rem; color: #8B5CF6;">SURPLUS (Excess Supply):</strong></p>
+                    <div style="margin: 20px 0; padding: 25px; background: #F3E8FF; border-left: 5px solid #8B5CF6; border-radius: 8px;">
+                        <p style="font-size: 1.3rem; margin-bottom: 10px;">Occurs when price is <strong>ABOVE</strong> equilibrium</p>
+                        <p style="font-size: 1.3rem;"><strong>Qs > Qd</strong> (Quantity supplied exceeds quantity demanded)</p>
+                    </div>
+                    <p><strong>What happens in the market:</strong></p>
+                    <ul style="margin-left: 40px; margin-top: 15px;">
+                        <li>Consumers want to buy LESS (prices too high)</li>
+                        <li>Producers want to supply MORE (high profits are attractive)</li>
+                        <li>Too many goods, not enough buyers</li>
+                        <li>Excess inventory, unsold products, warehouses full</li>
+                    </ul>
+                `,
+                notes: "📝 Fill in: Surplus definition (price above equilibrium, Qs > Qd)",
+                graph: 'surplus-shown'
+            },
+            {
+                title: "Real-World Surpluses",
+                content: `
+                    <p><strong>Examples of surpluses you might have seen:</strong></p>
+                    <div style="margin: 30px 0;">
+                        <div style="padding: 20px; background: #F3E8FF; border-radius: 8px; margin-bottom: 15px;">
+                            <p><strong>Minimum wage:</strong> Set above market-clearing wage → more people want jobs than employers want to hire → unemployment</p>
+                        </div>
+                        <div style="padding: 20px; background: #F3E8FF; border-radius: 8px; margin-bottom: 15px;">
+                            <p><strong>Overpriced products:</strong> Store charges too much → shelves stay full, clearance sales, "Everything Must Go!"</p>
+                        </div>
+                        <div style="padding: 20px; background: #F3E8FF; border-radius: 8px;">
+                            <p><strong>Agricultural surplus:</strong> Government price supports keep food prices high → farmers produce more than people want to buy</p>
+                        </div>
+                    </div>
+                    <p><strong>Key insight:</strong> Surpluses happen when sellers can't/won't lower prices to equilibrium.</p>
+                `,
+                notes: "📝 Add surplus examples to your notes",
+                graph: 'surplus-shown'
+            },
+            {
+                title: "How Markets Self-Correct",
+                content: `
+                    <p>Good news: <strong>Markets naturally move toward equilibrium!</strong></p>
+                    <div style="margin: 30px 0;">
+                        <div style="padding: 25px; background: #FEF3C7; border-radius: 12px; margin-bottom: 20px;">
+                            <h4 style="color: #92400E; margin-bottom: 10px; font-size: 1.3rem;">SHORTAGE → Prices RISE</h4>
+                            <p style="color: #92400E;">When there's a shortage, frustrated buyers offer more money. Sellers notice and raise prices. Higher prices:</p>
+                            <p style="color: #92400E; margin-top: 5px;">• Reduce quantity demanded (some buyers drop out)</p>
+                            <p style="color: #92400E;">• Increase quantity supplied (more profitable to produce)</p>
+                            <p style="color: #92400E; margin-top: 5px;"><strong>→ Market moves back to equilibrium</strong></p>
+                        </div>
+                        <div style="padding: 25px; background: #F3E8FF; border-radius: 12px;">
+                            <h4 style="color: #6B21A8; margin-bottom: 10px; font-size: 1.3rem;">SURPLUS → Prices FALL</h4>
+                            <p style="color: #6B21A8;">When there's a surplus, sellers compete for customers by lowering prices. Lower prices:</p>
+                            <p style="color: #6B21A8; margin-top: 5px;">• Increase quantity demanded (more buyers enter market)</p>
+                            <p style="color: #6B21A8;">• Decrease quantity supplied (less profitable to produce)</p>
+                            <p style="color: #6B21A8; margin-top: 5px;"><strong>→ Market moves back to equilibrium</strong></p>
+                        </div>
+                    </div>
+                `,
+                notes: "📝 Fill in: How shortages and surpluses self-correct",
+                graph: 'equilibrium'
+            },
+            {
+                title: "Reading Shortage/Surplus on Graphs",
+                content: `
+                    <p><strong>How to identify shortages and surpluses visually:</strong></p>
+                    <div style="margin: 30px 0; padding: 25px; background: #E0F2FE; border-left: 5px solid #0EA5E9; border-radius: 8px;">
+                        <p style="margin-bottom: 15px;"><strong>Step 1:</strong> Find the equilibrium point (where curves intersect)</p>
+                        <p style="margin-bottom: 15px;"><strong>Step 2:</strong> Look for a horizontal price line</p>
+                        <p style="margin-bottom: 15px;"><strong>Step 3:</strong> Is the price line ABOVE or BELOW equilibrium?</p>
+                        <ul style="margin-left: 40px; margin-top: 10px;">
+                            <li><strong>Below equilibrium:</strong> SHORTAGE (Qd > Qs)</li>
+                            <li><strong>Above equilibrium:</strong> SURPLUS (Qs > Qd)</li>
+                        </ul>
+                    </div>
+                    <p style="margin-top: 20px;"><strong>Pro tip:</strong> Look where the price line intersects each curve. The gap between those points shows the size of the shortage or surplus.</p>
+                `,
+                notes: "📝 Note: How to identify shortages/surpluses on graphs",
+                graph: 'shortage-shown'
+            },
+            {
+                title: "Ready to Practice!",
+                content: `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">✅</div>
+                        <h2 style="color: #10B981; font-size: 2rem; margin-bottom: 20px;">Lesson 3 Complete!</h2>
+                        <p style="font-size: 1.3rem; line-height: 2; color: #64748B;">
+                            You now understand shortages, surpluses, and how markets self-correct.<br><br>
+                            Time to practice identifying them on graphs!
+                        </p>
+                        <div style="margin-top: 40px; padding: 30px; background: #FFFBEB; border: 3px solid #F59E0B; border-radius: 12px;">
+                            <p style="font-size: 1.2rem; color: #92400E; margin: 0; font-weight: 600;">
+                                📝 Check: Did you complete all shortage and surplus sections?
+                            </p>
+                        </div>
+                    </div>
+                `,
+                notes: "",
+                graph: null
+            }
+        ];
+        
+        const practiceQuestions = [
+            {
+                title: "Identifying a Shortage",
+                scenario: "Concert tickets are priced at $30, but equilibrium price is $100. At $30, many fans want tickets but the venue has limited seats.",
+                question: "What situation is shown on the graph?",
+                notes: "",
+                correct: 2,
+                graphs: [
+                    { type: 'equilibrium', label: 'Market at equilibrium' },
+                    { type: 'surplus-shown', label: 'High price line' },
+                    { type: 'shortage-shown', label: 'Low price line' },
+                    { type: 'demand-shift-right', label: 'Demand increases' }
+                ]
+            },
+            {
+                title: "Identifying a Surplus",
+                scenario: "A store prices shirts at $80, but equilibrium is $40. At $80, the store has many unsold shirts piling up in inventory.",
+                question: "What situation is shown on the graph?",
+                notes: "",
+                correct: 1,
+                graphs: [
+                    { type: 'equilibrium', label: 'Market at equilibrium' },
+                    { type: 'surplus-shown', label: 'High price line' },
+                    { type: 'shortage-shown', label: 'Low price line' },
+                    { type: 'supply-shift-left', label: 'Supply decreases' }
+                ]
+            },
+            {
+                title: "Price Below Equilibrium",
+                scenario: "Rent control sets apartment rent at $1000/month when equilibrium rent is $2000. Result: Long waitlists and housing shortage.",
+                question: "What does this price control create?",
+                notes: "",
+                correct: 2,
+                graphs: [
+                    { type: 'equilibrium', label: 'Balanced market' },
+                    { type: 'surplus-shown', label: 'Excess apartments' },
+                    { type: 'shortage-shown', label: 'Housing shortage' },
+                    { type: 'demand-shift-left', label: 'Less demand' }
+                ]
+            },
+            {
+                title: "Price Above Equilibrium",
+                scenario: "Minimum wage is set at $18/hour when equilibrium wage is $12. Result: More people seeking jobs than businesses want to hire.",
+                question: "What does this price floor create?",
+                notes: "",
+                correct: 1,
+                graphs: [
+                    { type: 'equilibrium', label: 'Full employment' },
+                    { type: 'surplus-shown', label: 'Labor surplus (unemployment)' },
+                    { type: 'shortage-shown', label: 'Labor shortage' },
+                    { type: 'supply-shift-right', label: 'More supply' }
+                ]
+            },
+            {
+                title: "Self-Correcting Market - Shortage",
+                scenario: "Gaming console launches at $400 but instantly sells out (shortage). What happens next in a free market?",
+                question: "How does the market self-correct?",
+                notes: "",
+                correct: 0,
+                graphs: [
+                    { type: 'equilibrium', label: 'Prices RISE to equilibrium' },
+                    { type: 'shortage-shown', label: 'Shortage continues' },
+                    { type: 'demand-shift-left', label: 'Demand falls' },
+                    { type: 'supply-shift-right', label: 'Supply increases' }
+                ]
+            },
+            {
+                title: "Self-Correcting Market - Surplus",
+                scenario: "Store has too many winter coats in inventory (surplus). What happens next in a free market?",
+                question: "How does the market self-correct?",
+                notes: "",
+                correct: 0,
+                graphs: [
+                    { type: 'equilibrium', label: 'Prices FALL to equilibrium' },
+                    { type: 'surplus-shown', label: 'Surplus continues' },
+                    { type: 'demand-shift-right', label: 'Demand rises' },
+                    { type: 'supply-shift-left', label: 'Supply decreases' }
+                ]
+            },
+            {
+                title: "Quantity Demanded vs Supplied",
+                scenario: "At a price of $5, consumers want 1000 units but producers only supply 300 units.",
+                question: "What market condition exists?",
+                notes: "",
+                correct: 2,
+                graphs: [
+                    { type: 'equilibrium', label: 'Qd = Qs (balanced)' },
+                    { type: 'surplus-shown', label: 'Qs > Qd (surplus)' },
+                    { type: 'shortage-shown', label: 'Qd > Qs (shortage)' },
+                    { type: 'demand-shift-right', label: 'Increasing demand' }
+                ]
+            },
+            {
+                title: "Comprehensive Analysis",
+                scenario: "Black Friday deals price TVs at $200 (below equilibrium of $500). Stores open at 5am and TVs sell out in 20 minutes.",
+                question: "What happened and what would fix it?",
+                notes: "",
+                correct: 2,
+                graphs: [
+                    { type: 'surplus-shown', label: 'Surplus - lower prices more' },
+                    { type: 'equilibrium', label: 'Already at equilibrium' },
+                    { type: 'shortage-shown', label: 'Shortage - raise prices' },
+                    { type: 'supply-shift-right', label: 'Make more TVs' }
+                ]
+            }
+        ];
+        
+        // Graph drawing functions
+        function drawGraph(canvas, type) {
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, w, h);
+            
+            // Grid
+            ctx.strokeStyle = '#E5E7EB';
+            ctx.lineWidth = 1;
+            for (let i = 1; i <= 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(40, 20 + i * 70);
+                ctx.lineTo(w - 20, 20 + i * 70);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(40 + i * 80, 20);
+                ctx.lineTo(40 + i * 80, h - 30);
+                ctx.stroke();
+            }
+            
+            // Axes
+            ctx.strokeStyle = '#1F2937';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(40, h - 30);
+            ctx.lineTo(w - 20, h - 30);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(40, h - 30);
+            ctx.lineTo(40, 20);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#1F2937';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('P', 15, 25);
+            ctx.fillText('Q', w - 25, h - 10);
+            
+            // Draw curves
+            if (type === 'equilibrium' || type === 'shortage-shown' || type === 'surplus-shown') {
+                // Demand
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                // Supply
+                ctx.strokeStyle = '#EF4444';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                // Equilibrium point
+                ctx.fillStyle = '#10B981';
+                ctx.beginPath();
+                ctx.arc(170, 125, 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if (type === 'shortage-shown') {
+                    // Price line below equilibrium
+                    ctx.strokeStyle = '#F59E0B';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(40, 160);
+                    ctx.lineTo(280, 160);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                } else if (type === 'surplus-shown') {
+                    // Price line above equilibrium
+                    ctx.strokeStyle = '#8B5CF6';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(40, 80);
+                    ctx.lineTo(280, 80);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            } else if (type === 'demand-shift-right') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#EF4444';
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#818CF8';
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.moveTo(100, 40);
+                ctx.quadraticCurveTo(190, 120, 320, 210);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (type === 'demand-shift-left') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#EF4444';
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#818CF8';
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.moveTo(20, 40);
+                ctx.quadraticCurveTo(110, 120, 240, 210);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (type === 'supply-shift-right') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#EF4444';
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#F97316';
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.moveTo(100, 210);
+                ctx.quadraticCurveTo(190, 120, 320, 40);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (type === 'supply-shift-left') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#EF4444';
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#F97316';
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.moveTo(20, 210);
+                ctx.quadraticCurveTo(110, 120, 240, 40);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+        
+        function loadLesson() {
+            const slide = lessonSlides[state.lessonSlide];
+            const isLast = state.lessonSlide === lessonSlides.length - 1;
+            
+            let graphHTML = '';
+            if (slide.graph) {
+                graphHTML = '<canvas id="lesson-graph" width="400" height="350"></canvas>';
+            }
+            
+            let notesHTML = '';
+            if (slide.notes) {
+                notesHTML = `<div class="notes-reminder">${slide.notes}</div>`;
+            }
+            
+            document.getElementById('lesson-content').innerHTML = `
+                <div class="lesson-content">
+                    <div class="slide-counter">Slide ${state.lessonSlide + 1} of ${lessonSlides.length}</div>
+                    <h2 class="slide-title">${slide.title}</h2>
+                    <div class="slide-content">
+                        ${slide.content}
+                        ${graphHTML}
+                        ${notesHTML}
+                    </div>
+                </div>
+            `;
+            
+            if (slide.graph) {
+                setTimeout(() => {
+                    const canvas = document.getElementById('lesson-graph');
+                    if (canvas) drawGraph(canvas, slide.graph);
+                }, 100);
+            }
+            
+            document.getElementById('lesson-prev').style.display = state.lessonSlide > 0 ? 'inline-block' : 'none';
+            document.getElementById('lesson-next').textContent = isLast ? 'Start Practice →' : 'Next →';
+        }
+        
+        function nextSlide() {
+            if (state.lessonSlide < lessonSlides.length - 1) {
+                state.lessonSlide++;
+                loadLesson();
+            } else {
+                document.getElementById('step-lesson').classList.add('complete');
+                document.getElementById('step-practice').classList.add('active');
+                document.getElementById('tab-practice').disabled = false;
+                document.getElementById('tab-practice').classList.remove('locked');
+                showTab('practice');
+            }
+        }
+        
+        function previousSlide() {
+            if (state.lessonSlide > 0) {
+                state.lessonSlide--;
+                loadLesson();
+            }
+        }
+        
+        function loadPractice() {
+            const q = practiceQuestions[state.practiceIndex];
+            document.getElementById('practice-number').textContent = state.practiceIndex + 1;
+            
+            document.getElementById('practice-content').innerHTML = `
+                <div class="scenario-box">
+                    <h3>⚠️ ${q.title}</h3>
+                    <div class="scenario-text"><strong>Scenario:</strong> ${q.scenario}</div>
+                </div>
+                
+                <div class="question-box">
+                    <h4>${q.question}</h4>
+                    <div class="graph-options">
+                        ${q.graphs.map((g, i) => `
+                            <div class="graph-option" onclick="selectAnswer(${i})">
+                                <div class="option-label">${String.fromCharCode(65 + i)}</div>
+                                <canvas class="graph-canvas-small" width="320" height="280" id="practice-graph-${i}"></canvas>
+                                <div class="graph-description">${g.label}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                q.graphs.forEach((g, i) => {
+                    const canvas = document.getElementById(`practice-graph-${i}`);
+                    if (canvas) drawGraph(canvas, g.type);
+                });
+            }, 100);
+            
+            document.getElementById('practice-feedback').classList.remove('show');
+            document.getElementById('practice-next').style.display = 'none';
+        }
+        
+        function selectAnswer(index) {
+            const q = practiceQuestions[state.practiceIndex];
+            const options = document.querySelectorAll('.graph-option');
+            const feedback = document.getElementById('practice-feedback');
+            
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            
+            if (index === q.correct) {
+                options[index].classList.add('correct');
+                feedback.className = 'feedback correct show';
+                feedback.innerHTML = '<strong>🎉 Excellent!</strong> You correctly identified the market condition!';
+                state.practiceScore++;
+            } else {
+                options[index].classList.add('incorrect');
+                options[q.correct].classList.add('correct');
+                feedback.className = 'feedback incorrect show';
+                feedback.innerHTML = `<strong>Not quite.</strong> The correct answer is <strong>${String.fromCharCode(65 + q.correct)}</strong>.`;
+            }
+            
+            setTimeout(() => {
+                document.getElementById('practice-next').style.display = 'inline-block';
+            }, 1500);
+        }
+        
+        function nextPractice() {
+            state.practiceIndex++;
+            if (state.practiceIndex >= practiceQuestions.length) {
+                showResults();
+            } else {
+                loadPractice();
+            }
+        }
+        
+        function showResults() {
+            const percent = Math.round((state.practiceScore / practiceQuestions.length) * 100);
+            
+            document.getElementById('practice-content').innerHTML = `
+                <div class="completion-badge">
+                    <h2>🎉 Lesson 3 Complete!</h2>
+                    <p>You've mastered shortages and surpluses!</p>
+                </div>
+                
+                <div class="score-display">
+                    <div style="font-size: 1.4rem; opacity: 0.95;">Your Score</div>
+                    <div class="score-big">${percent}%</div>
+                    <div style="font-size: 1.3rem; opacity: 0.95;">${state.practiceScore} out of ${practiceQuestions.length} correct</div>
+                </div>
+                
+                <div style="text-align: center; margin: 40px 0; padding: 30px; background: #D1FAE5; border-radius: 12px; border: 3px solid #10B981;">
+                    <p style="font-size: 1.5rem; color: #065F46; margin: 0 0 20px 0; font-weight: 700;">
+                        🎓 All 3 Lessons Complete!
+                    </p>
+                    <p style="font-size: 1.2rem; color: #065F46; margin-bottom: 20px;">
+                        You now understand:<br>
+                        ✓ Supply & Demand curves<br>
+                        ✓ Market equilibrium & shifters<br>
+                        ✓ Shortages & surpluses
+                    </p>
+                    <p style="font-size: 1.1rem; color: #065F46;">
+                        Ready for the comprehensive Final Mastery Test?
+                    </p>
+                </div>
+            `;
+            
+            document.getElementById('practice-feedback').style.display = 'none';
+            document.getElementById('practice-next').style.display = 'none';
+            document.getElementById('step-practice').classList.add('complete');
+        }
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById('panel-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'lesson') loadLesson();
+            else if (tabName === 'practice') loadPractice();
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLesson();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 2: Equilibrium & Shifters | ClassClick</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+            min-height: 100vh; 
+            color: #333;
+        }
+        
+        .header { 
+            background: #2B2D42; 
+            color: white; 
+            padding: 20px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap;
+        }
+        .header h1 { font-size: 1.8rem; margin-bottom: 5px; }
+        .header span { color: #14B8A6; }
+        
+        .progress-bar { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            margin-top: 10px;
+        }
+        .progress-step { 
+            padding: 8px 16px; 
+            background: #555; 
+            border-radius: 20px; 
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .progress-step.complete { background: #10B981; }
+        .progress-step.active { background: #F59E0B; box-shadow: 0 0 15px #F59E0B; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px; }
+        
+        .banner {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            text-align: center;
+        }
+        .banner h2 { margin: 0 0 10px 0; font-size: 1.5rem; }
+        .banner p { margin: 0; font-size: 1.05rem; }
+        
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { 
+            padding: 14px 28px; 
+            background: #2B2D42; 
+            color: #888; 
+            border: none; 
+            border-radius: 10px 10px 0 0; 
+            cursor: pointer; 
+            font-size: 1.05rem; 
+            transition: all 0.3s; 
+            font-weight: 600;
+        }
+        .tab:hover { background: #3B3D52; }
+        .tab.active { background: white; color: #2B2D42; }
+        .tab:disabled { opacity: 0.4; cursor: not-allowed; }
+        .tab.locked::before { content: "🔒 "; }
+        
+        .panel { 
+            display: none; 
+            background: white; 
+            border-radius: 0 15px 15px 15px; 
+            padding: 40px; 
+            min-height: 600px; 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4); 
+        }
+        .panel.active { display: block; animation: slideIn 0.4s ease-out; }
+        
+        @keyframes slideIn { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .lesson-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .slide-counter {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        
+        .slide-title {
+            text-align: center;
+            color: #2B2D42;
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+        
+        .slide-content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 1.2rem;
+            line-height: 2;
+        }
+        
+        .notes-reminder {
+            margin-top: 30px;
+            padding: 20px;
+            background: #E0F2FE;
+            border-left: 5px solid #0EA5E9;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #0C4A6E;
+        }
+        
+        canvas {
+            display: block;
+            margin: 30px auto;
+            border: 3px solid #E5E7EB;
+            border-radius: 12px;
+            background: white;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: #14B8A6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0D9488;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+        .btn-secondary {
+            background: #E5E7EB;
+            color: #374151;
+        }
+        .btn-secondary:hover {
+            background: #D1D5DB;
+        }
+        
+        .question-counter {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #64748B;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        .question-counter .current { color: #14B8A6; font-size: 1.6rem; }
+        
+        .scenario-box {
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            padding: 30px;
+            border-radius: 12px;
+            border: 3px solid #818CF8;
+            margin-bottom: 30px;
+        }
+        .scenario-box h3 {
+            color: #3730A3;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .scenario-text {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #1F2937;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .question-box {
+            background: #F8FAFC;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #14B8A6;
+            margin: 25px 0;
+        }
+        .question-box h4 {
+            color: #2B2D42;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+        
+        .graph-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .graph-option {
+            background: white;
+            border: 3px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .graph-option:hover {
+            border-color: #14B8A6;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.2);
+        }
+        .graph-option.selected {
+            border-color: #14B8A6;
+            background: #F0FDF4;
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.3);
+        }
+        .graph-option.correct {
+            border-color: #10B981;
+            background: #D1FAE5;
+        }
+        .graph-option.incorrect {
+            border-color: #EF4444;
+            background: #FEE2E2;
+        }
+        
+        .option-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #2B2D42;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .graph-canvas-small {
+            width: 100%;
+            height: 280px;
+            margin: 10px 0;
+        }
+        
+        .graph-description {
+            text-align: center;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 10px;
+            font-size: 1.05rem;
+        }
+        
+        .feedback {
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-size: 1.15rem;
+            font-weight: 500;
+            display: none;
+            line-height: 1.6;
+        }
+        .feedback.show { display: block; animation: slideIn 0.4s ease-out; }
+        .feedback.correct {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 3px solid #10B981;
+        }
+        .feedback.incorrect {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 3px solid #EF4444;
+        }
+        
+        .completion-badge {
+            background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+            color: white;
+            padding: 50px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
+        }
+        .completion-badge h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .score-display {
+            background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .score-big {
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .graph-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>📊 Lesson 2: <span>Equilibrium & Shifters</span></h1>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-step active" id="step-lesson">Lesson</div>
+            <div class="progress-step" id="step-practice">Practice</div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="banner">
+            <h2>📝 Have Your Notes Worksheet Ready!</h2>
+            <p>Fill in Part 2 as you go through this lesson</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('lesson')">📖 Lesson</button>
+            <button class="tab locked" id="tab-practice" onclick="showTab('practice')" disabled>🎯 Practice (12)</button>
+        </div>
+        
+        <!-- LESSON PANEL -->
+        <div class="panel active" id="panel-lesson">
+            <div id="lesson-content"></div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="lesson-prev" onclick="previousSlide()" style="display: none;">← Previous</button>
+                <button class="btn btn-primary" id="lesson-next" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+        
+        <!-- PRACTICE PANEL -->
+        <div class="panel" id="panel-practice">
+            <div class="question-counter">
+                Question <span class="current" id="practice-number">1</span> of 12
+            </div>
+            
+            <div id="practice-content"></div>
+            
+            <div class="feedback" id="practice-feedback"></div>
+            
+            <div class="nav-buttons">
+                <div></div>
+                <button class="btn btn-primary" id="practice-next" onclick="nextPractice()" style="display: none;">Next Question →</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const state = {
+            lessonSlide: 0,
+            practiceIndex: 0,
+            practiceScore: 0
+        };
+        
+        const lessonSlides = [
+            {
+                title: "Where Supply Meets Demand",
+                content: `
+                    <p>In Lesson 1, you learned that demand slopes DOWN and supply slopes UP.</p>
+                    <p style="margin-top: 20px;">But what happens when we put them on the SAME graph?</p>
+                    <div style="margin: 30px 0; padding: 30px; background: #D1FAE5; border-radius: 12px; border-left: 5px solid #10B981;">
+                        <h3 style="color: #065F46; font-size: 1.6rem; margin-bottom: 15px;">They INTERSECT!</h3>
+                        <p style="color: #065F46; margin: 0;">This intersection point is called <strong>EQUILIBRIUM</strong> - the most important concept in all of economics.</p>
+                    </div>
+                `,
+                notes: "📝 Have Part 2 of your notes ready",
+                graph: null
+            },
+            {
+                title: "Market Equilibrium",
+                content: `
+                    <p><strong style="font-size: 1.4rem; color: #10B981;">EQUILIBRIUM</strong> is where:</p>
+                    <div style="margin: 20px 0; padding: 25px; background: #D1FAE5; border-left: 5px solid #10B981; border-radius: 8px;">
+                        <p style="font-size: 1.3rem; margin-bottom: 10px;"><strong>Quantity Supplied = Quantity Demanded</strong></p>
+                        <p style="margin: 0;">The market "clears" - no shortage, no surplus</p>
+                    </div>
+                    <p><strong>What does this mean?</strong></p>
+                    <ul style="margin-left: 40px; margin-top: 15px;">
+                        <li>Everything produced gets sold</li>
+                        <li>Every buyer who wants it at this price gets it</li>
+                        <li>No leftover inventory</li>
+                        <li>No frustrated buyers or sellers</li>
+                    </ul>
+                `,
+                notes: "📝 Fill in: Equilibrium definition",
+                graph: 'equilibrium'
+            },
+            {
+                title: "Equilibrium Price & Quantity",
+                content: `
+                    <p>At the equilibrium point, we identify two values:</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0;">
+                        <div style="padding: 25px; background: #DBEAFE; border-radius: 12px;">
+                            <h4 style="color: #1E40AF; margin-bottom: 10px; font-size: 1.4rem;">Equilibrium PRICE (Pe)</h4>
+                            <p style="color: #1E3A8A;">The price at which quantity supplied equals quantity demanded</p>
+                        </div>
+                        <div style="padding: 25px; background: #FEE2E2; border-radius: 12px;">
+                            <h4 style="color: #991B1B; margin-bottom: 10px; font-size: 1.4rem;">Equilibrium QUANTITY (Qe)</h4>
+                            <p style="color: #991B1B;">The amount bought AND sold at equilibrium price</p>
+                        </div>
+                    </div>
+                    <p><strong>Example:</strong> If equilibrium price is $10 and equilibrium quantity is 100 units, then at $10, exactly 100 units will be both produced AND purchased.</p>
+                `,
+                notes: "📝 Fill in: Pe and Qe definitions",
+                graph: 'equilibrium'
+            },
+            {
+                title: "What Makes Demand Shift?",
+                content: `
+                    <p>Sometimes the ENTIRE demand curve moves left or right. This is called a <strong>SHIFT</strong>.</p>
+                    <div style="margin: 20px 0; padding: 25px; background: #EEF2FF; border-left: 5px solid #3B82F6; border-radius: 8px;">
+                        <p style="font-size: 1.2rem; margin-bottom: 15px;"><strong>Demand Shifters (5 factors):</strong></p>
+                        <p>1. <strong>INCOME</strong> - More money → more demand (normal goods)</p>
+                        <p>2. <strong>PREFERENCES/TASTES</strong> - Trends, fads, advertising</p>
+                        <p>3. <strong>PRICE OF RELATED GOODS</strong> - Substitutes & complements</p>
+                        <p>4. <strong>EXPECTATIONS</strong> - Future price predictions</p>
+                        <p>5. <strong>NUMBER OF BUYERS</strong> - Population changes</p>
+                    </div>
+                    <p><strong>Key:</strong> Price changes cause movement ALONG the curve. These factors cause the curve to SHIFT.</p>
+                `,
+                notes: "📝 Fill in: All 5 demand shifters",
+                graph: 'demand-shift-right'
+            },
+            {
+                title: "What Makes Supply Shift?",
+                content: `
+                    <p>Supply curves can also shift left or right based on production factors.</p>
+                    <div style="margin: 20px 0; padding: 25px; background: #FEF2F2; border-left: 5px solid #EF4444; border-radius: 8px;">
+                        <p style="font-size: 1.2rem; margin-bottom: 15px;"><strong>Supply Shifters (5 factors):</strong></p>
+                        <p>1. <strong>INPUT COSTS</strong> - Wages, materials, resources</p>
+                        <p>2. <strong>TECHNOLOGY</strong> - Better production methods</p>
+                        <p>3. <strong>TAXES & SUBSIDIES</strong> - Government policies</p>
+                        <p>4. <strong>EXPECTATIONS</strong> - Future price predictions</p>
+                        <p>5. <strong>NUMBER OF SELLERS</strong> - More/fewer producers</p>
+                    </div>
+                    <p><strong>Key:</strong> Lower costs → supply shifts RIGHT. Higher costs → supply shifts LEFT.</p>
+                `,
+                notes: "📝 Fill in: All 5 supply shifters",
+                graph: 'supply-shift-right'
+            },
+            {
+                title: "Complements vs. Substitutes",
+                content: `
+                    <p>Two special types of related goods affect demand:</p>
+                    <div style="margin: 30px 0;">
+                        <div style="padding: 25px; background: #DBEAFE; border-radius: 12px; margin-bottom: 20px;">
+                            <h4 style="color: #1E40AF; margin-bottom: 10px; font-size: 1.4rem;">COMPLEMENTS</h4>
+                            <p style="color: #1E3A8A;"><strong>Definition:</strong> Goods used TOGETHER</p>
+                            <p style="color: #1E3A8A; margin-top: 10px;"><strong>Examples:</strong> Peanut butter & jelly, Cars & gasoline, Hot dogs & buns</p>
+                            <p style="color: #1E3A8A; margin-top: 10px;"><strong>Rule:</strong> If price of one ↑ → demand for BOTH ↓</p>
+                        </div>
+                        <div style="padding: 25px; background: #FEE2E2; border-radius: 12px;">
+                            <h4 style="color: #991B1B; margin-bottom: 10px; font-size: 1.4rem;">SUBSTITUTES</h4>
+                            <p style="color: #991B1B;"><strong>Definition:</strong> Goods that REPLACE each other</p>
+                            <p style="color: #991B1B; margin-top: 10px;"><strong>Examples:</strong> Coke & Pepsi, Butter & margarine, Nike & Adidas</p>
+                            <p style="color: #991B1B; margin-top: 10px;"><strong>Rule:</strong> If price of one ↑ → demand for OTHER ↑</p>
+                        </div>
+                    </div>
+                `,
+                notes: "📝 Fill in: Complements and Substitutes with examples",
+                graph: null
+            },
+            {
+                title: "Normal vs. Inferior Goods",
+                content: `
+                    <p>Goods respond differently to income changes:</p>
+                    <div style="margin: 30px 0;">
+                        <div style="padding: 25px; background: #D1FAE5; border-radius: 12px; margin-bottom: 20px;">
+                            <h4 style="color: #065F46; margin-bottom: 10px; font-size: 1.4rem;">NORMAL GOODS</h4>
+                            <p style="color: #065F46;"><strong>Definition:</strong> Buy MORE when income INCREASES</p>
+                            <p style="color: #065F46; margin-top: 10px;"><strong>Examples:</strong> New cars, restaurant meals, vacation travel, brand-name products</p>
+                            <p style="color: #065F46; margin-top: 10px;"><strong>Rule:</strong> Income ↑ → Demand ↑</p>
+                        </div>
+                        <div style="padding: 25px; background: #FEF3C7; border-radius: 12px;">
+                            <h4 style="color: #92400E; margin-bottom: 10px; font-size: 1.4rem;">INFERIOR GOODS</h4>
+                            <p style="color: #92400E;"><strong>Definition:</strong> Buy LESS when income INCREASES</p>
+                            <p style="color: #92400E; margin-top: 10px;"><strong>Examples:</strong> Used cars, instant noodles, generic brands, public transit</p>
+                            <p style="color: #92400E; margin-top: 10px;"><strong>Rule:</strong> Income ↑ → Demand ↓ (we upgrade!)</p>
+                        </div>
+                    </div>
+                `,
+                notes: "📝 Fill in: Normal and Inferior goods with examples",
+                graph: null
+            },
+            {
+                title: "Putting It All Together",
+                content: `
+                    <p><strong>To analyze any market shift:</strong></p>
+                    <ol style="margin-left: 40px; margin-top: 20px; line-height: 2;">
+                        <li><strong>Identify:</strong> Does it affect SUPPLY or DEMAND?</li>
+                        <li><strong>Direction:</strong> Does it INCREASE (right) or DECREASE (left)?</li>
+                        <li><strong>New Equilibrium:</strong> What happens to P and Q?</li>
+                    </ol>
+                    <div style="margin: 30px 0; padding: 30px; background: #F8FAFC; border: 2px solid #CBD5E1; border-radius: 12px;">
+                        <p style="font-size: 1.2rem; margin-bottom: 15px;"><strong>Quick Reference:</strong></p>
+                        <p>Demand ↑ (right) → P↑ Q↑</p>
+                        <p>Demand ↓ (left) → P↓ Q↓</p>
+                        <p>Supply ↑ (right) → P↓ Q↑</p>
+                        <p>Supply ↓ (left) → P↑ Q↓</p>
+                    </div>
+                `,
+                notes: "📝 REVIEW: All shifters complete?",
+                graph: 'both-shift-right'
+            },
+            {
+                title: "Ready to Practice!",
+                content: `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">✅</div>
+                        <h2 style="color: #10B981; font-size: 2rem; margin-bottom: 20px;">Lesson 2 Complete!</h2>
+                        <p style="font-size: 1.3rem; line-height: 2; color: #64748B;">
+                            You now understand equilibrium and what makes curves shift.<br><br>
+                            Time to practice analyzing real market scenarios!
+                        </p>
+                        <div style="margin-top: 40px; padding: 30px; background: #FFFBEB; border: 3px solid #F59E0B; border-radius: 12px;">
+                            <p style="font-size: 1.2rem; color: #92400E; margin: 0; font-weight: 600;">
+                                📝 Check: Did you fill in all equilibrium and shifter sections?
+                            </p>
+                        </div>
+                    </div>
+                `,
+                notes: "",
+                graph: null
+            }
+        ];
+        
+        const practiceQuestions = [
+            {
+                title: "Health Study Increases Demand",
+                scenario: "A study shows avocados prevent heart disease. This changes consumer PREFERENCES (a demand shifter). People want MORE avocados.",
+                question: "What happens to the avocado market?",
+                notes: "",
+                correct: 0,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'demand-shift-left', label: 'Demand LEFT → P↓ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'supply-shift-left', label: 'Supply LEFT → P↑ Q↓' }
+                ]
+            },
+            {
+                title: "Frost Reduces Supply",
+                scenario: "Frost destroys 40% of orange crops. Fewer oranges available = higher INPUT COSTS (supply shifter). Supply DECREASES.",
+                question: "What happens to the orange market?",
+                notes: "",
+                correct: 3,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'demand-shift-left', label: 'Demand LEFT → P↓ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'supply-shift-left', label: 'Supply LEFT → P↑ Q↓' }
+                ]
+            },
+            {
+                title: "Normal Goods - Income Effect",
+                scenario: "Economy booms, incomes rise 20%. Restaurant meals are a NORMAL GOOD - we buy MORE when richer. Demand INCREASES.",
+                question: "What happens to the restaurant market?",
+                notes: "",
+                correct: 0,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'demand-shift-left', label: 'Demand LEFT → P↓ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'equilibrium', label: 'No change' }
+                ]
+            },
+            {
+                title: "Technology Lowers Costs",
+                scenario: "New robots make electric cars cheaper to produce. Better TECHNOLOGY (supply shifter) = lower costs. Supply INCREASES.",
+                question: "What happens to the electric car market?",
+                notes: "",
+                correct: 2,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'supply-shift-left', label: 'Supply LEFT → P↑ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'demand-shift-left', label: 'Demand LEFT → P↓ Q↓' }
+                ]
+            },
+            {
+                title: "Complementary Goods",
+                scenario: "Coffee prices surge. Coffee and donuts are COMPLEMENTS. When coffee costs more, people buy less coffee AND less donuts.",
+                question: "What happens in the DONUT market?",
+                notes: "",
+                correct: 1,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'demand-shift-left', label: 'Demand LEFT → P↓ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'supply-shift-left', label: 'Supply LEFT → P↑ Q↓' }
+                ]
+            },
+            {
+                title: "Substitute Goods",
+                scenario: "Beef prices skyrocket. Chicken is a SUBSTITUTE for beef. When beef gets expensive, people switch to chicken. Chicken demand INCREASES.",
+                question: "What happens in the CHICKEN market?",
+                notes: "",
+                correct: 0,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'demand-shift-left', label: 'Demand LEFT → P↓ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'equilibrium', label: 'No change' }
+                ]
+            },
+            {
+                title: "Inferior Goods - Income Effect",
+                scenario: "Economy booms, incomes rise. Instant ramen is an INFERIOR GOOD - we buy LESS when richer (upgrade to better food). Demand DECREASES.",
+                question: "What happens to the ramen market?",
+                notes: "",
+                correct: 1,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'demand-shift-left', label: 'Demand LEFT → P↓ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'supply-shift-left', label: 'Supply LEFT → P↑ Q↓' }
+                ]
+            },
+            {
+                title: "Number of Sellers Increases",
+                scenario: "15 new coffee shops open downtown. More SELLERS (supply shifter) = more supply in market. Supply INCREASES.",
+                question: "What happens to the coffee market?",
+                notes: "",
+                correct: 2,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'supply-shift-left', label: 'Supply LEFT → P↑ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'demand-shift-left', label: 'Demand LEFT → P↓ Q↓' }
+                ]
+            },
+            {
+                title: "Expectations Shift Demand",
+                scenario: "Rumors say gas prices will spike 50% next week. EXPECTATIONS (demand shifter) make people fill up NOW. Current demand INCREASES.",
+                question: "What happens to TODAY's gas market?",
+                notes: "",
+                correct: 0,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'demand-shift-left', label: 'Demand LEFT → P↓ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'equilibrium', label: 'No change' }
+                ]
+            },
+            {
+                title: "Government Subsidies",
+                scenario: "Government gives tax breaks to solar panel makers. Subsidies LOWER production costs (supply shifter). Supply INCREASES.",
+                question: "What happens to the solar panel market?",
+                notes: "",
+                correct: 2,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'supply-shift-left', label: 'Supply LEFT → P↑ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'demand-shift-left', label: 'Demand LEFT → P↓ Q↓' }
+                ]
+            },
+            {
+                title: "Input Price Increase",
+                scenario: "Steel prices double. Steel is a major INPUT for car production. Higher input costs (supply shifter) = supply DECREASES.",
+                question: "What happens to the car market?",
+                notes: "",
+                correct: 1,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'supply-shift-left', label: 'Supply LEFT → P↑ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'equilibrium', label: 'No change' }
+                ]
+            },
+            {
+                title: "Population Growth",
+                scenario: "City population grows 30%. More BUYERS (demand shifter) in the market. Demand for housing INCREASES.",
+                question: "What happens to the apartment rental market?",
+                notes: "",
+                correct: 0,
+                graphs: [
+                    { type: 'demand-shift-right', label: 'Demand RIGHT → P↑ Q↑' },
+                    { type: 'demand-shift-left', label: 'Demand LEFT → P↓ Q↓' },
+                    { type: 'supply-shift-right', label: 'Supply RIGHT → P↓ Q↑' },
+                    { type: 'supply-shift-left', label: 'Supply LEFT → P↑ Q↓' }
+                ]
+            }
+        ];
+        
+        // [Insert the exact same drawing functions from Lesson 1]
+        function drawGraph(canvas, type) {
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, w, h);
+            
+            // Grid
+            ctx.strokeStyle = '#E5E7EB';
+            ctx.lineWidth = 1;
+            for (let i = 1; i <= 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(40, 20 + i * 70);
+                ctx.lineTo(w - 20, 20 + i * 70);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(40 + i * 80, 20);
+                ctx.lineTo(40 + i * 80, h - 30);
+                ctx.stroke();
+            }
+            
+            // Axes
+            ctx.strokeStyle = '#1F2937';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(40, h - 30);
+            ctx.lineTo(w - 20, h - 30);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(40, h - 30);
+            ctx.lineTo(40, 20);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#1F2937';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('P', 15, 25);
+            ctx.fillText('Q', w - 25, h - 10);
+            
+            // Draw curves
+            if (type === 'demand-only') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+            } else if (type === 'supply-only') {
+                ctx.strokeStyle = '#EF4444';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+            } else if (type === 'equilibrium') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#EF4444';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#10B981';
+                ctx.beginPath();
+                ctx.arc(170, 125, 6, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (type === 'demand-shift-right') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#EF4444';
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#818CF8';
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.moveTo(100, 40);
+                ctx.quadraticCurveTo(190, 120, 320, 210);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (type === 'demand-shift-left') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#EF4444';
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#818CF8';
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.moveTo(20, 40);
+                ctx.quadraticCurveTo(110, 120, 240, 210);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (type === 'supply-shift-right') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#EF4444';
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#F97316';
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.moveTo(100, 210);
+                ctx.quadraticCurveTo(190, 120, 320, 40);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (type === 'supply-shift-left') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#EF4444';
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#F97316';
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.moveTo(20, 210);
+                ctx.quadraticCurveTo(110, 120, 240, 40);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (type === 'both-shift-right') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#EF4444';
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#818CF8';
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.moveTo(100, 40);
+                ctx.quadraticCurveTo(190, 120, 320, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#F97316';
+                ctx.beginPath();
+                ctx.moveTo(100, 210);
+                ctx.quadraticCurveTo(190, 120, 320, 40);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+        
+        // [Insert the same lesson/practice functions from Lesson 1, updated for lesson 2]
+        
+        function loadLesson() {
+            const slide = lessonSlides[state.lessonSlide];
+            const isLast = state.lessonSlide === lessonSlides.length - 1;
+            
+            let graphHTML = '';
+            if (slide.graph) {
+                graphHTML = '<canvas id="lesson-graph" width="400" height="350"></canvas>';
+            }
+            
+            let notesHTML = '';
+            if (slide.notes) {
+                notesHTML = `<div class="notes-reminder">${slide.notes}</div>`;
+            }
+            
+            document.getElementById('lesson-content').innerHTML = `
+                <div class="lesson-content">
+                    <div class="slide-counter">Slide ${state.lessonSlide + 1} of ${lessonSlides.length}</div>
+                    <h2 class="slide-title">${slide.title}</h2>
+                    <div class="slide-content">
+                        ${slide.content}
+                        ${graphHTML}
+                        ${notesHTML}
+                    </div>
+                </div>
+            `;
+            
+            if (slide.graph) {
+                setTimeout(() => {
+                    const canvas = document.getElementById('lesson-graph');
+                    if (canvas) drawGraph(canvas, slide.graph);
+                }, 100);
+            }
+            
+            document.getElementById('lesson-prev').style.display = state.lessonSlide > 0 ? 'inline-block' : 'none';
+            document.getElementById('lesson-next').textContent = isLast ? 'Start Practice →' : 'Next →';
+        }
+        
+        function nextSlide() {
+            if (state.lessonSlide < lessonSlides.length - 1) {
+                state.lessonSlide++;
+                loadLesson();
+            } else {
+                document.getElementById('step-lesson').classList.add('complete');
+                document.getElementById('step-practice').classList.add('active');
+                document.getElementById('tab-practice').disabled = false;
+                document.getElementById('tab-practice').classList.remove('locked');
+                showTab('practice');
+            }
+        }
+        
+        function previousSlide() {
+            if (state.lessonSlide > 0) {
+                state.lessonSlide--;
+                loadLesson();
+            }
+        }
+        
+        function loadPractice() {
+            const q = practiceQuestions[state.practiceIndex];
+            document.getElementById('practice-number').textContent = state.practiceIndex + 1;
+            
+            document.getElementById('practice-content').innerHTML = `
+                <div class="scenario-box">
+                    <h3>🎯 ${q.title}</h3>
+                    <div class="scenario-text"><strong>Scenario:</strong> ${q.scenario}</div>
+                </div>
+                
+                <div class="question-box">
+                    <h4>${q.question}</h4>
+                    <div class="graph-options">
+                        ${q.graphs.map((g, i) => `
+                            <div class="graph-option" onclick="selectAnswer(${i})">
+                                <div class="option-label">${String.fromCharCode(65 + i)}</div>
+                                <canvas class="graph-canvas-small" width="320" height="280" id="practice-graph-${i}"></canvas>
+                                <div class="graph-description">${g.label}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                q.graphs.forEach((g, i) => {
+                    const canvas = document.getElementById(`practice-graph-${i}`);
+                    if (canvas) drawGraph(canvas, g.type);
+                });
+            }, 100);
+            
+            document.getElementById('practice-feedback').classList.remove('show');
+            document.getElementById('practice-next').style.display = 'none';
+        }
+        
+        function selectAnswer(index) {
+            const q = practiceQuestions[state.practiceIndex];
+            const options = document.querySelectorAll('.graph-option');
+            const feedback = document.getElementById('practice-feedback');
+            
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            
+            if (index === q.correct) {
+                options[index].classList.add('correct');
+                feedback.className = 'feedback correct show';
+                feedback.innerHTML = '<strong>🎉 Excellent!</strong> You correctly analyzed the market shift!';
+                state.practiceScore++;
+            } else {
+                options[index].classList.add('incorrect');
+                options[q.correct].classList.add('correct');
+                feedback.className = 'feedback incorrect show';
+                feedback.innerHTML = `<strong>Not quite.</strong> The correct answer is <strong>${String.fromCharCode(65 + q.correct)}</strong>.`;
+            }
+            
+            setTimeout(() => {
+                document.getElementById('practice-next').style.display = 'inline-block';
+            }, 1500);
+        }
+        
+        function nextPractice() {
+            state.practiceIndex++;
+            if (state.practiceIndex >= practiceQuestions.length) {
+                showResults();
+            } else {
+                loadPractice();
+            }
+        }
+        
+        function showResults() {
+            const percent = Math.round((state.practiceScore / practiceQuestions.length) * 100);
+            
+            document.getElementById('practice-content').innerHTML = `
+                <div class="completion-badge">
+                    <h2>🎉 Lesson 2 Complete!</h2>
+                    <p>You've mastered equilibrium and market shifters!</p>
+                </div>
+                
+                <div class="score-display">
+                    <div style="font-size: 1.4rem; opacity: 0.95;">Your Score</div>
+                    <div class="score-big">${percent}%</div>
+                    <div style="font-size: 1.3rem; opacity: 0.95;">${state.practiceScore} out of ${practiceQuestions.length} correct</div>
+                </div>
+                
+                <div style="text-align: center; margin: 40px 0; padding: 30px; background: #E0F2FE; border-radius: 12px; border: 3px solid #0EA5E9;">
+                    <p style="font-size: 1.3rem; color: #0C4A6E; margin: 0 0 20px 0; font-weight: 700;">
+                        📚 Ready for Lesson 3?
+                    </p>
+                    <p style="font-size: 1.1rem; color: #0C4A6E;">
+                        Next up: Shortages & Surpluses
+                    </p>
+                </div>
+            `;
+            
+            document.getElementById('practice-feedback').style.display = 'none';
+            document.getElementById('practice-next').style.display = 'none';
+            document.getElementById('step-practice').classList.add('complete');
+        }
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById('panel-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'lesson') loadLesson();
+            else if (tabName === 'practice') loadPractice();
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLesson();
+        });
+    </script>
+</body>
+</html>

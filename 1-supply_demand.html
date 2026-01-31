@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 1: Supply & Demand Basics | ClassClick</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+            min-height: 100vh; 
+            color: #333;
+        }
+        
+        .header { 
+            background: #2B2D42; 
+            color: white; 
+            padding: 20px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap;
+        }
+        .header h1 { font-size: 1.8rem; margin-bottom: 5px; }
+        .header span { color: #14B8A6; }
+        .lesson-badge {
+            background: #F59E0B;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px; }
+        
+        .banner {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); 
+            color: white; 
+            padding: 25px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            text-align: center;
+        }
+        .banner h2 { margin: 0 0 10px 0; font-size: 1.8rem; }
+        .banner p { margin: 0; font-size: 1.1rem; opacity: 0.95; }
+        
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { 
+            padding: 14px 28px; 
+            background: #2B2D42; 
+            color: #888; 
+            border: none; 
+            border-radius: 10px 10px 0 0; 
+            cursor: pointer; 
+            font-size: 1.05rem; 
+            transition: all 0.3s; 
+            font-weight: 600;
+        }
+        .tab:hover { background: #3B3D52; }
+        .tab.active { background: white; color: #2B2D42; }
+        
+        .panel { 
+            display: none; 
+            background: white; 
+            border-radius: 0 15px 15px 15px; 
+            padding: 40px; 
+            min-height: 600px; 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4); 
+        }
+        .panel.active { display: block; animation: slideIn 0.4s ease-out; }
+        
+        @keyframes slideIn { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .slide-counter {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        
+        .slide-title {
+            text-align: center;
+            color: #2B2D42;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+        
+        .slide-content {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .slide-content p {
+            font-size: 1.2rem;
+            line-height: 2;
+            margin-bottom: 15px;
+        }
+        
+        .slide-content ul, .slide-content ol {
+            font-size: 1.2rem;
+            line-height: 2;
+            margin-left: 40px;
+            margin-top: 15px;
+        }
+        
+        .highlight-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 5px solid;
+        }
+        
+        .demand-box {
+            background: #EEF2FF;
+            border-left-color: #3B82F6;
+        }
+        
+        .supply-box {
+            background: #FEF2F2;
+            border-left-color: #EF4444;
+        }
+        
+        .success-box {
+            background: #D1FAE5;
+            border-left-color: #10B981;
+        }
+        
+        .notes-reminder {
+            background: #E0F2FE;
+            border-left: 4px solid #0EA5E9;
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            font-weight: 600;
+            color: #0C4A6E;
+        }
+        
+        .graph-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        canvas {
+            border: 3px solid #E5E7EB;
+            border-radius: 12px;
+            background: white;
+        }
+        
+        .question-counter {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #64748B;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        .question-counter .current { color: #14B8A6; font-size: 1.6rem; }
+        
+        .question-box {
+            background: #F8FAFC;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #14B8A6;
+            margin: 25px 0;
+        }
+        .question-box h4 {
+            color: #2B2D42;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+        
+        .graph-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .graph-option {
+            background: white;
+            border: 3px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .graph-option:hover {
+            border-color: #14B8A6;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.2);
+        }
+        .graph-option.selected {
+            border-color: #14B8A6;
+            background: #F0FDF4;
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.3);
+        }
+        .graph-option.correct {
+            border-color: #10B981;
+            background: #D1FAE5;
+        }
+        .graph-option.incorrect {
+            border-color: #EF4444;
+            background: #FEE2E2;
+        }
+        
+        .option-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #2B2D42;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .graph-canvas-small {
+            width: 100%;
+            height: 280px;
+            margin: 10px 0;
+        }
+        
+        .graph-description {
+            text-align: center;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 10px;
+            font-size: 1.05rem;
+        }
+        
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: #14B8A6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0D9488;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+        .btn-secondary {
+            background: #E5E7EB;
+            color: #374151;
+        }
+        .btn-secondary:hover {
+            background: #D1D5DB;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .feedback {
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-size: 1.15rem;
+            font-weight: 500;
+            display: none;
+            line-height: 1.6;
+        }
+        .feedback.show { display: block; animation: slideIn 0.4s ease-out; }
+        .feedback.correct {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 3px solid #10B981;
+        }
+        .feedback.incorrect {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 3px solid #EF4444;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .completion-badge {
+            background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+            color: white;
+            padding: 50px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
+        }
+        .completion-badge h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .score-display {
+            background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .score-big {
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .graph-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>📊 Supply & Demand <span>Interactive Lab</span></h1>
+        </div>
+        <div class="lesson-badge">LESSON 1: Basics</div>
+    </div>
+    
+    <div class="container">
+        <div class="banner">
+            <h2>📖 Lesson 1: Supply & Demand Basics</h2>
+            <p>Learn the fundamental laws and how to read economic graphs</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('lesson')">📖 Interactive Lesson</button>
+            <button class="tab" id="tab-practice" onclick="showTab('practice')">📈 Practice Questions</button>
+        </div>
+        
+        <!-- LESSON PANEL -->
+        <div class="panel active" id="panel-lesson">
+            <div id="lesson-content"></div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="lesson-prev" onclick="previousSlide()" style="display: none;">← Previous</button>
+                <button class="btn btn-primary" id="lesson-next" onclick="nextSlide()">Next →</button>
+            </div>
+        </div>
+        
+        <!-- PRACTICE PANEL -->
+        <div class="panel" id="panel-practice">
+            <div id="practice-test">
+                <div class="question-counter">
+                    Question <span class="current" id="question-number">1</span> of 8
+                </div>
+                
+                <div id="practice-content"></div>
+                
+                <div class="feedback" id="practice-feedback"></div>
+                
+                <div class="nav-buttons">
+                    <div></div>
+                    <button class="btn btn-primary" id="practice-next" onclick="nextQuestion()" style="display: none;">Next Question →</button>
+                </div>
+            </div>
+            
+            <div id="practice-results" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== STATE ====================
+        const state = {
+            currentSlide: 0,
+            questionIndex: 0,
+            score: 0
+        };
+        
+        // ==================== LESSON SLIDES ====================
+        const lessonSlides = [
+            {
+                title: "Welcome to Supply & Demand",
+                content: `
+                    <p>In this lesson, you'll master the two most important concepts in economics:</p>
+                    <div class="demand-box highlight-box">
+                        <h3 style="color: #1E40AF; font-size: 1.5rem; margin-bottom: 10px;">📉 DEMAND</h3>
+                        <p style="margin: 0;">What consumers WANT to buy at different prices</p>
+                    </div>
+                    <div class="supply-box highlight-box">
+                        <h3 style="color: #991B1B; font-size: 1.5rem; margin-bottom: 10px;">📈 SUPPLY</h3>
+                        <p style="margin: 0;">What producers WANT to sell at different prices</p>
+                    </div>
+                    <p style="margin-top: 20px;">These two forces interact to determine prices and quantities in every market!</p>
+                `,
+                notes: "📝 Get your notes worksheet ready - Lesson 1",
+                graph: null
+            },
+            {
+                title: "The Law of Demand",
+                content: `
+                    <div class="demand-box highlight-box">
+                        <h3 style="color: #1E40AF; font-size: 1.4rem; margin-bottom: 15px;">The Law of Demand</h3>
+                        <p style="font-size: 1.3rem; margin: 0;">
+                            When PRICE increases → Quantity demanded DECREASES<br>
+                            When PRICE decreases → Quantity demanded INCREASES
+                        </p>
+                    </div>
+                    <p><strong>Why does this happen?</strong></p>
+                    <ul>
+                        <li><strong>Substitution Effect:</strong> Higher prices make you switch to cheaper alternatives</li>
+                        <li><strong>Income Effect:</strong> Higher prices mean you can afford less</li>
+                        <li><strong>Diminishing Value:</strong> Each additional unit is worth less to you</li>
+                    </ul>
+                    <p style="margin-top: 20px;"><strong>Key Point:</strong> This is an <strong style="color: #3B82F6;">INVERSE</strong> relationship - they move in OPPOSITE directions!</p>
+                `,
+                notes: "📝 Fill in: Law of Demand section",
+                graph: 'demand-only'
+            },
+            {
+                title: "The Demand Curve",
+                content: `
+                    <p>The demand curve is the visual representation of the law of demand.</p>
+                    <div class="demand-box highlight-box">
+                        <p style="margin: 0; font-size: 1.2rem;"><strong>The demand curve slopes DOWNWARD</strong> from left to right because of the inverse relationship.</p>
+                    </div>
+                    <p><strong>On the graph:</strong></p>
+                    <ul>
+                        <li><strong>Y-axis (vertical):</strong> PRICE</li>
+                        <li><strong>X-axis (horizontal):</strong> QUANTITY</li>
+                        <li><strong>The curve:</strong> Shows how much people buy at each price</li>
+                    </ul>
+                    <p><strong>Example:</strong> At $10, people buy 100 pizzas. At $5, they buy 200 pizzas.</p>
+                `,
+                notes: "📝 Note: Demand slopes DOWN, Y=Price, X=Quantity",
+                graph: 'demand-only'
+            },
+            {
+                title: "The Law of Supply",
+                content: `
+                    <div class="supply-box highlight-box">
+                        <h3 style="color: #991B1B; font-size: 1.4rem; margin-bottom: 15px;">The Law of Supply</h3>
+                        <p style="font-size: 1.3rem; margin: 0;">
+                            When PRICE increases → Quantity supplied INCREASES<br>
+                            When PRICE decreases → Quantity supplied DECREASES
+                        </p>
+                    </div>
+                    <p><strong>Why does this happen?</strong></p>
+                    <ul>
+                        <li><strong>Profit Motive:</strong> Higher prices = more profit = more production</li>
+                        <li><strong>New Sellers:</strong> High prices attract new businesses to enter</li>
+                        <li><strong>Existing Producers:</strong> Want to sell more when prices are high</li>
+                    </ul>
+                    <p style="margin-top: 20px;"><strong>Key Point:</strong> This is a <strong style="color: #EF4444;">DIRECT</strong> relationship - they move in the SAME direction!</p>
+                `,
+                notes: "📝 Fill in: Law of Supply section",
+                graph: 'supply-only'
+            },
+            {
+                title: "The Supply Curve",
+                content: `
+                    <p>The supply curve shows how much producers want to sell at different prices.</p>
+                    <div class="supply-box highlight-box">
+                        <p style="margin: 0; font-size: 1.2rem;"><strong>The supply curve slopes UPWARD</strong> from left to right because of the direct relationship.</p>
+                    </div>
+                    <p><strong>On the graph:</strong></p>
+                    <ul>
+                        <li>Same axes as demand (Y=Price, X=Quantity)</li>
+                        <li>BUT slopes in the opposite direction</li>
+                        <li>Shows producer behavior, not consumer behavior</li>
+                    </ul>
+                    <p><strong>Example:</strong> At $5, pizza shops only want to make 50 pizzas. At $15, they want to make 250 pizzas.</p>
+                `,
+                notes: "📝 Note: Supply slopes UP",
+                graph: 'supply-only'
+            },
+            {
+                title: "Comparing the Two Curves",
+                content: `
+                    <p>Here's how to keep them straight:</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0;">
+                        <div class="demand-box highlight-box">
+                            <h4 style="color: #1E40AF; margin-bottom: 10px;">📉 DEMAND</h4>
+                            <p><strong>Slopes:</strong> DOWNWARD ↘️</p>
+                            <p><strong>Relationship:</strong> INVERSE</p>
+                            <p><strong>Represents:</strong> Buyers/Consumers</p>
+                            <p><strong>Think:</strong> "I buy less when it costs more"</p>
+                        </div>
+                        <div class="supply-box highlight-box">
+                            <h4 style="color: #991B1B; margin-bottom: 10px;">📈 SUPPLY</h4>
+                            <p><strong>Slopes:</strong> UPWARD ↗️</p>
+                            <p><strong>Relationship:</strong> DIRECT</p>
+                            <p><strong>Represents:</strong> Sellers/Producers</p>
+                            <p><strong>Think:</strong> "I sell more when prices are high"</p>
+                        </div>
+                    </div>
+                `,
+                notes: "📝 Review: Make sure both laws are complete in your notes",
+                graph: 'both-curves'
+            },
+            {
+                title: "Reading Economic Graphs",
+                content: `
+                    <p><strong>Every supply and demand graph has the same setup:</strong></p>
+                    <div class="success-box highlight-box">
+                        <ul style="margin: 0;">
+                            <li><strong>Vertical axis (Y):</strong> Always PRICE</li>
+                            <li><strong>Horizontal axis (X):</strong> Always QUANTITY</li>
+                            <li><strong>Demand curve:</strong> Slopes DOWN (↘️)</li>
+                            <li><strong>Supply curve:</strong> Slopes UP (↗️)</li>
+                        </ul>
+                    </div>
+                    <p style="margin-top: 20px;"><strong>Pro tip:</strong> If you ever forget which is which, remember: 
+                    "<strong>D</strong>emand goes <strong>D</strong>own" and "Supply goes up toward the Sky!"</p>
+                `,
+                notes: "📝 Final check: Complete all Lesson 1 blanks",
+                graph: 'both-curves'
+            },
+            {
+                title: "You're Ready to Practice!",
+                content: `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">✅</div>
+                        <h2 style="color: #10B981; font-size: 2rem; margin-bottom: 20px;">Lesson 1 Complete!</h2>
+                        <p style="font-size: 1.3rem; line-height: 2; color: #64748B;">
+                            You now understand:<br>
+                            ✓ The Law of Demand (inverse relationship)<br>
+                            ✓ The Law of Supply (direct relationship)<br>
+                            ✓ How to read supply and demand graphs<br><br>
+                            Time to practice identifying these curves!
+                        </p>
+                        <div style="margin-top: 40px; padding: 30px; background: #FFFBEB; border: 3px solid #F59E0B; border-radius: 12px;">
+                            <p style="font-size: 1.2rem; color: #92400E; margin: 0; font-weight: 600;">
+                                📝 Make sure your Lesson 1 notes are complete!
+                            </p>
+                        </div>
+                    </div>
+                `,
+                notes: "",
+                graph: null
+            }
+        ];
+        
+        // ==================== PRACTICE QUESTIONS ====================
+        const practiceQuestions = [
+            {
+                question: "Which graph correctly shows the demand curve?",
+                graphs: [
+                    { type: 'demand-only', label: 'Downward slope' },
+                    { type: 'supply-only', label: 'Upward slope' },
+                    { type: 'horizontal', label: 'Horizontal line' },
+                    { type: 'vertical', label: 'Vertical line' }
+                ],
+                correct: 0,
+                explanation: "Demand slopes DOWNWARD because of the inverse relationship between price and quantity demanded."
+            },
+            {
+                question: "Which graph correctly shows the supply curve?",
+                graphs: [
+                    { type: 'demand-only', label: 'Downward slope' },
+                    { type: 'supply-only', label: 'Upward slope' },
+                    { type: 'horizontal', label: 'Horizontal line' },
+                    { type: 'vertical', label: 'Vertical line' }
+                ],
+                correct: 1,
+                explanation: "Supply slopes UPWARD because of the direct relationship between price and quantity supplied."
+            },
+            {
+                question: "What does the law of demand state?",
+                graphs: [
+                    { type: 'demand-only', label: 'Price ↑ → Qd ↓ (inverse)' },
+                    { type: 'supply-only', label: 'Price ↑ → Qs ↑ (direct)' },
+                    { type: 'horizontal', label: 'No relationship' },
+                    { type: 'vertical', label: 'Fixed quantity' }
+                ],
+                correct: 0,
+                explanation: "The law of demand shows an INVERSE relationship: when price increases, quantity demanded decreases."
+            },
+            {
+                question: "What does the law of supply state?",
+                graphs: [
+                    { type: 'demand-only', label: 'Price ↑ → Qd ↓' },
+                    { type: 'supply-only', label: 'Price ↑ → Qs ↑ (direct)' },
+                    { type: 'horizontal', label: 'No relationship' },
+                    { type: 'demand-shift-right', label: 'Shift right' }
+                ],
+                correct: 1,
+                explanation: "The law of supply shows a DIRECT relationship: when price increases, quantity supplied increases."
+            },
+            {
+                question: "On a supply and demand graph, what does the Y-axis represent?",
+                graphs: [
+                    { type: 'both-curves', label: 'PRICE (vertical axis)' },
+                    { type: 'demand-only', label: 'Quantity' },
+                    { type: 'supply-only', label: 'Time' },
+                    { type: 'horizontal', label: 'Consumers' }
+                ],
+                correct: 0,
+                explanation: "The Y-axis (vertical) ALWAYS represents PRICE on supply and demand graphs."
+            },
+            {
+                question: "Which curve represents CONSUMER behavior?",
+                graphs: [
+                    { type: 'demand-only', label: 'Demand (buyers)' },
+                    { type: 'supply-only', label: 'Supply (sellers)' },
+                    { type: 'both-curves', label: 'Both curves' },
+                    { type: 'horizontal', label: 'Neither curve' }
+                ],
+                correct: 0,
+                explanation: "The DEMAND curve shows consumer/buyer behavior - how much they want to purchase at different prices."
+            },
+            {
+                question: "Which curve represents PRODUCER behavior?",
+                graphs: [
+                    { type: 'demand-only', label: 'Demand (buyers)' },
+                    { type: 'supply-only', label: 'Supply (sellers)' },
+                    { type: 'both-curves', label: 'Both curves' },
+                    { type: 'vertical', label: 'Neither curve' }
+                ],
+                correct: 1,
+                explanation: "The SUPPLY curve shows producer/seller behavior - how much they want to produce at different prices."
+            },
+            {
+                question: "If pizza prices increase from $5 to $15, what happens to quantity demanded?",
+                graphs: [
+                    { type: 'demand-only', label: 'Quantity demanded DECREASES' },
+                    { type: 'supply-only', label: 'Quantity demanded INCREASES' },
+                    { type: 'horizontal', label: 'Stays the same' },
+                    { type: 'demand-shift-right', label: 'Demand curve shifts' }
+                ],
+                correct: 0,
+                explanation: "Higher prices → lower quantity demanded. This is the law of demand (inverse relationship)."
+            }
+        ];
+        
+        // ==================== GRAPH DRAWING ====================
+        function drawGraph(canvas, type) {
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            // Clear
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, w, h);
+            
+            // Grid
+            ctx.strokeStyle = '#E5E7EB';
+            ctx.lineWidth = 1;
+            for (let i = 1; i <= 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(40, 20 + i * 70);
+                ctx.lineTo(w - 20, 20 + i * 70);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(40 + i * 80, 20);
+                ctx.lineTo(40 + i * 80, h - 30);
+                ctx.stroke();
+            }
+            
+            // Axes
+            ctx.strokeStyle = '#1F2937';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(40, h - 30);
+            ctx.lineTo(w - 20, h - 30);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(40, h - 30);
+            ctx.lineTo(40, 20);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#1F2937';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('P', 15, 25);
+            ctx.fillText('Q', w - 25, h - 10);
+            
+            // Draw curves
+            if (type === 'demand-only' || type === 'both-curves') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#1E40AF';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText('D', 290, 215);
+            }
+            
+            if (type === 'supply-only' || type === 'both-curves') {
+                ctx.strokeStyle = '#EF4444';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(60, 210);
+                ctx.quadraticCurveTo(150, 120, 280, 40);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#991B1B';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText('S', 290, 45);
+            }
+            
+            if (type === 'horizontal') {
+                ctx.strokeStyle = '#6B7280';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 125);
+                ctx.lineTo(280, 125);
+                ctx.stroke();
+            }
+            
+            if (type === 'vertical') {
+                ctx.strokeStyle = '#6B7280';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(170, 40);
+                ctx.lineTo(170, 210);
+                ctx.stroke();
+            }
+            
+            if (type === 'demand-shift-right') {
+                ctx.strokeStyle = '#3B82F6';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(60, 40);
+                ctx.quadraticCurveTo(150, 120, 280, 210);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#818CF8';
+                ctx.setLineDash([8, 4]);
+                ctx.beginPath();
+                ctx.moveTo(100, 40);
+                ctx.quadraticCurveTo(190, 120, 320, 210);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+        
+        // ==================== LESSON FUNCTIONS ====================
+        function loadLesson() {
+            const slide = lessonSlides[state.currentSlide];
+            const isLast = state.currentSlide === lessonSlides.length - 1;
+            
+            let graphHTML = '';
+            if (slide.graph) {
+                graphHTML = `
+                    <div class="graph-container">
+                        <canvas id="lesson-graph" width="350" height="280"></canvas>
+                    </div>
+                `;
+            }
+            
+            let notesHTML = '';
+            if (slide.notes) {
+                notesHTML = `<div class="notes-reminder">${slide.notes}</div>`;
+            }
+            
+            document.getElementById('lesson-content').innerHTML = `
+                <div class="slide-counter">Slide ${state.currentSlide + 1} of ${lessonSlides.length}</div>
+                <h2 class="slide-title">${slide.title}</h2>
+                <div class="slide-content">
+                    ${slide.content}
+                    ${graphHTML}
+                    ${notesHTML}
+                </div>
+            `;
+            
+            if (slide.graph) {
+                setTimeout(() => {
+                    const canvas = document.getElementById('lesson-graph');
+                    if (canvas) drawGraph(canvas, slide.graph);
+                }, 100);
+            }
+            
+            document.getElementById('lesson-prev').style.display = state.currentSlide > 0 ? 'inline-block' : 'none';
+            document.getElementById('lesson-next').textContent = isLast ? 'Start Practice →' : 'Next →';
+        }
+        
+        function nextSlide() {
+            if (state.currentSlide < lessonSlides.length - 1) {
+                state.currentSlide++;
+                loadLesson();
+            } else {
+                showTab('practice');
+            }
+        }
+        
+        function previousSlide() {
+            if (state.currentSlide > 0) {
+                state.currentSlide--;
+                loadLesson();
+            }
+        }
+        
+        // ==================== PRACTICE FUNCTIONS ====================
+        function loadQuestion() {
+            const q = practiceQuestions[state.questionIndex];
+            
+            document.getElementById('question-number').textContent = state.questionIndex + 1;
+            document.getElementById('practice-content').innerHTML = `
+                <div class="question-box">
+                    <h4>${q.question}</h4>
+                    <div class="graph-options">
+                        ${q.graphs.map((g, i) => `
+                            <div class="graph-option" onclick="selectAnswer(${i})">
+                                <div class="option-label">${String.fromCharCode(65 + i)}</div>
+                                <canvas class="graph-canvas-small" width="320" height="280" id="graph-${i}"></canvas>
+                                <div class="graph-description">${g.label}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="showHint()" id="hint-btn">💡 Need a Hint?</button>
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                q.graphs.forEach((g, i) => {
+                    const canvas = document.getElementById(`graph-${i}`);
+                    if (canvas) drawGraph(canvas, g.type);
+                });
+            }, 100);
+            
+            document.getElementById('practice-feedback').classList.remove('show');
+            document.getElementById('practice-next').style.display = 'none';
+        }
+        
+        function selectAnswer(index) {
+            const q = practiceQuestions[state.questionIndex];
+            const options = document.querySelectorAll('.graph-option');
+            const feedback = document.getElementById('practice-feedback');
+            
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            
+            if (index === q.correct) {
+                options[index].classList.add('correct');
+                feedback.className = 'feedback correct show';
+                feedback.innerHTML = `<strong>🎉 Correct!</strong> ${q.explanation}`;
+                state.score++;
+            } else {
+                options[index].classList.add('incorrect');
+                options[q.correct].classList.add('correct');
+                feedback.className = 'feedback incorrect show';
+                feedback.innerHTML = `<strong>Not quite.</strong> ${q.explanation}`;
+            }
+            
+            document.getElementById('hint-btn').style.display = 'none';
+            setTimeout(() => {
+                document.getElementById('practice-next').style.display = 'inline-block';
+            }, 1500);
+        }
+        
+        function showHint() {
+            const q = practiceQuestions[state.questionIndex];
+            const feedback = document.getElementById('practice-feedback');
+            
+            let hint = '';
+            if (state.questionIndex <= 1) {
+                hint = '💡 <strong>Hint:</strong> Demand slopes DOWN, Supply slopes UP!';
+            } else if (state.questionIndex <= 3) {
+                hint = '💡 <strong>Hint:</strong> Inverse = opposite directions. Direct = same direction.';
+            } else if (state.questionIndex === 4) {
+                hint = '💡 <strong>Hint:</strong> Y-axis is always vertical (up and down).';
+            } else {
+                hint = '💡 <strong>Hint:</strong> Think about which group this describes - buyers or sellers?';
+            }
+            
+            feedback.className = 'feedback show';
+            feedback.style.background = '#FEF3C7';
+            feedback.style.color = '#92400E';
+            feedback.style.border = '2px solid #F59E0B';
+            feedback.innerHTML = hint;
+            
+            document.getElementById('hint-btn').style.display = 'none';
+        }
+        
+        function nextQuestion() {
+            state.questionIndex++;
+            if (state.questionIndex >= practiceQuestions.length) {
+                showResults();
+            } else {
+                loadQuestion();
+            }
+        }
+        
+        function showResults() {
+            const percent = Math.round((state.score / practiceQuestions.length) * 100);
+            
+            document.getElementById('practice-test').style.display = 'none';
+            document.getElementById('practice-results').style.display = 'block';
+            document.getElementById('practice-results').innerHTML = `
+                <div class="completion-badge">
+                    <h2>🎉 Lesson 1 Complete!</h2>
+                    <p>You've mastered the basics of supply and demand!</p>
+                </div>
+                
+                <div class="score-display">
+                    <div style="font-size: 1.4rem; opacity: 0.9;">Your Score</div>
+                    <div class="score-big">${percent}%</div>
+                    <div style="font-size: 1.3rem; opacity: 0.9;">${state.score} out of ${practiceQuestions.length} correct</div>
+                </div>
+                
+                <div style="text-align: center; margin: 40px 0; padding: 30px; background: #E0F2FE; border: 3px solid #0EA5E9; border-radius: 12px;">
+                    <p style="font-size: 1.3rem; color: #0C4A6E; margin: 0 0 20px 0; font-weight: 600;">
+                        📚 Ready for Lesson 2?
+                    </p>
+                    <p style="font-size: 1.1rem; color: #0C4A6E; margin: 0;">
+                        Next up: Market Equilibrium & Shifters<br>
+                        Learn what happens when supply and demand interact!
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="location.reload()">↺ Restart Lesson 1</button>
+                </div>
+            `;
+        }
+        
+        // ==================== TAB NAVIGATION ====================
+        function showTab(tabName) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById('panel-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'practice') {
+                loadQuestion();
+            }
+        }
+        
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLesson();
+        });
+    </script>
+</body>
+</html>
