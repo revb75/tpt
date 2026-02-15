@@ -2684,6 +2684,33 @@ function printCertificate() {
     printWindow.print();
 }
 
+// ==================== BONUS GAME ====================
+function initGame() {
+    const iframe = document.getElementById('game-frame');
+    if (!iframe || iframe.src) return; // Already loaded
+    
+    // Load the game HTML file from the same directory
+    iframe.src = 'dungeon-trader-final.html';
+    
+    // Add error handling
+    iframe.onload = function() {
+        console.log('🎮 Dungeon Trader game loaded successfully!');
+    };
+    
+    iframe.onerror = function() {
+        console.error('❌ Could not load game. Make sure dungeon-trader-final.html is in the same folder.');
+        iframe.parentElement.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #EF4444; background: #FEE2E2; border-radius: 8px;">
+                <h2>🎮 Game File Missing</h2>
+                <p style="margin-top: 10px; color: #666;">Make sure <strong>dungeon-trader-final.html</strong> is in the same folder as this file.</p>
+                <p style="margin-top: 10px; color: #666;">Both files should be together for the game to work!</p>
+            </div>
+        `;
+    };
+    
+    console.log('🎮 Loading Dungeon Trader...');
+}
+
 // ==================== INITIALIZE ====================
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize teacher preview mode
@@ -2706,33 +2733,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateProgress();
         
         console.log('🎓 All sections unlocked for teacher preview');
-    }
-    
-    // ==================== BONUS GAME ====================
-    function initGame() {
-        const iframe = document.getElementById('game-frame');
-        if (!iframe || iframe.src) return; // Already loaded
-        
-        // Load the game HTML file from the same directory
-        iframe.src = 'dungeon-trader-final.html';
-        
-        // Add error handling
-        iframe.onload = function() {
-            console.log('🎮 Dungeon Trader game loaded successfully!');
-        };
-        
-        iframe.onerror = function() {
-            console.error('❌ Could not load game. Make sure dungeon-trader-final.html is in the same folder.');
-            iframe.parentElement.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #EF4444; background: #FEE2E2; border-radius: 8px;">
-                    <h2>🎮 Game File Missing</h2>
-                    <p style="margin-top: 10px; color: #666;">Make sure <strong>dungeon-trader-final.html</strong> is in the same folder as this file.</p>
-                    <p style="margin-top: 10px; color: #666;">Both files should be together for the game to work!</p>
-                </div>
-            `;
-        };
-        
-        console.log('🎮 Loading Dungeon Trader...');
     }
     
     renderLesson();
