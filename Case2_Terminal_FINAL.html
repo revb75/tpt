@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FORENSIC PSYCHOLOGY CONSULTANCY - CASE FILE 01</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'IBM Plex Mono', 'Courier New', monospace;
+            padding: 0;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        /* CRT Screen Effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 255, 65, 0.03) 0px,
+                    rgba(0, 255, 65, 0.03) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
+            pointer-events: none;
+            z-index: 1000;
+            animation: scanline 8s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100%); }
+        }
+        
+        /* Screen flicker */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 255, 65, 0.02);
+            pointer-events: none;
+            z-index: 999;
+            animation: flicker 0.15s infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 0.05; }
+            50% { opacity: 0.08; }
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .boot-sequence {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .boot-sequence.hidden {
+            animation: fadeOut 0.5s ease forwards;
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; pointer-events: none; }
+        }
+        
+        .boot-line {
+            color: #00ff41;
+            margin: 4px 0;
+            opacity: 0;
+            animation: bootLine 0.3s ease forwards;
+        }
+        
+        @keyframes bootLine {
+            to { opacity: 1; }
+        }
+        
+        .header {
+            border: 2px solid #00ff41;
+            padding: 30px;
+            margin-bottom: 30px;
+            background: rgba(0, 255, 65, 0.03);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.7;
+            letter-spacing: 2px;
+        }
+        
+        .classified {
+            color: #ff0000;
+            font-weight: 700;
+            animation: blink 1.5s infinite;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        }
+        
+        @keyframes blink {
+            0%, 49%, 100% { opacity: 1; }
+            50%, 99% { opacity: 0; }
+        }
+        
+        .menu {
+            border: 1px solid #00ff41;
+            padding: 30px;
+            margin: 30px 0;
+            background: rgba(0, 255, 65, 0.02);
+        }
+        
+        .prompt {
+            color: #00ff41;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        .prompt::before {
+            content: "> ";
+            color: #00ff41;
+            text-shadow: 0 0 5px rgba(0, 255, 65, 0.8);
+        }
+        
+        .menu-item {
+            padding: 15px 20px;
+            margin: 8px 0;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .menu-item:hover {
+            background: rgba(0, 255, 65, 0.08);
+            border-left-color: #00ff41;
+            padding-left: 30px;
+            box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+        
+        .menu-item::before {
+            content: "[ ]";
+            margin-right: 10px;
+            color: #00ff41;
+            opacity: 0.5;
+        }
+        
+        .menu-item.viewed::before {
+            content: "[✓]";
+            opacity: 1;
+        }
+        
+        .menu-item:hover::before {
+            opacity: 1;
+        }
+        
+        .content-area {
+            border: 1px solid #00ff41;
+            padding: 40px;
+            min-height: 500px;
+            background: rgba(0, 255, 65, 0.01);
+            display: none;
+        }
+        
+        .content-area.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .doc-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #00ff41;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .loading::after {
+            content: "...";
+            animation: ellipsis 1.5s infinite;
+        }
+        
+        @keyframes ellipsis {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+        
+        .typing-text {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 18px;
+            background: #00ff41;
+            margin-left: 2px;
+            animation: cursorBlink 0.8s infinite;
+        }
+        
+        @keyframes cursorBlink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        
+        button {
+            background: transparent;
+            color: #00ff41;
+            border: 2px solid #00ff41;
+            padding: 12px 24px;
+            margin: 20px 10px 20px 0;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+        
+        button:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        hr {
+            border: none;
+            border-top: 1px solid #00ff41;
+            margin: 20px 0;
+            opacity: 0.3;
+        }
+        
+        .progress-bar {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #00ff41;
+            background: rgba(0, 255, 65, 0.02);
+        }
+        
+        .progress-bar .label {
+            font-size: 12px;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+        
+        .progress-dots {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .progress-dot {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #00ff41;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .progress-dot.completed {
+            background: #00ff41;
+            color: #000;
+            font-weight: 700;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+                letter-spacing: 2px;
+            }
+            
+            .header .subtitle {
+                font-size: 11px;
+            }
+            
+            .menu {
+                padding: 20px 15px;
+            }
+            
+            .menu-item {
+                padding: 12px 15px;
+                font-size: 13px;
+            }
+            
+            .menu-item:hover {
+                padding-left: 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+                font-size: 13px;
+            }
+            
+            .doc-header {
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+            
+            button {
+                padding: 10px 15px;
+                font-size: 11px;
+                margin: 10px 5px 10px 0;
+            }
+            
+            .boot-sequence {
+                padding: 20px;
+                font-size: 13px;
+            }
+            
+            .skip-hint {
+                font-size: 9px;
+                padding: 8px 10px;
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .progress-dot {
+                width: 25px;
+                height: 25px;
+                font-size: 11px;
+            }
+            
+            .progress-dots {
+                gap: 6px;
+            }
+        }
+        
+        @media print {
+            body { background: #fff; color: #000; }
+            body::before, body::after { display: none; }
+            .menu, button, .header { display: none; }
+            .content-area { display: block; border: 1px solid #000; }
+        }
+        
+        .skip-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            padding: 10px 15px;
+            font-size: 11px;
+            opacity: 0;
+            animation: fadeInHint 0.5s ease 2s forwards;
+            z-index: 100;
+        }
+        
+        @keyframes fadeInHint {
+            to { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Boot Sequence -->
+    <div class="boot-sequence" id="bootSeq">
+        <div class="boot-line" style="animation-delay: 0s;">> INITIALIZING FORENSIC DATABASE SYSTEM...</div>
+        <div class="boot-line" style="animation-delay: 0.5s;">> LOADING CASE FILES...</div>
+        <div class="boot-line" style="animation-delay: 1s;">> AUTHENTICATING CONSULTANT ACCESS...</div>
+        <div class="boot-line" style="animation-delay: 1.5s;">> DECRYPTING CLASSIFIED DOCUMENTS...</div>
+        <div class="boot-line" style="animation-delay: 2s;">> ESTABLISHING SECURE CONNECTION...</div>
+        <div class="boot-line" style="animation-delay: 2.5s;">> ACCESS GRANTED</div>
+        <div class="boot-line" style="animation-delay: 3s; color: #00ff41; font-weight: 700;">> WELCOME, CONSULTANT</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔬 FORENSIC PSYCHOLOGY CONSULTANCY</h1>
+            <p class="subtitle">SENSATION & PERCEPTION DIVISION</p>
+            <p style="margin-top: 15px; font-size: 12px;">CLEARANCE LEVEL: <span class="classified">[CONSULTANT]</span></p>
+            <p style="font-size: 11px; opacity: 0.5; margin-top: 5px;">CASE ACCESS: MODULE 18</p>
+        </div>
+
+        <!-- Document Menu -->
+        <div id="doc-menu" class="menu">
+            <div class="prompt">CASE FILE 02: THE TRAFFIC COLLISION</div>
+            <div class="progress-bar">
+                <div class="label">DOCUMENTS ACCESSED:</div>
+                <div class="progress-dots" id="progress"></div>
+            </div>
+            <div id="doc-menu-items">
+                <div class="menu-item" onclick="showDoc('intro')">● CASE BRIEFING</div>
+                <div class="menu-item" onclick="showDoc('doca')">● DOCUMENT A: Witness Statement</div>
+                <div class="menu-item" onclick="showDoc('docb')">● DOCUMENT B: Environmental Analysis</div>
+                <div class="menu-item" onclick="showDoc('docc')">● DOCUMENT C: Vision Science Reference</div>
+                <div class="menu-item" onclick="showDoc('docd')">● DOCUMENT D: Physical Evidence</div>
+            </div>
+        </div>
+
+        <!-- Content Display Area -->
+        <div id="content-area" class="content-area"></div>
+        <div id="button-area" style="display:none;">
+            <button id="back-btn" onclick="backToDocMenu()">← BACK TO DOCUMENTS</button>
+            <button id="print-btn" style="display:none;" onclick="window.print()">🖨️ PRINT</button>
+        </div>
+
+    </div>
+
+    <script>
+        let typingSpeed = 12;
+        let isTyping = false;
+        let skipTyping = false;
+        let documentsViewed = new Set();
+        
+        
+        const caseData = {
+            intro: `CASE FILE 02: THE TRAFFIC COLLISION
+INTERSECTION OF MAIN STREET & OAK AVENUE
+INCIDENT DATE: JUNE 8, 2024, 07:45 HOURS
+
+CASE SUMMARY:
+
+At approximately 07:45 hours, a two-vehicle collision occurred at the intersection of Main Street and Oak Avenue. Both drivers sustained minor injuries. Both vehicles sustained significant damage.
+
+Driver A (Sarah Chen, eastbound on Main Street) and Driver B (Michael Torres, northbound on Oak Avenue) both claim they entered the intersection on a green traffic signal.
+
+Traffic camera footage is inconclusive due to sun glare obscuring the traffic signals at the time of collision.
+
+DISPUTE:
+
+Driver A claims: "I had been stopped at a red light for 90 seconds, staring at it, waiting for it to turn green. When it turned green, I proceeded through the intersection. I am certain the light was green."
+
+Driver B claims: "I had a green light. She ran a red light and T-boned my vehicle."
+
+Insurance companies are in dispute regarding liability. Physical damage patterns are consistent with Driver B's vehicle striking Driver A's vehicle on the driver's side, suggesting Driver A may have been crossing the intersection when Driver B entered.
+
+YOUR ROLE:
+
+You have been retained as an independent forensic psychology consultant to analyze whether Driver A's perception of the traffic signal color could have been affected by prolonged viewing of the red signal immediately prior to the light change.
+
+Your expertise in color vision mechanisms and visual aftereffects is required.
+
+DOCUMENTS ATTACHED:
+- Document A: Driver A Statement (Sarah Chen)
+- Document B: Traffic Signal Data & Timeline
+- Document C: Color Vision Theory Reference
+- Document D: Research on Negative Afterimages
+
+CONFIDENTIALITY NOTICE: This case involves insurance litigation. Handle accordingly.`,
+            doca: `DOCUMENT A: DRIVER STATEMENT
+TRAFFIC COLLISION REPORT
+METROPOLITAN POLICE DEPARTMENT
+
+DRIVER: Sarah Chen
+AGE: 34
+VEHICLE: 2022 Honda Accord
+DIRECTION OF TRAVEL: Eastbound on Main Street
+INTERVIEWED BY: Officer Martinez
+DATE/TIME: June 8, 2024, 08:15 hours
+
+STATEMENT (Verbatim Transcript):
+
+"I was driving eastbound on Main Street, approaching the intersection with Oak Avenue. It was about 7:45 in the morning. I was running a bit late for work, so I was watching the time.
+
+The sun was really bright that morning. It was directly ahead of me, right on the eastern horizon. It was pretty annoying actually - I had to squint a bit even though I was wearing my sunglasses. But I could see fine.
+
+When I approached the intersection, the traffic light was red, so I came to a complete stop. I remember sitting there waiting for what felt like forever. I was looking right at that red light, just staring at it, waiting for it to change so I could get going.
+
+I actually checked my dashboard clock at one point - it said 7:44 AM. The light was still red. I kept watching it. I must have been sitting there for at least 90 seconds, maybe close to two minutes. My eyes were basically locked on that red light the whole time because I wanted to go the instant it changed.
+
+Finally, the light changed to GREEN. I'm absolutely certain about this. I saw it change from red to green with my own eyes. The moment I saw green, I took my foot off the brake and started accelerating forward into the intersection.
+
+That's when the other driver came out of nowhere from my right side and slammed into my door. I never saw his car coming until the moment of impact. Everything happened so fast.
+
+After the crash, I looked up at the traffic signal. It was showing green for my direction. I know I had the right of way. There's no way I would have gone through a red light. I'm a very careful driver - I've never even had a speeding ticket.
+
+I've been thinking about it all morning, trying to remember exactly what happened, and I keep seeing that green light in my mind. It was definitely green when I entered the intersection. I'm 100% certain."
+
+OFFICER'S OBSERVATIONAL NOTES:
+
+- Driver appeared shaken but coherent following collision
+- No signs of impairment (alcohol, drugs, medical emergency)
+- Driver was wearing prescription sunglasses at time of collision
+- Weather conditions: Clear, sunny, temperature 78°F
+- Sun position: Low on eastern horizon (approximately 15 degrees above horizon at 07:45 hours)
+- Driver's windshield was facing directly into sunrise
+- Driver A's vehicle damage: Significant impact to driver's side door and front quarter panel
+- Driver appeared genuinely confused about how collision occurred
+- Repeated claim of "100% certainty" regarding green light
+
+END OF STATEMENT`,
+            docb: `DOCUMENT B: TRAFFIC SIGNAL DATA & ENVIRONMENTAL CONDITIONS
+TRAFFIC ENGINEERING DEPARTMENT
+CITY OF METROPOLITAN
+
+INTERSECTION: Main Street & Oak Avenue
+DATE OF ANALYSIS: June 8, 2024
+ANALYST: Traffic Engineer David Park, P.E.
+
+SIGNAL TIMING SPECIFICATIONS:
+
+The traffic signal at Main Street & Oak Avenue operates on a fixed 120-second cycle.
+
+Main Street (East-West):
+- RED duration: 90 seconds
+- YELLOW duration: 3 seconds  
+- GREEN duration: 27 seconds
+
+Oak Avenue (North-South):
+- RED duration: 90 seconds
+- YELLOW duration: 3 seconds
+- GREEN duration: 27 seconds
+
+SIGNAL LOG - JUNE 8, 2024:
+
+Based on signal controller data:
+
+07:43:00 - Main St RED, Oak Ave GREEN
+07:44:30 - Main St RED, Oak Ave GREEN (Driver A arrives at intersection based on witness account)
+07:45:00 - Main St GREEN, Oak Ave RED (Signal changes)
+07:45:27 - Main St YELLOW, Oak Ave RED
+07:45:30 - Main St RED, Oak Ave GREEN
+
+COLLISION TIMING:
+
+Based on physical evidence, vehicle damage patterns, and witness accounts, collision occurred at approximately 07:45:30 (±3 seconds).
+
+At 07:45:30, traffic signal status was:
+- Main Street: RED
+- Oak Avenue: GREEN
+
+CRITICAL TIMELINE ANALYSIS:
+
+If Driver A entered intersection at 07:45:00 when light turned green (as she claims), she would have had right of way and the collision timing doesn't match physical evidence.
+
+Physical evidence suggests collision occurred 30 seconds after Main Street light turned green, which would be 3 seconds after light turned red again.
+
+ENVIRONMENTAL CONDITIONS:
+
+Sun Position:
+- Azimuth: 88 degrees (nearly due east)
+- Elevation: 15 degrees above horizon
+- Sun intensity: 95,000 lux (extremely bright, clear day, no clouds)
+- Sun direction: Directly aligned with eastbound Main Street traffic
+
+Visual Conditions for Driver A:
+- Windshield facing directly into sunrise
+- Sun glare on windshield confirmed by post-collision inspection
+- Driver wearing sunglasses (per witness statement)
+- Driver's eyes fixated on red traffic light for approximately 90 seconds prior to light change
+
+TRAFFIC SIGNAL SPECIFICATIONS:
+
+Signal housing: Standard gray metal enclosure
+Signal lenses: 12-inch diameter, LED array
+Colors: Red (upper), Yellow (middle), Green (lower)
+Red LED wavelength: 625 nm (standard red)
+Green LED wavelength: 530 nm (standard green)
+
+RELEVANT VISUAL PHENOMENA (Educational Reference Only):
+
+When the human eye is exposed to intense colored light for extended periods (typically 60+ seconds), the photoreceptors and neural pathways responding to that color can become temporarily fatigued. This is a well-documented physiological effect.
+
+Upon looking at a neutral-colored surface (such as white, gray, or bright sunlight) after prolonged exposure to a specific color, observers commonly experience what is known as a "negative afterimage" or "complementary afterimage."
+
+The afterimage appears in the complementary color:
+- After viewing RED → observer sees CYAN/GREEN afterimage
+- After viewing GREEN → observer sees MAGENTA/RED afterimage  
+- After viewing BLUE → observer sees YELLOW/ORANGE afterimage
+
+This phenomenon is automatic and occurs due to opponent-process mechanisms in the visual system. It is not under conscious control.
+
+Duration: Afterimages typically persist for 8-20 seconds depending on the intensity and duration of the original stimulus.
+
+ENVIRONMENTAL NOTE:
+
+At 07:45 hours on June 8, there was intense sun glare conditions. Bright sunlight reflecting off the traffic signal housing and Driver A's windshield would have created areas of bright white/gray light in the visual field.
+
+This report presents factual data and timing information. Interpretation regarding Driver A's perception requires expert analysis from vision science professionals.
+
+END OF REPORT`,
+            docc: `DOCUMENT C: COLOR VISION THEORY REFERENCE
+PREPARED FOR LEGAL CONSULTATION
+SOURCE: Vision Research Institute
+
+This document provides general scientific information about human color vision theories. These are established principles in vision science and do not constitute opinion about any specific case.
+
+SECTION 1: TRICHROMATIC THEORY OF COLOR VISION
+
+The Trichromatic Theory (Young-Helmholtz Theory) explains the initial stage of color perception at the photoreceptor level.
+
+BASIC PRINCIPLE:
+
+The human retina contains three types of cone photoreceptors, each containing different photopigment proteins that respond maximally to different wavelengths of light.
+
+THE THREE CONE TYPES:
+
+S-Cones (Short wavelength):
+- Peak sensitivity: ~420 nanometers
+- Color association: Blue
+- Proportion: ~6-7% of all cones
+- Distribution: Sparse throughout retina
+
+M-Cones (Medium wavelength):
+- Peak sensitivity: ~530 nanometers  
+- Color association: Green
+- Proportion: ~33% of all cones
+- Distribution: Concentrated in fovea
+
+L-Cones (Long wavelength):
+- Peak sensitivity: ~560 nanometers
+- Color association: Red (though peak is actually yellow-green)
+- Proportion: ~60% of all cones
+- Distribution: Concentrated in fovea
+
+COLOR PERCEPTION MECHANISM:
+
+Color is perceived through comparison of activation levels across the three cone types. For example:
+
+- Pure red light (625nm) → Strong L-cone response, weak M-cone response, minimal S-cone response
+- Pure green light (530nm) → Strong M-cone response, moderate L-cone response, minimal S-cone response  
+- Pure blue light (420nm) → Strong S-cone response, weak M and L-cone response
+
+The brain interprets color based on the RATIO of responses across the three cone types, not absolute activation levels.
+
+SECTION 2: OPPONENT-PROCESS THEORY
+
+The Opponent-Process Theory (Hering) explains the neural processing of color information AFTER the cone receptors.
+
+BASIC PRINCIPLE:
+
+After cones transduce light into neural signals, the visual system organizes color information into three opponent channels. Each channel processes two opposing colors that cannot be perceived simultaneously.
+
+THE THREE OPPONENT CHANNELS:
+
+Channel 1: Red versus Green
+- Some neurons are excited by red light and inhibited by green light
+- Other neurons are excited by green light and inhibited by red light
+- Result: You cannot perceive "reddish-green" (the sensations are mutually exclusive)
+
+Channel 2: Blue versus Yellow
+- Some neurons are excited by blue light and inhibited by yellow light
+- Other neurons are excited by yellow light and inhibited by blue light
+- Result: You cannot perceive "bluish-yellow"
+
+Channel 3: Black versus White (Brightness)
+- Some neurons are excited by light and inhibited by darkness
+- Other neurons are excited by darkness and inhibited by light
+- This channel processes luminance/brightness information
+
+NEURAL MECHANISM:
+
+The opponent channels receive input from multiple cone types. For example:
+- Red-Green channel: Receives input from (L-cones minus M-cones)
+- Blue-Yellow channel: Receives input from (S-cones minus L+M cones)
+
+SECTION 3: NEGATIVE AFTERIMAGES
+
+Negative afterimages (also called complementary afterimages) are a direct consequence of opponent-process mechanisms.
+
+PHYSIOLOGICAL BASIS:
+
+When one color in an opponent pair is viewed for an extended period (typically 30-90 seconds), the neurons responding to that color become fatigued through several mechanisms:
+
+1. Photopigment depletion in cones
+2. Neural adaptation in retinal ganglion cells
+3. Adaptation in lateral geniculate nucleus (LGN)
+4. Cortical adaptation in visual cortex
+
+MECHANISM EXAMPLE (Red Stimulus):
+
+When viewing red light for 60-90 seconds:
+
+Step 1: L-cones are strongly activated
+Step 2: Red-opponent neurons (excited by red) fire continuously
+Step 3: These neurons become fatigued/adapted (reduced response)
+Step 4: Green-opponent neurons (inhibited by red) have reduced inhibition
+
+When gaze shifts to neutral surface (white/gray):
+
+Step 5: Both red and green opponent neurons receive balanced input
+Step 6: But red neurons are fatigued (weakened response)
+Step 7: Green neurons dominate (normal response)
+Step 8: Result: GREEN perception on neutral surface
+
+This is NOT an optical illusion - it is a physiological response occurring at the neural level.
+
+COMPLEMENTARY COLOR PAIRS:
+
+The afterimage appears in the complementary color because these are the opponent pairs:
+- Red stimulus → Cyan/Green afterimage (opponents in Red-Green channel)
+- Green stimulus → Magenta/Red afterimage (opponents in Red-Green channel)
+- Blue stimulus → Yellow afterimage (opponents in Blue-Yellow channel)
+- Yellow stimulus → Blue afterimage (opponents in Blue-Yellow channel)
+
+DURATION AND INTENSITY:
+
+Afterimage duration depends on:
+- Original viewing duration (longer viewing = longer afterimage)
+- Original stimulus intensity (brighter = stronger afterimage)
+- Background surface brightness
+
+Typical parameters:
+- 30-second viewing: 5-10 second afterimage
+- 60-second viewing: 10-15 second afterimage  
+- 90-second viewing: 15-20 second afterimage
+
+CRITICAL DISTINCTION:
+
+Afterimages appear on NEUTRAL surfaces (white, gray, bright light). If a true colored stimulus is present, it generally dominates perception. However, if the colored stimulus is ambiguous, obscured, or viewed under challenging conditions (glare, distance, brief duration), the afterimage can influence color judgments.
+
+SECTION 4: PERCEPTUAL FACTORS
+
+Research has documented that afterimages can interact with:
+- Expectation (if you expect to see a certain color, afterimage may be interpreted as that color)
+- Context (surrounding colors and lighting can enhance or reduce afterimage visibility)
+- Attention (directing attention to afterimage makes it more noticeable)
+
+SECTION 5: INDIVIDUAL DIFFERENCES
+
+Afterimage strength and duration vary between individuals based on:
+- Age (children show stronger afterimages than elderly adults)
+- Color vision status (colorblind individuals show different patterns)
+- Fatigue and alertness levels
+- Ambient lighting conditions
+
+This document presents general principles of color vision science. Application to specific cases requires analysis of all relevant factors by qualified experts.
+
+END OF REFERENCE MATERIALS
+
+DISCLAIMER: This document does not constitute analysis or opinion regarding any specific incident.`,
+            docd: `DOCUMENT D: RESEARCH DATA - NEGATIVE AFTERIMAGES
+JOURNAL OF VISION, VOL. 23(4), 2023
+TITLE: "Color Adaptation and Afterimage Persistence in Traffic Signal Contexts"
+
+ABSTRACT:
+
+We investigated the characteristics of negative afterimages induced by viewing traffic signal colors under conditions similar to real driving. Participants (n=120) viewed red, yellow, or green LED traffic signals for varying durations and reported afterimage experiences.
+
+METHODOLOGY:
+
+Participants:
+- 120 adults (ages 22-65)
+- Normal color vision (confirmed by Ishihara test)
+- Valid driver's licenses
+
+Apparatus:
+- Standard 12-inch LED traffic signals (same type used at most intersections)
+- Red LED: 625nm wavelength
+- Green LED: 530nm wavelength
+- Darkened room with controlled lighting
+
+Procedure:
+Participants fixated on illuminated traffic signal for specified duration (30s, 60s, 90s, or 120s), then signal was turned off and participants viewed a neutral gray screen. They reported:
+- Whether they saw an afterimage
+- Color of afterimage
+- Duration of afterimage
+- Intensity rating (1-10 scale)
+
+EXPERIMENT 1: BASIC AFTERIMAGE CHARACTERISTICS
+
+RESULTS - Afterimage Occurrence by Viewing Duration:
+
+30-second fixation:
+- 62% reported seeing an afterimage
+- Mean intensity rating: 4.2/10
+- Mean duration: 6.3 seconds
+
+60-second fixation:
+- 89% reported seeing an afterimage
+- Mean intensity rating: 6.8/10
+- Mean duration: 10.7 seconds
+
+90-second fixation:
+- 96% reported seeing an afterimage  
+- Mean intensity rating: 8.1/10
+- Mean duration: 11.2 seconds
+
+120-second fixation:
+- 98% reported seeing an afterimage
+- Mean intensity rating: 8.9/10
+- Mean duration: 12.4 seconds
+
+RESULTS - Afterimage Color Accuracy:
+
+RED stimulus → CYAN/GREEN afterimage:
+- 94% correctly identified afterimage as cyan/green
+- 6% reported other colors or no color
+
+GREEN stimulus → MAGENTA/PINK afterimage:
+- 91% correctly identified afterimage as magenta/pink
+- 9% reported other colors or no color
+
+YELLOW stimulus → BLUE/PURPLE afterimage:
+- 88% correctly identified afterimage as blue/purple
+- 12% reported other colors or no color
+
+EXPERIMENT 2: AFTERIMAGES UNDER BRIGHT AMBIENT LIGHT
+
+To simulate daylight driving conditions, the experiment was repeated with bright ambient lighting (10,000 lux simulating daylight).
+
+RESULTS:
+
+Afterimage visibility was REDUCED but still present:
+- 78% of participants reported seeing afterimages after 90-second viewing
+- Intensity ratings reduced by approximately 30%
+- Duration reduced by approximately 20%
+- Color identification accuracy remained high (87%)
+
+CRITICAL FINDING: Even under bright daylight conditions simulating real traffic scenarios, the majority of participants experienced afterimages after prolonged viewing.
+
+EXPERIMENT 3: "PERCEPTUAL CONFUSION" PARADIGM
+
+Participants viewed red traffic signal for 90 seconds, then immediately viewed an AMBIGUOUS stimulus: a gray traffic signal lens with bright white light (simulating sun glare) superimposed.
+
+Participants were asked: "What color is this traffic signal - red or green?"
+
+RESULTS:
+
+CONDITION A - No suggestive instructions:
+- 43% incorrectly identified the stimulus as GREEN
+- 48% correctly identified as gray/ambiguous  
+- 9% identified as red
+
+CONDITION B - Asked "Is it safe to proceed?" (implies expectation of green):
+- 67% incorrectly identified the stimulus as GREEN
+- 28% identified as gray/ambiguous
+- 5% identified as red
+
+CONDITION C - Participants asked to view stimulus a second time more carefully:
+- 89% corrected their initial response
+- Upon careful examination, most recognized the signal was not actually green
+
+INTERPRETATION:
+
+When participants experienced a strong green afterimage (from red adaptation) combined with:
+1. An ambiguous visual stimulus (glare obscuring actual signal)
+2. Expectation that signal "should" turn green (after long wait)
+
+They were highly prone to misidentifying the ambiguous stimulus as green, despite it being objectively gray or red.
+
+Importantly, this was NOT a conscious decision - participants genuinely reported seeing green and expressed surprise when shown the stimulus was not green.
+
+EXPERIMENT 4: TIME COURSE ANALYSIS
+
+Examined how quickly afterimages could influence perception after adaptation.
+
+RESULTS:
+
+Afterimage effects on perception were strongest within first 3-10 seconds after adaptation.
+
+After 90-second red adaptation:
+- 0-3 seconds: 72% misidentified ambiguous stimulus as green
+- 3-6 seconds: 58% misidentified as green  
+- 6-10 seconds: 39% misidentified as green
+- 10-15 seconds: 18% misidentified as green
+- >15 seconds: 7% misidentified as green
+
+DISCUSSION:
+
+The researchers conclude:
+
+"Negative afterimages represent a genuine physiological phenomenon that can create false perceptions of color, particularly when:
+
+1. The adaptation stimulus is viewed for 60+ seconds
+2. The subsequent stimulus is ambiguous due to glare, motion, or brief viewing
+3. The observer has expectations aligned with the afterimage color
+4. The judgment is made within 3-10 seconds of the adaptation period
+
+In traffic contexts, prolonged viewing of a red signal followed by sun glare or brief viewing of the signal could create conditions where a driver genuinely perceives green when the signal is red or ambiguous.
+
+This is not a failure of attention or memory - it is an automatic sensory consequence of neural adaptation in the color vision system. Drivers in this situation would have high subjective confidence in their perception despite it being inaccurate."
+
+LIMITATIONS:
+
+- Laboratory study may not fully replicate real driving conditions
+- Participants knew they were in experiment (may have altered attention)
+- No distraction or divided attention conditions tested
+
+CONCLUSIONS:
+
+This research demonstrates that prolonged viewing of colored traffic signals can create negative afterimages that persist for 8-15 seconds and can influence color judgments under ambiguous viewing conditions.
+
+Observers report high confidence in these false color perceptions, suggesting afterimage-based errors may be difficult for drivers to detect or correct in real-time.
+
+END OF RESEARCH SUMMARY`
+        };
+
+        
+        function typeWriter(element, text, callback) {
+            if (skipTyping) {
+                element.innerHTML = text.replace(/\n/g, '<br>');
+                if (callback) callback();
+                return;
+            }
+            
+            isTyping = true;
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (skipTyping || i >= text.length) {
+                    element.innerHTML = text.replace(/\n/g, '<br>');
+                    isTyping = false;
+                    if (callback) callback();
+                    return;
+                }
+                
+                if (text.charAt(i) === '\n') {
+                    element.innerHTML += '<br>';
+                } else {
+                    element.innerHTML += text.charAt(i);
+                }
+                i++;
+                
+                setTimeout(type, typingSpeed);
+            }
+            
+            type();
+        }
+        
+        document.addEventListener('click', (e) => {
+            if (isTyping && !e.target.closest('button') && !e.target.closest('.menu-item')) {
+                skipTyping = true;
+            }
+        });
+        
+        function showDoc(docKey) {
+            documentsViewed.add(docKey);
+            skipTyping = false;
+            
+            // Mark menu item as viewed
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                if (item.textContent.includes(docKey.toUpperCase().replace('DOC', 'DOCUMENT '))) {
+                    item.classList.add('viewed');
+                }
+            });
+            
+            const contentArea = document.getElementById('content-area');
+            const buttonArea = document.getElementById('button-area');
+            
+            document.getElementById('doc-menu').style.display = 'none';
+            contentArea.classList.add('active');
+            buttonArea.style.display = 'block';
+            
+            const docTitles = {
+                intro: 'CASE BRIEFING',
+                doca: 'DOCUMENT A: WITNESS STATEMENT',
+                docb: 'DOCUMENT B: ENVIRONMENTAL ANALYSIS',
+                docc: 'DOCUMENT C: VISION SCIENCE REFERENCE',
+                docd: 'DOCUMENT D: PHYSICAL EVIDENCE',
+                worksheet: 'ANALYSIS WORKSHEET'
+            };
+            
+            contentArea.innerHTML = `<div class="doc-header">> LOADING DOCUMENT<span class="loading"></span></div>`;
+            
+            setTimeout(() => {
+                contentArea.innerHTML = `<div class="doc-header">${docTitles[docKey]}</div><hr><div id="typing-target" class="typing-text"></div>`;
+                typeWriter(document.getElementById('typing-target'), caseData[docKey]);
+            }, 500);
+            
+            updateProgress();
+        }
+        
+        function backToDocMenu() {
+            document.getElementById('content-area').classList.remove('active');
+            document.getElementById('button-area').style.display = 'none';
+            document.getElementById('doc-menu').style.display = 'block';
+            skipTyping = true;
+        }
+        
+        function updateProgress() {
+            const progressDiv = document.getElementById('progress');
+            const docs = ['intro', 'doca', 'docb', 'docc', 'docd'];
+            progressDiv.innerHTML = docs.map((doc, i) => 
+                `<div class="progress-dot ${documentsViewed.has(doc) ? 'completed' : ''}">${i + 1}</div>`
+            ).join('');
+        }
+        
+        setTimeout(() => {
+            document.getElementById('bootSeq').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('bootSeq').style.display = 'none';
+            }, 500);
+        }, 3500);
+        
+        updateProgress();
+    </script>
+</body>
+</html>

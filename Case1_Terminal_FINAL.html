@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FORENSIC PSYCHOLOGY CONSULTANCY - CASE FILE 01</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'IBM Plex Mono', 'Courier New', monospace;
+            padding: 0;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        /* CRT Screen Effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 255, 65, 0.03) 0px,
+                    rgba(0, 255, 65, 0.03) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
+            pointer-events: none;
+            z-index: 1000;
+            animation: scanline 8s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100%); }
+        }
+        
+        /* Screen flicker */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 255, 65, 0.02);
+            pointer-events: none;
+            z-index: 999;
+            animation: flicker 0.15s infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 0.05; }
+            50% { opacity: 0.08; }
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .boot-sequence {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .boot-sequence.hidden {
+            animation: fadeOut 0.5s ease forwards;
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; pointer-events: none; }
+        }
+        
+        .boot-line {
+            color: #00ff41;
+            margin: 4px 0;
+            opacity: 0;
+            animation: bootLine 0.3s ease forwards;
+        }
+        
+        @keyframes bootLine {
+            to { opacity: 1; }
+        }
+        
+        .header {
+            border: 2px solid #00ff41;
+            padding: 30px;
+            margin-bottom: 30px;
+            background: rgba(0, 255, 65, 0.03);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.7;
+            letter-spacing: 2px;
+        }
+        
+        .classified {
+            color: #ff0000;
+            font-weight: 700;
+            animation: blink 1.5s infinite;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        }
+        
+        @keyframes blink {
+            0%, 49%, 100% { opacity: 1; }
+            50%, 99% { opacity: 0; }
+        }
+        
+        .menu {
+            border: 1px solid #00ff41;
+            padding: 30px;
+            margin: 30px 0;
+            background: rgba(0, 255, 65, 0.02);
+        }
+        
+        .prompt {
+            color: #00ff41;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        .prompt::before {
+            content: "> ";
+            color: #00ff41;
+            text-shadow: 0 0 5px rgba(0, 255, 65, 0.8);
+        }
+        
+        .menu-item {
+            padding: 15px 20px;
+            margin: 8px 0;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .menu-item:hover {
+            background: rgba(0, 255, 65, 0.08);
+            border-left-color: #00ff41;
+            padding-left: 30px;
+            box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+        
+        .menu-item::before {
+            content: "[ ]";
+            margin-right: 10px;
+            color: #00ff41;
+            opacity: 0.5;
+        }
+        
+        .menu-item.viewed::before {
+            content: "[✓]";
+            opacity: 1;
+        }
+        
+        .menu-item:hover::before {
+            opacity: 1;
+        }
+        
+        .content-area {
+            border: 1px solid #00ff41;
+            padding: 40px;
+            min-height: 500px;
+            background: rgba(0, 255, 65, 0.01);
+            display: none;
+        }
+        
+        .content-area.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .doc-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #00ff41;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .loading::after {
+            content: "...";
+            animation: ellipsis 1.5s infinite;
+        }
+        
+        @keyframes ellipsis {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+        
+        .typing-text {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 18px;
+            background: #00ff41;
+            margin-left: 2px;
+            animation: cursorBlink 0.8s infinite;
+        }
+        
+        @keyframes cursorBlink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        
+        button {
+            background: transparent;
+            color: #00ff41;
+            border: 2px solid #00ff41;
+            padding: 12px 24px;
+            margin: 20px 10px 20px 0;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+        
+        button:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        hr {
+            border: none;
+            border-top: 1px solid #00ff41;
+            margin: 20px 0;
+            opacity: 0.3;
+        }
+        
+        .progress-bar {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #00ff41;
+            background: rgba(0, 255, 65, 0.02);
+        }
+        
+        .progress-bar .label {
+            font-size: 12px;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+        
+        .progress-dots {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .progress-dot {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #00ff41;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .progress-dot.completed {
+            background: #00ff41;
+            color: #000;
+            font-weight: 700;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+                letter-spacing: 2px;
+            }
+            
+            .header .subtitle {
+                font-size: 11px;
+            }
+            
+            .menu {
+                padding: 20px 15px;
+            }
+            
+            .menu-item {
+                padding: 12px 15px;
+                font-size: 13px;
+            }
+            
+            .menu-item:hover {
+                padding-left: 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+                font-size: 13px;
+            }
+            
+            .doc-header {
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+            
+            button {
+                padding: 10px 15px;
+                font-size: 11px;
+                margin: 10px 5px 10px 0;
+            }
+            
+            .boot-sequence {
+                padding: 20px;
+                font-size: 13px;
+            }
+            
+            .skip-hint {
+                font-size: 9px;
+                padding: 8px 10px;
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .progress-dot {
+                width: 25px;
+                height: 25px;
+                font-size: 11px;
+            }
+            
+            .progress-dots {
+                gap: 6px;
+            }
+        }
+        
+        @media print {
+            body { background: #fff; color: #000; }
+            body::before, body::after { display: none; }
+            .menu, button, .header { display: none; }
+            .content-area { display: block; border: 1px solid #000; }
+        }
+        
+        .skip-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            padding: 10px 15px;
+            font-size: 11px;
+            opacity: 0;
+            animation: fadeInHint 0.5s ease 2s forwards;
+            z-index: 100;
+        }
+        
+        @keyframes fadeInHint {
+            to { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Boot Sequence -->
+    <div class="boot-sequence" id="bootSeq">
+        <div class="boot-line" style="animation-delay: 0s;">> INITIALIZING FORENSIC DATABASE SYSTEM...</div>
+        <div class="boot-line" style="animation-delay: 0.5s;">> LOADING CASE FILES...</div>
+        <div class="boot-line" style="animation-delay: 1s;">> AUTHENTICATING CONSULTANT ACCESS...</div>
+        <div class="boot-line" style="animation-delay: 1.5s;">> DECRYPTING CLASSIFIED DOCUMENTS...</div>
+        <div class="boot-line" style="animation-delay: 2s;">> ESTABLISHING SECURE CONNECTION...</div>
+        <div class="boot-line" style="animation-delay: 2.5s;">> ACCESS GRANTED</div>
+        <div class="boot-line" style="animation-delay: 3s; color: #00ff41; font-weight: 700;">> WELCOME, CONSULTANT</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔬 FORENSIC PSYCHOLOGY CONSULTANCY</h1>
+            <p class="subtitle">SENSATION & PERCEPTION DIVISION</p>
+            <p style="margin-top: 15px; font-size: 12px;">CLEARANCE LEVEL: <span class="classified">[CONSULTANT]</span></p>
+            <p style="font-size: 11px; opacity: 0.5; margin-top: 5px;">CASE ACCESS: MODULES 17-18</p>
+        </div>
+
+        <!-- Document Menu -->
+        <div id="doc-menu" class="menu">
+            <div class="prompt">CASE FILE 01: THE DARK MUSEUM HEIST</div>
+            <div class="progress-bar">
+                <div class="label">DOCUMENTS ACCESSED:</div>
+                <div class="progress-dots" id="progress"></div>
+            </div>
+            <div id="doc-menu-items">
+                <div class="menu-item" onclick="showDoc('intro')">● CASE BRIEFING</div>
+                <div class="menu-item" onclick="showDoc('doca')">● DOCUMENT A: Witness Statement</div>
+                <div class="menu-item" onclick="showDoc('docb')">● DOCUMENT B: Environmental Analysis</div>
+                <div class="menu-item" onclick="showDoc('docc')">● DOCUMENT C: Vision Science Reference</div>
+                <div class="menu-item" onclick="showDoc('docd')">● DOCUMENT D: Physical Evidence</div>
+            </div>
+        </div>
+
+        <!-- Content Display Area -->
+        <div id="content-area" class="content-area"></div>
+        <div id="button-area" style="display:none;">
+            <button id="back-btn" onclick="backToDocMenu()">← BACK TO DOCUMENTS</button>
+            <button id="print-btn" style="display:none;" onclick="window.print()">🖨️ PRINT</button>
+        </div>
+
+    </div>
+
+    <script>
+        let typingSpeed = 12;
+        let isTyping = false;
+        let skipTyping = false;
+        let documentsViewed = new Set();
+        
+        const caseData = {
+            intro: `CASE FILE 01: THE DARK MUSEUM HEIST
+METROPOLITAN ART MUSEUM - GALLERY 3
+INCIDENT DATE: MARCH 15, 2024, 02:17 HOURS
+
+CASE SUMMARY:
+
+At approximately 02:17 hours, a painting valued at $2,000,000 was stolen from Gallery 3 of the Metropolitan Art Museum. The stolen item was a replica of Johannes Vermeer's "Girl with a Pearl Earring."
+
+Suspect Jason Torres (34) was apprehended three blocks from the museum at 02:35 hours. At time of arrest, Torres was wearing a gray hooded jacket, dark jeans, and black sneakers.
+
+WITNESS TESTIMONY:
+
+Primary witness Marcus Williams (52), employed as night security guard for eight years, claims to have observed the suspect fleeing Gallery 3. Williams positively identified Torres in a subsequent photo lineup.
+
+DISPUTE:
+
+Williams states with "100% certainty" that the fleeing suspect was wearing a BRIGHT RED hooded jacket. Physical evidence shows Torres's jacket is medium gray (Pantone Cool Gray 9).
+
+Defense counsel argues the identification is unreliable due to environmental conditions at the time of observation.
+
+YOUR ROLE:
+
+You have been retained as an independent forensic psychology consultant to analyze the reliability of the eyewitness testimony. Your expertise in visual perception and human sensory limitations is required to provide an expert opinion to the court.
+
+Review all evidence documents and prepare a professional analysis.
+
+DOCUMENTS ATTACHED:
+- Document A: Witness Statement (Marcus Williams)
+- Document B: Crime Scene Environmental Analysis
+- Document C: Vision Science Reference Materials
+- Document D: Physical Evidence Analysis
+
+CONFIDENTIALITY NOTICE: This case file contains sensitive information. Handle accordingly.`,
+
+            doca: `DOCUMENT A: WITNESS STATEMENT
+METROPOLITAN POLICE DEPARTMENT
+INCIDENT REPORT - WITNESS INTERVIEW
+
+WITNESS: Marcus Williams
+AGE: 52
+OCCUPATION: Night Security Guard, Metropolitan Art Museum
+YEARS EMPLOYED: 8 years
+INTERVIEWED BY: Detective Sarah Rodriguez
+DATE/TIME: March 15, 2024, 02:30 hours
+
+STATEMENT (Verbatim Transcript):
+
+"I've been working night security at the Metropolitan Museum for eight years. I know every inch of this building. I take my responsibilities very seriously and I've never had an incident like this before.
+
+On the night of March 15th, I was on duty in the main security office located on the first floor. The security office has standard fluorescent overhead lighting that remains on throughout my shift. I need the bright lighting to monitor the security camera feeds clearly. The lights are quite bright - I'd say similar to a typical office during business hours.
+
+At exactly 02:17 hours - I noted the time on the security monitor - I heard what sounded like breaking glass. The sound came from the direction of Gallery 3. I should mention that our alarm system experienced some kind of malfunction that night, because it didn't trigger immediately even though I clearly heard the glass break.
+
+I knew immediately something was wrong. I jumped up from my desk and ran toward Gallery 3 as fast as I could. To reach Gallery 3 from the security office, you have to go down the main corridor. We keep all corridor and gallery lights turned off during overnight hours - it's a cost-saving measure the museum implemented about two years ago. The only illumination in the corridors comes from the red emergency EXIT signs that are required by fire code.
+
+As I ran down the corridor, my eyes were adjusting to the darkness, but it was extremely dark. The transition from the bright office to the dark corridor was quite jarring. When I reached the entrance to Gallery 3, I observed a figure running toward the emergency exit at the back of the gallery.
+
+Now, here's what I am absolutely certain about: The individual I observed was wearing a hooded jacket that was BRIGHT RED in color. The red color was vivid and stood out clearly to me. I remember thinking it was unusual - why would someone wear such a conspicuous color while committing a crime? The brightness of the red jacket is what allowed me to see the person at all in the dark gallery.
+
+I pursued the individual, but they pushed through the emergency exit door and escaped into the parking lot. By the time I reached the parking lot, they had vanished into the darkness. I couldn't see which direction they went.
+
+The entire event, from hearing the glass break to losing sight of the suspect, lasted perhaps 30 to 45 seconds. But I got a clear look at that jacket. The red color is burned into my memory.
+
+When the police arrested Mr. Torres a short time later and showed me his photograph, I immediately recognized him. But I was confused when I saw that his jacket was gray, not red. However, I'm certain the person I saw in the museum was wearing a bright red jacket. Perhaps he changed jackets, or perhaps the police arrested the wrong person. All I know is what I saw - and I saw a bright red jacket.
+
+I understand the defense is questioning my observations, but I have excellent vision. I had my annual eye exam just two months ago and my vision is 20/20 with my prescription glasses, which I was wearing that night. I've been a security professional for nearly a decade, and I'm trained to observe and remember details.
+
+I am 100% certain about what I saw."
+
+DETECTIVE'S OBSERVATIONAL NOTES:
+- Witness appeared calm, coherent, and cooperative
+- No indication of impairment (alcohol, drugs, or medical emergency)
+- Witness wore prescription eyeglasses during interview
+- Clean employment record; no disciplinary issues
+- No apparent motive to provide false testimony
+- Witness expressed frustration that suspect's jacket color didn't match his recollection
+- Repeated claim of "100% certainty" multiple times during interview
+
+END OF STATEMENT`,
+
+            docb: `DOCUMENT B: ENVIRONMENTAL CONDITIONS ANALYSIS
+CRIME SCENE INVESTIGATION UNIT
+METROPOLITAN POLICE DEPARTMENT
+
+CASE NUMBER: 2024-03-15-0217
+LOCATION: Metropolitan Art Museum, First Floor
+DATE OF ANALYSIS: March 15, 2024, 03:15 hours
+ANALYST: Crime Scene Technician James Chen, Badge #4472
+
+FACILITY LAYOUT:
+
+The Metropolitan Art Museum first floor consists of:
+- Central security office (16' × 20')
+- Main corridor (8' wide × 75' long)
+- Gallery 3 (40' × 50')
+- Emergency exit (rear of Gallery 3)
+
+Distance from security office to Gallery 3: Approximately 75 feet
+
+LIGHTING MEASUREMENTS (Taken at 03:15 hours - same conditions as incident):
+
+SECURITY OFFICE:
+- Illumination level: 500 lux (measured with calibrated light meter)
+- Source: Eight fluorescent tube fixtures (overhead, 4000K color temperature)
+- Classification: Very bright office lighting
+- Comparable to: Standard commercial office space, retail store lighting
+
+MAIN CORRIDOR:
+- Illumination level: 0.5 lux
+- Source: Two red emergency EXIT signs (LED, 625nm wavelength)
+- Classification: Nearly complete darkness
+- Comparable to: Moonless night, deep twilight
+
+GALLERY 3:
+- Illumination level: 0.3 lux  
+- Source: One red emergency EXIT sign (rear wall)
+- Classification: Extremely dim
+- Comparable to: Heavily overcast night with no ambient light sources
+
+EXTERIOR PARKING LOT:
+- Illumination level: 0.2 lux
+- Source: None (overcast sky, no moon visible)
+- Weather conditions: Overcast, no precipitation
+
+REFERENCE SCALE - LUX MEASUREMENTS:
+
+For reference and comparison:
+- 500 lux: Bright office, retail store, well-lit workspace
+- 100 lux: Dimly lit office, living room with lamps
+- 50 lux: Minimum recommended for casual reading
+- 10 lux: Deep twilight, dimly lit corridor
+- 1 lux: Threshold of darkness, barely visible shadows
+- 0.3 lux: Moonless night, near pitch-black conditions
+
+TIMELINE RECONSTRUCTION:
+
+Based on security footage timestamps and witness account:
+
+02:15:00 - Marcus Williams at desk in security office (500 lux environment)
+02:17:00 - Glass breaking sound detected; Williams stands
+02:17:06 - Williams exits security office, enters corridor (elapsed: 6 seconds)
+          Transition from 500 lux → 0.5 lux
+02:17:28 - Williams reaches Gallery 3 entrance (elapsed: 28 seconds in low light)
+          Now in 0.3 lux environment
+02:17:35 - Williams reports observing individual in "red jacket" (elapsed: 35 seconds)
+02:18:15 - Individual exits via emergency door; Williams pursues
+
+TOTAL TIME IN LOW-LIGHT ENVIRONMENT BEFORE OBSERVATION: 28 seconds
+
+ADDITIONAL ENVIRONMENTAL FACTORS:
+
+- Red EXIT signs emit monochromatic light at approximately 625 nanometers (red wavelength)
+- No other light sources present in corridor or gallery
+- Gallery walls: neutral gray paint (low reflectivity)
+- Floor surface: polished concrete (some reflectivity, but minimal in low light)
+- No windows in Gallery 3 (interior gallery space)
+
+PHOTOMETRIC NOTES:
+
+Standard references indicate:
+- Human cone photoreceptors (responsible for color vision) require minimum 10 lux for activation
+- Rod photoreceptors (responsible for low-light vision) can function at levels below 1 lux
+- Complete dark adaptation (transition from bright to dark environment) typically requires 20-30 minutes for full rod sensitivity
+
+WITNESS DARK ADAPTATION TIME: 28 seconds (per timeline above)
+
+This report contains factual measurements only. Interpretation of how these conditions may have affected witness perception should be conducted by qualified vision science experts.
+
+END OF REPORT`,
+
+            docc: `DOCUMENT C: VISION SCIENCE REFERENCE MATERIALS
+PREPARED FOR LEGAL CONSULTATION
+SOURCE: National Institute of Vision Research
+
+This document provides general scientific information about human visual perception. These are established principles in vision science and do not constitute opinion about any specific case.
+
+SECTION 1: PHOTORECEPTORS AND THEIR FUNCTIONS
+
+The human retina contains two distinct types of photoreceptor cells: rods and cones. These cells serve different functions and operate under different conditions.
+
+ROD PHOTORECEPTORS:
+
+Rods are highly sensitive photoreceptor cells that enable vision in low-light conditions. Key characteristics include:
+
+- Number: Approximately 120 million rod cells per human retina
+- Distribution: Concentrated in peripheral retina; absent from central fovea
+- Light sensitivity: Can detect individual photons; functional at light levels as low as 0.001 lux
+- Chemical mechanism: Contain light-sensitive protein called rhodopsin (also called "visual purple")
+- Response time: Slow response; require 20-30 minutes for maximum sensitivity after bright light exposure
+- Wavelength sensitivity: Respond to light across visible spectrum but cannot distinguish between wavelengths
+- Color perception: Provide NO color information; output is achromatic (grayscale)
+- Function: Enable scotopic vision (night vision)
+
+CONE PHOTORECEPTORS:
+
+Cones are less sensitive photoreceptor cells that enable color vision and fine detail perception. Key characteristics include:
+
+- Number: Approximately 6-7 million cone cells per human retina
+- Distribution: Concentrated in central fovea; sparse in peripheral retina
+- Light sensitivity: Require approximately 10 lux minimum for activation; optimal function at 100+ lux
+- Types: Three types (S-cones, M-cones, L-cones) responding to short, medium, and long wavelengths
+- Wavelength sensitivity: S-cones peak ~420nm (blue), M-cones peak ~530nm (green), L-cones peak ~560nm (red)
+- Color perception: Brain compares outputs from three cone types to determine color
+- Response time: Fast response; adapt within seconds
+- Function: Enable photopic vision (daytime color vision)
+
+SECTION 2: SCOTOPIC VS PHOTOPIC VISION
+
+SCOTOPIC VISION (Rod-mediated):
+- Occurs at light levels below approximately 0.01 lux
+- Provides only black-and-white (achromatic) perception
+- No color discrimination possible
+- Lower visual acuity compared to photopic vision
+- Peripheral vision dominant
+
+PHOTOPIC VISION (Cone-mediated):
+- Occurs at light levels above approximately 10 lux
+- Provides full color perception
+- High visual acuity
+- Central vision dominant
+
+MESOPIC VISION (Mixed rod and cone):
+- Occurs at intermediate light levels (0.01 - 10 lux)
+- Both rods and cones active, but cone function limited
+- Reduced color perception
+- Transition zone between scotopic and photopic vision
+
+SECTION 3: DARK ADAPTATION
+
+Dark adaptation refers to the process by which the eye adjusts to low light levels after exposure to bright light.
+
+PHYSIOLOGICAL PROCESS:
+
+When the eye is exposed to bright light, rhodopsin in rod cells becomes depleted ("bleached"). Recovery occurs through:
+
+1. Regeneration of rhodopsin from its components
+2. Increased sensitivity of rod neural pathways
+3. Pupil dilation (increases light entering eye)
+
+TIME COURSE:
+
+- First 5-10 minutes: Cone adaptation (limited improvement)
+- 20-30 minutes: Full rod adaptation (maximum sensitivity)
+- At 28 seconds: Approximately 1-2% of full dark adaptation achieved
+
+FUNCTIONAL IMPLICATIONS:
+
+During incomplete dark adaptation:
+- Visual sensitivity is severely reduced
+- Fine detail perception is impaired
+- Object identification is difficult
+- Color perception depends entirely on available light levels (if below 10 lux, cones non-functional)
+
+SECTION 4: COLOR PERCEPTION MECHANISMS
+
+Human color perception requires:
+
+1. Sufficient illumination (minimum ~10 lux for cone activation)
+2. Functional cone photoreceptors (not available in scotopic conditions)
+3. Light containing color information (multiple wavelengths)
+
+WAVELENGTH AND COLOR:
+
+Visible light spectrum ranges from approximately 380nm (violet) to 750nm (red). Color perception occurs when:
+- Different wavelengths stimulate different cone types differentially
+- Brain processes relative activation levels across three cone types
+- Adequate light levels allow cone responses above neural noise threshold
+
+MONOCHROMATIC LIGHT:
+
+When only a single wavelength is present (such as red LED light at 625nm):
+- Only L-cones and M-cones respond significantly
+- S-cones have minimal response
+- Objects can only be perceived as varying shades of red and black
+- True color cannot be determined (e.g., a gray object reflecting red light appears reddish)
+
+SECTION 5: ABSOLUTE THRESHOLD
+
+The absolute threshold is the minimum light level required for detection or perception. 
+
+For color discrimination:
+- Minimum illumination: Approximately 10 lux
+- Below this level: Cone photoreceptors do not generate reliable signals
+- Result: No color information available to visual system
+
+For object detection (light/dark discrimination):
+- Minimum illumination: Approximately 0.001 lux (under ideal dark adaptation)
+- Rod photoreceptors can function at extremely low light levels
+- Shape and movement can be detected
+- No color information available
+
+SECTION 6: PERCEPTUAL SET AND EXPECTATION
+
+Note: While this section describes a psychological phenomenon, it is included for completeness. This represents established research but does not constitute analysis of any specific case.
+
+Perceptual set refers to the tendency for expectations, context, and prior experience to influence perception. Research has documented:
+
+- Observers sometimes report perceiving stimuli consistent with expectations even when stimuli differ from expectations
+- Context (including recently viewed colors) can influence color perception
+- Confidence in perceptions does not necessarily correlate with accuracy
+- Strong expectations can create false perceptions, particularly under ambiguous viewing conditions
+
+This is a general principle in perception research and applies across many perceptual domains.
+
+END OF REFERENCE MATERIALS
+
+DISCLAIMER: This document presents general scientific principles. Application to specific cases requires expert analysis considering all relevant factors.`,
+
+            docd: `DOCUMENT D: PHYSICAL EVIDENCE - JACKET ANALYSIS
+FORENSIC LABORATORY SERVICES
+CASE NUMBER: 2024-03-15-0217
+
+EVIDENCE ITEM: Hooded jacket recovered from suspect Jason Torres
+ITEM NUMBER: EVIDENCE-2024-0315-07
+ANALYST: Dr. Patricia Lee, Forensic Scientist
+DATE: March 16, 2024
+
+PHYSICAL DESCRIPTION:
+
+Item received: One hooded sweatshirt-style jacket with front zipper
+Size: Men's Large
+Material composition: 65% cotton, 35% polyester blend
+Color: Medium gray (objectively measured, see spectroscopy below)
+Condition: Clean, no visible stains, normal wear
+Surface finish: Matte (non-reflective)
+Brand markings: Generic manufacturer tag present
+
+OBJECTIVE COLOR MEASUREMENT:
+
+Standard color reference: Pantone Cool Gray 9
+Digital colorimetry: RGB values (133, 133, 133)
+L*a*b* values: L*=55.3, a*=0.1, b*=-0.8
+Classification: Neutral medium gray, no significant color bias
+
+SPECTROPHOTOMETRIC ANALYSIS:
+
+The jacket was analyzed using calibrated spectrophotometer to measure reflectance across the visible spectrum (380-750nm).
+
+RESULTS:
+
+Wavelength range (nm) | Reflectance (%)
+----------------------|----------------
+380-450 (blue)       | 28-32%
+450-550 (green)      | 29-33%
+550-650 (yellow-red) | 30-34%
+650-750 (red)        | 31-35%
+
+INTERPRETATION:
+
+The fabric reflects all visible wavelengths approximately equally, with reflectance values in the 28-35% range across the entire spectrum. This is consistent with a neutral gray color. There is NO preferential reflection of any particular wavelength range.
+
+For comparison: A true red fabric would show reflectance of 60-80% in the 650-750nm range and much lower reflectance (<20%) in shorter wavelength ranges.
+
+VIEWING CONDITION TESTING:
+
+The jacket was photographed and viewed under various lighting conditions to document its appearance:
+
+TEST 1: Standard office lighting (500 lux, white fluorescent)
+- Visual appearance: Medium gray
+- No color distortion observed
+- Color matches Pantone reference
+
+TEST 2: Dim interior lighting (50 lux, incandescent)
+- Visual appearance: Darker gray
+- Color saturation reduced but still clearly gray
+- No false color perception
+
+TEST 3: Low-light conditions (5 lux, white LED)
+- Visual appearance: Dark gray
+- Reduced contrast and detail
+- Gray color still distinguishable
+
+TEST 4: Very low-light conditions (0.3 lux, no direct illumination)
+- Visual appearance: Nearly black silhouette
+- No color distinguishable by human observer
+- Details not visible
+- Fabric appears as dark shape only
+
+TEST 5: Monochromatic red illumination (625nm LED, simulating emergency EXIT sign)
+- Visual appearance: Reddish gray
+- Fabric reflects the red wavelength light source
+- Creates appearance of red tint on gray surface
+- This is a REFLECTION of the light source color, not the fabric's inherent color
+- Comparable to viewing any gray object under red light
+
+CONTROL COMPARISON:
+
+For comparison, we tested an actual red jacket (true red fabric, Pantone Red 032):
+
+Under white light (500 lux):
+- Spectrophotometry shows 70% reflectance at 650-750nm
+- Clear bright red appearance
+- Visually distinct from gray jacket
+
+Under red LED light (625nm, simulating EXIT sign):
+- Strong red appearance (reflects red light efficiently)
+- Noticeably different from gray jacket under same conditions
+- Gray jacket shows minimal red reflection; true red jacket shows strong reflection
+
+OBSERVER PERCEPTION TESTING:
+
+Twenty volunteers were asked to identify jacket color under various conditions:
+
+CONDITION A: 0.5 lux with red EXIT signs only, no priming
+Asked: "What color is this jacket?"
+Results: 
+- 14 reported "gray" or "dark gray"
+- 3 reported "reddish-gray" or "gray with red tint"
+- 3 reported "black" or "very dark"
+- 0 reported "bright red"
+
+CONDITION B: 0.5 lux with red EXIT signs, observers told "look for someone in red"
+Asked: "What color is this jacket?"
+Results:
+- 11 reported "gray" or "dark"
+- 9 reported "reddish" or "red"
+- 0 reported "bright red" (most who said "red" qualified it as "sort of red" or "maybe red")
+
+CONDITION C: 0.5 lux with red EXIT signs, observers told "The suspect wore red. Is this the right jacket?"
+Results:
+- 13 reported "could be red" or "might be red, hard to tell"
+- 5 reported "doesn't look red to me"
+- 2 reported "yes, looks red"
+
+Note: When lights were turned to full brightness after viewing, 100% of observers in all conditions immediately identified the jacket as gray.
+
+CONCLUSIONS:
+
+Physical evidence analysis:
+1. The jacket is objectively gray (Pantone Cool Gray 9)
+2. Spectrophotometry confirms neutral reflectance across all wavelengths
+3. Under 0.3 lux illumination, jacket appears as dark silhouette with no distinguishable color
+4. Under red monochromatic light, jacket reflects red light (as would any gray surface)
+5. No evidence of red dye, red coloring, or preferential red wavelength reflection
+
+Observer testing suggests:
+- Viewing under red emergency lighting can create appearance of red tint
+- Expectations and suggestions can influence color perception reports under ambiguous conditions
+- High confidence does not necessarily indicate accurate perception under poor viewing conditions
+
+This analysis presents objective measurements and controlled observations. Interpretation regarding specific witness testimony should be conducted by experts in human perception and memory.
+
+END OF LABORATORY REPORT`
+        };
+        
+        function typeWriter(element, text, callback) {
+            if (skipTyping) {
+                element.innerHTML = text.replace(/\n/g, '<br>');
+                if (callback) callback();
+                return;
+            }
+            
+            isTyping = true;
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (skipTyping || i >= text.length) {
+                    element.innerHTML = text.replace(/\n/g, '<br>');
+                    isTyping = false;
+                    if (callback) callback();
+                    return;
+                }
+                
+                if (text.charAt(i) === '\n') {
+                    element.innerHTML += '<br>';
+                } else {
+                    element.innerHTML += text.charAt(i);
+                }
+                i++;
+                
+                setTimeout(type, typingSpeed);
+            }
+            
+            type();
+        }
+        
+        document.addEventListener('click', (e) => {
+            if (isTyping && !e.target.closest('button') && !e.target.closest('.menu-item')) {
+                skipTyping = true;
+            }
+        });
+        
+        function showDoc(docKey) {
+            documentsViewed.add(docKey);
+            skipTyping = false;
+            
+            // Mark menu item as viewed
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                if (item.textContent.includes(docKey.toUpperCase().replace('DOC', 'DOCUMENT '))) {
+                    item.classList.add('viewed');
+                }
+            });
+            
+            const contentArea = document.getElementById('content-area');
+            const buttonArea = document.getElementById('button-area');
+            
+            document.getElementById('doc-menu').style.display = 'none';
+            contentArea.classList.add('active');
+            buttonArea.style.display = 'block';
+            
+            const docTitles = {
+                intro: 'CASE BRIEFING',
+                doca: 'DOCUMENT A: WITNESS STATEMENT',
+                docb: 'DOCUMENT B: ENVIRONMENTAL ANALYSIS',
+                docc: 'DOCUMENT C: VISION SCIENCE REFERENCE',
+                docd: 'DOCUMENT D: PHYSICAL EVIDENCE',
+                worksheet: 'ANALYSIS WORKSHEET'
+            };
+            
+            contentArea.innerHTML = `<div class="doc-header">> LOADING DOCUMENT<span class="loading"></span></div>`;
+            
+            setTimeout(() => {
+                contentArea.innerHTML = `<div class="doc-header">${docTitles[docKey]}</div><hr><div id="typing-target" class="typing-text"></div>`;
+                typeWriter(document.getElementById('typing-target'), caseData[docKey]);
+            }, 500);
+            
+            updateProgress();
+        }
+        
+        function backToDocMenu() {
+            document.getElementById('content-area').classList.remove('active');
+            document.getElementById('button-area').style.display = 'none';
+            document.getElementById('doc-menu').style.display = 'block';
+            skipTyping = true;
+        }
+        
+        function updateProgress() {
+            const progressDiv = document.getElementById('progress');
+            const docs = ['intro', 'doca', 'docb', 'docc', 'docd'];
+            progressDiv.innerHTML = docs.map((doc, i) => 
+                `<div class="progress-dot ${documentsViewed.has(doc) ? 'completed' : ''}">${i + 1}</div>`
+            ).join('');
+        }
+        
+        setTimeout(() => {
+            document.getElementById('bootSeq').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('bootSeq').style.display = 'none';
+            }, 500);
+        }, 3500);
+        
+        updateProgress();
+    </script>
+</body>
+</html>

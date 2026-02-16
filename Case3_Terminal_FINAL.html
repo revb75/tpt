@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FORENSIC PSYCHOLOGY CONSULTANCY - CASE FILE 01</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'IBM Plex Mono', 'Courier New', monospace;
+            padding: 0;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        /* CRT Screen Effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 255, 65, 0.03) 0px,
+                    rgba(0, 255, 65, 0.03) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
+            pointer-events: none;
+            z-index: 1000;
+            animation: scanline 8s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100%); }
+        }
+        
+        /* Screen flicker */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 255, 65, 0.02);
+            pointer-events: none;
+            z-index: 999;
+            animation: flicker 0.15s infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 0.05; }
+            50% { opacity: 0.08; }
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .boot-sequence {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .boot-sequence.hidden {
+            animation: fadeOut 0.5s ease forwards;
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; pointer-events: none; }
+        }
+        
+        .boot-line {
+            color: #00ff41;
+            margin: 4px 0;
+            opacity: 0;
+            animation: bootLine 0.3s ease forwards;
+        }
+        
+        @keyframes bootLine {
+            to { opacity: 1; }
+        }
+        
+        .header {
+            border: 2px solid #00ff41;
+            padding: 30px;
+            margin-bottom: 30px;
+            background: rgba(0, 255, 65, 0.03);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.7;
+            letter-spacing: 2px;
+        }
+        
+        .classified {
+            color: #ff0000;
+            font-weight: 700;
+            animation: blink 1.5s infinite;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        }
+        
+        @keyframes blink {
+            0%, 49%, 100% { opacity: 1; }
+            50%, 99% { opacity: 0; }
+        }
+        
+        .menu {
+            border: 1px solid #00ff41;
+            padding: 30px;
+            margin: 30px 0;
+            background: rgba(0, 255, 65, 0.02);
+        }
+        
+        .prompt {
+            color: #00ff41;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        .prompt::before {
+            content: "> ";
+            color: #00ff41;
+            text-shadow: 0 0 5px rgba(0, 255, 65, 0.8);
+        }
+        
+        .menu-item {
+            padding: 15px 20px;
+            margin: 8px 0;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .menu-item:hover {
+            background: rgba(0, 255, 65, 0.08);
+            border-left-color: #00ff41;
+            padding-left: 30px;
+            box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+        
+        .menu-item::before {
+            content: "[ ]";
+            margin-right: 10px;
+            color: #00ff41;
+            opacity: 0.5;
+        }
+        
+        .menu-item.viewed::before {
+            content: "[✓]";
+            opacity: 1;
+        }
+        
+        .menu-item:hover::before {
+            opacity: 1;
+        }
+        
+        .content-area {
+            border: 1px solid #00ff41;
+            padding: 40px;
+            min-height: 500px;
+            background: rgba(0, 255, 65, 0.01);
+            display: none;
+        }
+        
+        .content-area.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .doc-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #00ff41;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .loading::after {
+            content: "...";
+            animation: ellipsis 1.5s infinite;
+        }
+        
+        @keyframes ellipsis {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+        
+        .typing-text {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 18px;
+            background: #00ff41;
+            margin-left: 2px;
+            animation: cursorBlink 0.8s infinite;
+        }
+        
+        @keyframes cursorBlink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        
+        button {
+            background: transparent;
+            color: #00ff41;
+            border: 2px solid #00ff41;
+            padding: 12px 24px;
+            margin: 20px 10px 20px 0;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+        
+        button:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        hr {
+            border: none;
+            border-top: 1px solid #00ff41;
+            margin: 20px 0;
+            opacity: 0.3;
+        }
+        
+        .progress-bar {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #00ff41;
+            background: rgba(0, 255, 65, 0.02);
+        }
+        
+        .progress-bar .label {
+            font-size: 12px;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+        
+        .progress-dots {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .progress-dot {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #00ff41;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .progress-dot.completed {
+            background: #00ff41;
+            color: #000;
+            font-weight: 700;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+                letter-spacing: 2px;
+            }
+            
+            .header .subtitle {
+                font-size: 11px;
+            }
+            
+            .menu {
+                padding: 20px 15px;
+            }
+            
+            .menu-item {
+                padding: 12px 15px;
+                font-size: 13px;
+            }
+            
+            .menu-item:hover {
+                padding-left: 20px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
+                font-size: 13px;
+            }
+            
+            .doc-header {
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+            
+            button {
+                padding: 10px 15px;
+                font-size: 11px;
+                margin: 10px 5px 10px 0;
+            }
+            
+            .boot-sequence {
+                padding: 20px;
+                font-size: 13px;
+            }
+            
+            .skip-hint {
+                font-size: 9px;
+                padding: 8px 10px;
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .progress-dot {
+                width: 25px;
+                height: 25px;
+                font-size: 11px;
+            }
+            
+            .progress-dots {
+                gap: 6px;
+            }
+        }
+        
+        @media print {
+            body { background: #fff; color: #000; }
+            body::before, body::after { display: none; }
+            .menu, button, .header { display: none; }
+            .content-area { display: block; border: 1px solid #000; }
+        }
+        
+        .skip-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            padding: 10px 15px;
+            font-size: 11px;
+            opacity: 0;
+            animation: fadeInHint 0.5s ease 2s forwards;
+            z-index: 100;
+        }
+        
+        @keyframes fadeInHint {
+            to { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Boot Sequence -->
+    <div class="boot-sequence" id="bootSeq">
+        <div class="boot-line" style="animation-delay: 0s;">> INITIALIZING FORENSIC DATABASE SYSTEM...</div>
+        <div class="boot-line" style="animation-delay: 0.5s;">> LOADING CASE FILES...</div>
+        <div class="boot-line" style="animation-delay: 1s;">> AUTHENTICATING CONSULTANT ACCESS...</div>
+        <div class="boot-line" style="animation-delay: 1.5s;">> DECRYPTING CLASSIFIED DOCUMENTS...</div>
+        <div class="boot-line" style="animation-delay: 2s;">> ESTABLISHING SECURE CONNECTION...</div>
+        <div class="boot-line" style="animation-delay: 2.5s;">> ACCESS GRANTED</div>
+        <div class="boot-line" style="animation-delay: 3s; color: #00ff41; font-weight: 700;">> WELCOME, CONSULTANT</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔬 FORENSIC PSYCHOLOGY CONSULTANCY</h1>
+            <p class="subtitle">SENSATION & PERCEPTION DIVISION</p>
+            <p style="margin-top: 15px; font-size: 12px;">CLEARANCE LEVEL: <span class="classified">[CONSULTANT]</span></p>
+            <p style="font-size: 11px; opacity: 0.5; margin-top: 5px;">CASE ACCESS: MODULE 19</p>
+        </div>
+
+        <!-- Document Menu -->
+        <div id="doc-menu" class="menu">
+            <div class="prompt">CASE FILE 03: THE APARTMENT INCIDENT</div>
+            <div class="progress-bar">
+                <div class="label">DOCUMENTS ACCESSED:</div>
+                <div class="progress-dots" id="progress"></div>
+            </div>
+            <div id="doc-menu-items">
+                <div class="menu-item" onclick="showDoc('intro')">● CASE BRIEFING</div>
+                <div class="menu-item" onclick="showDoc('doca')">● DOCUMENT A: Witness Statement</div>
+                <div class="menu-item" onclick="showDoc('docb')">● DOCUMENT B: Environmental Analysis</div>
+                <div class="menu-item" onclick="showDoc('docc')">● DOCUMENT C: Vision Science Reference</div>
+                <div class="menu-item" onclick="showDoc('docd')">● DOCUMENT D: Physical Evidence</div>
+            </div>
+        </div>
+
+        <!-- Content Display Area -->
+        <div id="content-area" class="content-area"></div>
+        <div id="button-area" style="display:none;">
+            <button id="back-btn" onclick="backToDocMenu()">← BACK TO DOCUMENTS</button>
+            <button id="print-btn" style="display:none;" onclick="window.print()">🖨️ PRINT</button>
+        </div>
+
+    </div>
+
+    <script>
+        let typingSpeed = 12;
+        let isTyping = false;
+        let skipTyping = false;
+        let documentsViewed = new Set();
+        
+        
+        const caseData = {
+            intro: `CASE FILE 03: THE APARTMENT INCIDENT
+RIVERSIDE APARTMENTS, BUILDING 3
+INCIDENT DATE: OCTOBER 12, 2024, 23:00 HOURS
+
+CASE SUMMARY:
+
+At approximately 23:00 hours, three gunshots were fired inside Riverside Apartments, Building 3. Multiple residents called 911 reporting gunfire.
+
+Police response located three spent shell casings in Apartment 3B (first floor, center unit). Suspect was apprehended fleeing the building. A 9mm handgun was recovered.
+
+No injuries reported. Ballistic analysis confirmed all three shots were fired from the recovered weapon inside Apartment 3B.
+
+WITNESS TESTIMONY DISCREPANCIES:
+
+Two key witnesses provided conflicting accounts of the incident:
+
+Witness 1 - Resident of Apartment 3A (first floor, directly adjacent to 3B):
+Claims: "I heard THREE gunshots. They came from ABOVE me - directly overhead. The sound was HIGH-PITCHED, like a small caliber weapon."
+
+Witness 2 - Resident of Apartment 4B (second floor, directly above 3B):
+Claims: "I heard TWO gunshots. They came from BELOW me. The sound was DEEP and BOOMING, like a large caliber weapon."
+
+VERIFIED FACTS:
+
+- Physical evidence: THREE shots fired (three shell casings recovered)
+- Location: Apartment 3B (first floor)
+- Weapon: 9mm pistol (medium frequency sound signature)
+- Building layout: Standard hallway configuration with hard surfaces
+
+DISPUTE:
+
+Both witnesses are confident in their accounts. Both are wrong about either the number of shots, the location of shots, or the sound characteristics - or all three.
+
+YOUR ROLE:
+
+You have been retained as an independent forensic psychology consultant to analyze how acoustic properties of the building and limitations of human auditory localization could explain these discrepancies.
+
+Your expertise in auditory perception and sound localization is required.
+
+DOCUMENTS ATTACHED:
+- Document A: Witness Statements
+- Document B: Building Acoustic Analysis
+- Document C: Auditory Localization Principles
+- Document D: Experimental Data on Sound Localization
+
+CONFIDENTIALITY NOTICE: This case involves potential criminal proceedings. Handle accordingly.`,
+            doca: `DOCUMENT A: WITNESS STATEMENTS
+METROPOLITAN POLICE DEPARTMENT
+INCIDENT REPORT - WITNESS INTERVIEWS
+
+WITNESS 1: Jennifer Martinez
+AGE: 42
+RESIDENCE: Apartment 3A, Riverside Apartments Building 3
+INTERVIEWED BY: Detective James Wilson
+DATE/TIME: October 12, 2024, 23:35 hours
+
+STATEMENT (Verbatim Transcript):
+
+"I was in my living room watching TV when I heard the gunshots. It was around 11 PM. I know it was gunshots immediately - I grew up in a rough neighborhood, so I know that sound.
+
+I heard THREE distinct shots. They were spaced maybe 2 or 3 seconds apart. Bang... bang... bang. Three shots, I'm certain.
+
+The shots came from ABOVE me. I'm positive about that. The sound came from directly overhead, like from the second floor apartment above mine. I live on the first floor, so the sound had to be coming from upstairs.
+
+The sound was sharp and high-pitched - like a small gun, maybe a .22 or something like that. Not a big heavy gun. It had that sharp, crackling sound to it.
+
+I immediately got on the floor and called 911. I told them shots were fired in the apartment above me.
+
+I know what I heard. Three shots, from above, high-pitched sound."
+
+DETECTIVE'S NOTES:
+- Witness appeared calm and credible
+- No hearing impairment noted
+- Apartment 3A is on first floor, directly adjacent to 3B (shares a wall)
+- Witness has no criminal record
+- Appeared confident in account
+
+---
+
+WITNESS 2: David Park
+AGE: 38
+RESIDENCE: Apartment 4B, Riverside Apartments Building 3
+INTERVIEWED BY: Detective James Wilson  
+DATE/TIME: October 12, 2024, 23:42 hours
+
+STATEMENT (Verbatim Transcript):
+
+"I was in my bedroom getting ready for bed when I heard gunshots. This was about 11 PM.
+
+I heard TWO shots. They were loud - really loud. There was a pause of a few seconds between them. Two definite shots.
+
+The shots came from BELOW me. I live on the second floor, and the sound was clearly coming from the first floor, directly beneath my apartment.
+
+The sound was deep and booming - like a heavy caliber weapon, maybe a .45 or even bigger. It had that deep, bass-heavy sound that shakes your chest. Definitely a big gun.
+
+I immediately moved away from the floor and called 911. I told them there was shooting in the apartment below mine.
+
+I'm absolutely certain about what I heard. Two shots, from below, deep sound."
+
+DETECTIVE'S NOTES:
+- Witness appeared shaken but coherent
+- No hearing impairment noted
+- Apartment 4B is on second floor, directly above 3B (3B is below)
+- Witness is a military veteran with firearms experience
+- Very confident in assessment
+- Seemed puzzled when informed shots came from adjacent unit, not below
+
+---
+
+VERIFIED PHYSICAL EVIDENCE:
+
+Location of shell casings: All three found in Apartment 3B (first floor, CENTER unit)
+Weapon recovered: 9mm pistol (Glock 19)
+Ballistic analysis: All casings match recovered weapon
+Sound signature of 9mm: Medium frequency (approximately 500-1000 Hz)
+
+BUILDING LAYOUT (First Floor):
+[3A] ---- [3B] ---- [3C]
+         (hallway)
+
+BUILDING LAYOUT (Second Floor):
+[4A] ---- [4B] ---- [4C]
+         (hallway)
+
+Apartment 3B is:
+- BESIDE Apartment 3A (shares wall)
+- BELOW Apartment 4B (directly beneath)
+
+END OF WITNESS STATEMENTS`,
+            docb: `DOCUMENT B: BUILDING ACOUSTIC ANALYSIS
+FORENSIC AUDIO SERVICES
+CASE NUMBER: 2024-10-12-2300
+
+FACILITY: Riverside Apartments, Building 3
+DATE OF ANALYSIS: October 13, 2024
+ANALYST: Acoustic Engineer Dr. Lisa Thompson, Ph.D.
+
+BUILDING CONSTRUCTION SPECIFICATIONS:
+
+Riverside Apartments, Building 3 is a standard two-story residential structure built in 2015.
+
+Construction materials:
+- Walls: Drywall on wood studs (standard residential construction)
+- Floors/Ceilings: Wood joist construction with carpet on second floor, tile on first floor
+- Hallways: Tile floors, painted drywall walls, acoustical ceiling tiles
+- Doors: Hollow-core wood doors
+
+Sound Transmission Classification (STC):
+- Interior walls: STC 33 (minimal sound isolation)
+- Floor/ceiling assemblies: STC 50 (moderate sound isolation)
+- Corridor walls: STC 40 (moderate sound isolation)
+
+HALLWAY ACOUSTIC PROPERTIES:
+
+The hallway configuration is critical to sound propagation in this building:
+
+Dimensions: 6 feet wide × 8 feet high × 80 feet long
+Surface materials:
+- Floor: Ceramic tile (highly reflective to sound)
+- Walls: Painted drywall (moderately reflective)
+- Ceiling: Drop acoustical tiles (partially absorptive, but still reflective at high frequencies)
+
+Reverberation time: 1.2 seconds (longer than typical living spaces)
+Echo pattern: Multiple discrete echoes due to parallel hard surfaces
+
+SOUND PROPAGATION ANALYSIS:
+
+When a gunshot is fired in Apartment 3B:
+
+Path 1: Through shared wall to Apartment 3A
+- Direct transmission through wall (minimal delay)
+- Some high-frequency attenuation due to wall mass
+
+Path 2: Through door into hallway
+- Sound enters hallway (minimal attenuation)
+- Reflects off hard hallway surfaces (tile floor, walls, ceiling)
+- Multiple reflections create complex echo pattern
+- Sound propagates both directions down hallway
+
+Path 3: Through floor to Apartment 4B above
+- Transmission through floor/ceiling assembly
+- Some low-frequency emphasis due to structural vibration
+- High frequencies attenuated more than low frequencies
+
+MEASURED SOUND CHARACTERISTICS:
+
+A controlled test was conducted using a calibrated sound source (500-1000 Hz frequency range, similar to 9mm gunshot) placed in Apartment 3B.
+
+Sound recordings made simultaneously in Apartments 3A and 4B:
+
+APARTMENT 3A (adjacent, first floor):
+- Primary sound arrival: Direct through shared wall (0 ms)
+- Secondary arrivals: Reflected from hallway (15-45 ms delays)
+- Frequency emphasis: High frequencies present, some hallway echoes boost mid-range
+- Perceived direction: Ambiguous (combination of direct and reflected sound)
+
+APARTMENT 4B (above, second floor):
+- Primary sound arrival: Through floor (5 ms)
+- Secondary arrivals: Reflected from hallway (20-50 ms delays)
+- Frequency emphasis: Low frequencies emphasized due to floor transmission, high frequencies attenuated
+- Perceived direction: Ambiguous (combination of floor transmission and hallway reflections)
+
+ECHO PATTERN ANALYSIS:
+
+The hallway creates a complex pattern of echoes:
+
+Initial sound (0 ms) → 1st echo from opposite wall (18 ms) → 2nd echo from end of hallway (62 ms) → 3rd echo from ceiling (35 ms) → 4th echo (combinations, 80-120 ms)
+
+These echoes can:
+- Make single sounds appear as multiple sounds
+- Obscure the true number of sounds
+- Create ambiguous directional cues
+- Alter perceived frequency content
+
+FREQUENCY-DEPENDENT EFFECTS:
+
+High frequencies (>2000 Hz):
+- Attenuated by walls and floors
+- Reflected strongly by hallway hard surfaces
+- Create sharp, "crackling" sound quality
+
+Low frequencies (<500 Hz):
+- Transmit more easily through walls and floors
+- Create structural vibrations
+- Perceived as "booming" or "deep" sound
+
+Mid frequencies (500-1000 Hz):
+- Most characteristic of 9mm gunshot
+- Mixed transmission and reflection pattern
+
+CONCLUSIONS (Factual Observations Only):
+
+1. Sound from Apartment 3B reaches both 3A and 4B through multiple paths
+2. Hallway reflections create complex echo patterns
+3. Echoes can make single sounds appear as multiple sounds, or multiple sounds appear as fewer
+4. Frequency content is altered differently for different listeners based on transmission path
+5. Directional cues are ambiguous due to multiple arrival paths
+
+This analysis presents measured acoustic data. Interpretation of how these factors affect human sound localization should be conducted by auditory perception experts.
+
+END OF ACOUSTIC ANALYSIS`,
+            docc: `DOCUMENT C: AUDITORY LOCALIZATION PRINCIPLES
+PREPARED FOR LEGAL CONSULTATION
+SOURCE: National Institute of Hearing Research
+
+This document provides general scientific information about human sound localization capabilities. These are established principles in auditory science and do not constitute opinion about any specific case.
+
+SECTION 1: BINAURAL CUES FOR SOUND LOCALIZATION
+
+Humans localize sound in space primarily using binaural cues - differences between the sound arriving at the two ears.
+
+INTERAURAL TIME DIFFERENCE (ITD):
+
+When a sound originates from one side, it reaches the near ear slightly before the far ear.
+
+Mechanism:
+- Sound from right side reaches right ear first, left ear later
+- Time difference ranges from 0 microseconds (front/back) to ~700 microseconds (90° to side)
+- Brain detects this time difference with microsecond precision
+- Used primarily for localizing low-frequency sounds (<1500 Hz)
+
+Effectiveness:
+- Excellent for horizontal (left-right) localization
+- Poor for vertical (up-down) localization
+- Poor for front-back discrimination
+
+INTERAURAL LEVEL DIFFERENCE (ILD):
+
+When a sound originates from one side, the head creates an "acoustic shadow," making the sound slightly louder at the near ear.
+
+Mechanism:
+- Head blocks high-frequency sounds more effectively than low frequencies
+- Creates intensity/volume difference between ears
+- Difference ranges from 0 dB (front/back) to ~20 dB at high frequencies (90° to side)
+- Used primarily for high-frequency sounds (>1500 Hz)
+
+Effectiveness:
+- Excellent for horizontal (left-right) localization
+- Poor for vertical (up-down) localization
+- Poor for front-back discrimination
+
+SECTION 2: LIMITATIONS OF BINAURAL CUES
+
+VERTICAL LOCALIZATION:
+
+Determining whether a sound is above, below, or at ear level is much more difficult than horizontal localization because:
+
+- ITD and ILD provide minimal information about elevation
+- Sounds above and at ear level can have nearly identical binaural cues
+- Brain must rely on other cues (see spectral cues below)
+
+Accuracy:
+- Horizontal localization: ±5-10 degrees typical accuracy
+- Vertical localization: ±20-40 degrees typical accuracy (much worse)
+
+FRONT-BACK CONFUSION:
+
+Sounds directly in front and directly behind have identical ITD and ILD values, creating ambiguity.
+
+Resolution:
+- Head movements (change position to disambiguate)
+- Spectral cues from pinna filtering
+- Visual information
+- Context and expectation
+
+In stationary listening without visual cues: 20-30% front-back confusion rate is normal.
+
+SECTION 3: SPECTRAL CUES AND PINNA FILTERING
+
+The outer ear (pinna) has a complex shape that filters sound frequencies differently depending on source elevation.
+
+Mechanism:
+- Sound from above emphasizes certain frequencies
+- Sound from below emphasizes different frequencies
+- Brain learns these patterns through experience
+- Acts as a frequency-dependent filter
+
+Effectiveness:
+- Moderately helpful for vertical localization
+- Requires learning (not innate)
+- Easily disrupted by unfamiliar sounds or acoustic environments
+- Works best in anechoic (echo-free) environments
+
+SECTION 4: REVERBERATION AND ECHOES
+
+In enclosed spaces with hard surfaces, sound reflects off walls, floors, and ceilings, creating echoes.
+
+EFFECT ON LOCALIZATION:
+
+Multiple sound arrivals:
+- Direct sound arrives first
+- Reflections arrive later (delays of 10-100+ milliseconds)
+- Brain receives conflicting directional cues
+- Localization accuracy degrades significantly
+
+Precedence Effect (Haas Effect):
+- Brain typically assigns localization based on FIRST arrival
+- Later arrivals (echoes) are partially suppressed for localization
+- However, echoes still influence perceived sound quality and can create confusion
+
+In highly reverberant spaces:
+- Horizontal localization accuracy reduced by 50-80%
+- Vertical localization becomes nearly impossible
+- Front-back confusions increase dramatically
+
+SECTION 5: FREQUENCY CONTENT AND PERCEPTION
+
+Different frequencies are perceived differently:
+
+HIGH FREQUENCIES (>2000 Hz):
+- Perceived as sharp, bright, "crackling"
+- Provide good directional information (via ILD)
+- Easily blocked by barriers
+- Reflected strongly by hard surfaces
+
+LOW FREQUENCIES (<500 Hz):
+- Perceived as deep, booming, bass-heavy
+- Provide directional information via ITD
+- Penetrate barriers more easily
+- Less reflection, more transmission through structures
+
+MIDDLE FREQUENCIES (500-2000 Hz):
+- Balanced perception
+- Both ITD and ILD contribute to localization
+- Mixed transmission/reflection properties
+
+FREQUENCY-DEPENDENT TRANSMISSION:
+
+When sound passes through walls, floors, or other barriers:
+- High frequencies are attenuated (blocked) more than low frequencies
+- Result: Sound becomes more bass-heavy after transmission
+- A gunshot (broad frequency range) may sound "deeper" through a wall than in open air
+
+SECTION 6: COUNTING DISCRETE SOUNDS
+
+Humans typically distinguish discrete sounds if they are separated by >50-100 milliseconds.
+
+ECHO INTERFERENCE:
+
+When echoes arrive 10-50 ms after original sound:
+- May be perceived as single prolonged sound
+- May be perceived as additional discrete sounds
+- Listener cannot reliably count separate events
+
+In reverberant hallways:
+- Single gunshot creates multiple echoes
+- May be perceived as 2-3 sounds
+- Three gunshots with echoes may be perceived as 2, 3, 4, or 5+ sounds
+- Count accuracy is unreliable
+
+SECTION 7: INDIVIDUAL AND SITUATIONAL FACTORS
+
+Sound localization accuracy varies based on:
+
+Listener factors:
+- Hearing acuity (hearing loss reduces localization ability)
+- Experience with sounds
+- Attention and arousal (stress impairs localization)
+- Head position and movement
+
+Environmental factors:
+- Reverberation and echo patterns
+- Background noise
+- Acoustic properties of space
+- Number and proximity of reflective surfaces
+
+Sound characteristics:
+- Frequency content
+- Duration
+- Intensity
+- Familiarity
+
+SECTION 8: CONFIDENCE VS. ACCURACY
+
+Research consistently shows:
+- Listener confidence in localization judgments does NOT correlate well with accuracy
+- People are often highly confident in incorrect localization judgments
+- In ambiguous acoustic environments, confidence can remain high even when accuracy is poor
+
+This is particularly true for:
+- Vertical localization
+- Reverberant environments
+- Unfamiliar sounds
+- High-stress situations
+
+This document presents established principles of auditory perception. Application to specific cases requires analysis of all relevant factors by qualified experts.
+
+END OF REFERENCE MATERIALS
+
+DISCLAIMER: This document does not constitute analysis or opinion regarding any specific incident.`,
+            docd: `DOCUMENT D: EXPERIMENTAL DATA - SOUND LOCALIZATION IN BUILDINGS
+JOURNAL OF THE ACOUSTICAL SOCIETY, VOL. 145(2), 2024
+TITLE: "Sound Source Localization Accuracy in Residential Hallways"
+
+ABSTRACT:
+
+We investigated human ability to localize gunshot sounds in a residential building environment similar to typical apartment complexes. Participants (n=40) attempted to identify the location of recorded gunshot sounds played from various locations within an apartment building.
+
+METHODOLOGY:
+
+Facility:
+- Three-story apartment building scheduled for demolition
+- Standard hallway construction (tile floors, drywall walls)
+- Multiple apartments per floor
+
+Sound Source:
+- Recorded 9mm gunshot (authentic recording from ballistic testing)
+- Frequency range: 100-8000 Hz (typical gunshot spectrum)
+- Peak intensity: 160 dB at source (reduced to safe levels for participants)
+
+Participants:
+- 40 adults (ages 25-60)
+- Normal hearing (confirmed by audiometric testing)
+- 15 participants had military or law enforcement firearms experience
+- 25 participants had no firearms experience
+
+Procedure:
+Sound played from various apartments. Participants in different apartments asked to identify:
+1. Horizontal location (which apartment?)
+2. Vertical location (which floor?)
+3. Number of shots fired
+4. Perceived frequency/pitch
+
+EXPERIMENT 1: HORIZONTAL LOCALIZATION
+
+Sound source: Apartment 2B (center unit, second floor)
+Listeners: Distributed in Apartments 2A (adjacent), 2C (adjacent), 3B (above), 1B (below)
+
+RESULTS:
+
+Correct identification of horizontal location (which apartment):
+- Overall accuracy: 35% (14 out of 40 participants)
+- Firearms-experienced participants: 40% accuracy
+- No-experience participants: 32% accuracy
+- Not significantly different (p > 0.05)
+
+Common errors:
+- 28% identified source as adjacent apartment
+- 22% identified source as "somewhere in hallway"
+- 15% could not determine location
+
+Confidence ratings:
+- Mean confidence: 6.8/10
+- No correlation between confidence and accuracy (r = 0.12)
+- Some highly confident participants were incorrect
+
+EXPERIMENT 2: VERTICAL LOCALIZATION
+
+Sound source: Apartment 2B (second floor, center)
+Listeners: Apartments on floors 1, 2, and 3
+
+RESULTS:
+
+Vertical localization errors:
+- 67% of participants made errors in vertical localization
+- 42% thought sound was from different floor than actual
+- 25% reported "difficult to tell" which floor
+
+Specific error patterns:
+Listeners on Floor 1 (below source):
+- 52% incorrectly thought sound came from above them (when source was actually above)
+- 31% correctly identified as above
+- 17% thought sound came from same floor
+
+Listeners on Floor 2 (same level as source):
+- 41% incorrectly thought sound came from above or below (when source was same floor)
+- 59% correctly identified as same floor
+
+Listeners on Floor 3 (above source):
+- 58% incorrectly thought sound came from below them (when source was actually below)
+- 27% correctly identified as below
+- 15% thought sound came from same floor
+
+INTERPRETATION: Vertical localization was highly unreliable in hallway environment.
+
+EXPERIMENT 3: COUNTING SOUNDS
+
+Three gunshots fired with 2-second intervals between shots.
+Participants asked: "How many shots did you hear?"
+
+RESULTS:
+
+Correct count (3 shots): 48%
+Incorrect counts:
+- 2 shots: 23%
+- 4 shots: 17%
+- 5 or more shots: 9%
+- Could not determine: 3%
+
+Analysis:
+Errors correlated with:
+- Distance from source (more errors at greater distance)
+- Location in hallway (more errors near hallway ends where echoes converge)
+- No correlation with firearms experience
+
+INTERPRETATION: Echoes and reverber ations made accurate counting difficult for approximately half of participants.
+
+EXPERIMENT 4: FREQUENCY/PITCH PERCEPTION
+
+Same 9mm gunshot recording (objective frequency: 500-1000 Hz primary energy) played from Apartment 2B.
+
+Participants asked to characterize sound as:
+- High-pitched (small caliber weapon)
+- Medium-pitched (medium caliber)
+- Low-pitched/booming (large caliber)
+
+RESULTS:
+
+Overall distribution:
+- 40% reported "high-pitched"
+- 35% reported "medium-pitched"
+- 25% reported "low-pitched/booming"
+
+Same sound, different perceptions!
+
+Analysis by listener location:
+
+Listeners in ADJACENT apartments (sound through wall):
+- 62% reported "high-pitched"
+- Reason: High frequencies transmitted through direct wall path
+
+Listeners ABOVE or BELOW source (sound through floor):
+- 58% reported "low-pitched/booming"
+- Reason: Floor transmission emphasizes low frequencies
+
+Listeners in HALLWAY:
+- 47% reported "medium-pitched"
+- Reason: Mixture of direct and reflected sound
+
+EXPERIMENT 5: EFFECT OF EXPECTATION
+
+Participants divided into two groups for same test:
+
+Group A: Told "Report what you hear"
+Group B: Told "Shots may come from above, below, or same level - report which"
+
+RESULTS:
+
+Vertical localization accuracy:
+- Group A: 33% correct
+- Group B: 31% correct
+- No significant difference
+
+However, confidence was affected:
+- Group A: Mean confidence 5.2/10
+- Group B: Mean confidence 7.1/10
+
+INTERPRETATION: Priming participants to think about vertical location increased confidence but did not improve accuracy.
+
+DISCUSSION:
+
+The researchers conclude:
+
+"Sound localization in residential hallways with hard surfaces is fundamentally unreliable due to:
+
+1. Complex echo patterns that obscure true source location
+2. Frequency-dependent transmission through walls and floors creating different perceptions for different listeners
+3. Poor vertical localization even under optimal conditions
+4. Echo-based confusion about number of discrete sounds
+
+Critically, listener confidence does not predict accuracy. Participants reported high confidence even when completely wrong about location, floor level, or number of shots.
+
+Firearms experience provided minimal advantage, suggesting these errors are driven by acoustic environment rather than listener expertise.
+
+In legal contexts, eyewitness (or ear-witness) testimony about sound location in buildings should be considered highly unreliable without corroborating physical evidence."
+
+LIMITATIONS:
+
+- Controlled environment (empty building)
+- No background noise
+- Participants knew they were in experiment
+- Single sound source type
+
+CONCLUSIONS:
+
+Human sound localization in residential hallways with hard surfaces shows:
+- Poor horizontal accuracy (35%)
+- Very poor vertical accuracy (33%)
+- Unreliable counting (52% error rate for 3 shots)
+- Highly variable frequency perception of identical sound
+
+These limitations appear fundamental to acoustic environment, not listener capability.
+
+END OF RESEARCH SUMMARY`
+        };
+
+        
+        function typeWriter(element, text, callback) {
+            if (skipTyping) {
+                element.innerHTML = text.replace(/\n/g, '<br>');
+                if (callback) callback();
+                return;
+            }
+            
+            isTyping = true;
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (skipTyping || i >= text.length) {
+                    element.innerHTML = text.replace(/\n/g, '<br>');
+                    isTyping = false;
+                    if (callback) callback();
+                    return;
+                }
+                
+                if (text.charAt(i) === '\n') {
+                    element.innerHTML += '<br>';
+                } else {
+                    element.innerHTML += text.charAt(i);
+                }
+                i++;
+                
+                setTimeout(type, typingSpeed);
+            }
+            
+            type();
+        }
+        
+        document.addEventListener('click', (e) => {
+            if (isTyping && !e.target.closest('button') && !e.target.closest('.menu-item')) {
+                skipTyping = true;
+            }
+        });
+        
+        function showDoc(docKey) {
+            documentsViewed.add(docKey);
+            skipTyping = false;
+            
+            // Mark menu item as viewed
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                if (item.textContent.includes(docKey.toUpperCase().replace('DOC', 'DOCUMENT '))) {
+                    item.classList.add('viewed');
+                }
+            });
+            
+            const contentArea = document.getElementById('content-area');
+            const buttonArea = document.getElementById('button-area');
+            
+            document.getElementById('doc-menu').style.display = 'none';
+            contentArea.classList.add('active');
+            buttonArea.style.display = 'block';
+            
+            const docTitles = {
+                intro: 'CASE BRIEFING',
+                doca: 'DOCUMENT A: WITNESS STATEMENT',
+                docb: 'DOCUMENT B: ENVIRONMENTAL ANALYSIS',
+                docc: 'DOCUMENT C: VISION SCIENCE REFERENCE',
+                docd: 'DOCUMENT D: PHYSICAL EVIDENCE',
+                worksheet: 'ANALYSIS WORKSHEET'
+            };
+            
+            contentArea.innerHTML = `<div class="doc-header">> LOADING DOCUMENT<span class="loading"></span></div>`;
+            
+            setTimeout(() => {
+                contentArea.innerHTML = `<div class="doc-header">${docTitles[docKey]}</div><hr><div id="typing-target" class="typing-text"></div>`;
+                typeWriter(document.getElementById('typing-target'), caseData[docKey]);
+            }, 500);
+            
+            updateProgress();
+        }
+        
+        function backToDocMenu() {
+            document.getElementById('content-area').classList.remove('active');
+            document.getElementById('button-area').style.display = 'none';
+            document.getElementById('doc-menu').style.display = 'block';
+            skipTyping = true;
+        }
+        
+        function updateProgress() {
+            const progressDiv = document.getElementById('progress');
+            const docs = ['intro', 'doca', 'docb', 'docc', 'docd'];
+            progressDiv.innerHTML = docs.map((doc, i) => 
+                `<div class="progress-dot ${documentsViewed.has(doc) ? 'completed' : ''}">${i + 1}</div>`
+            ).join('');
+        }
+        
+        setTimeout(() => {
+            document.getElementById('bootSeq').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('bootSeq').style.display = 'none';
+            }, 500);
+        }, 3500);
+        
+        updateProgress();
+    </script>
+</body>
+</html>
