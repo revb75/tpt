@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDTC 1017 — Field Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:    #1a3a6b;
+  --blue-lt: #e8f0fb;
+  --gold:    #c8850a;
+  --gold-lt: #fff7e6;
+  --green:   #1a6b3a;
+  --green-lt:#e6f4ec;
+  --red:     #8b1a1a;
+  --red-lt:  #fdf0f0;
+  --purple:  #4a1a6b;
+  --purple-lt:#f2ecfb;
+  --teal:    #0a5f6b;
+  --teal-lt: #e6f6f8;
+  --gray:    #f4f5f7;
+  --text:    #1a1a2e;
+  --border:  #d0d8e8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  background: #eef2f8;
+  color: var(--text);
+  padding: 16px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.page { max-width: 1100px; margin: 0 auto; }
+
+/* TOP LABEL */
+.top-label {
+  background: var(--blue);
+  border-radius: 10px 10px 0 0;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.top-label span {
+  color: rgba(255,255,255,0.75);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.top-label strong {
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* MODULE CARD */
+.mod {
+  border-right: 1px solid var(--border);
+  padding: 0;
+}
+.mod:last-of-type { border-right: none; }
+
+.mod-header {
+  padding: 12px 14px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mod-num {
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.mod-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--mc);
+}
+
+.mod-body { padding: 0 14px 14px; }
+
+.section-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--mc);
+  margin: 10px 0 5px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* TROUBLE BOX */
+.trouble {
+  background: var(--red-lt);
+  border-left: 3px solid #c0392b;
+  border-radius: 0 5px 5px 0;
+  padding: 6px 9px;
+  margin-bottom: 4px;
+}
+.trouble .t-head {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--red);
+  line-height: 1.3;
+}
+.trouble .t-fix {
+  font-size: 0.68rem;
+  color: #444;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.trouble .t-fix::before {
+  content: '→ ';
+  color: var(--green);
+  font-weight: 700;
+}
+
+/* TEACH BOX */
+.teach {
+  background: var(--ml);
+  border-left: 3px solid var(--mc);
+  border-radius: 0 5px 5px 0;
+  padding: 6px 9px;
+  margin-bottom: 4px;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+.teach strong {
+  display: block;
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: var(--mb);
+  margin-bottom: 1px;
+}
+
+/* BOTTOM ROW */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--border);
+  border-radius: 0 0 10px 10px;
+  background: #fff;
+  margin-top: -1px;
+}
+.bottom-cell {
+  padding: 14px 18px;
+  border-right: 1px solid var(--border);
+}
+.bottom-cell:last-child { border-right: none; }
+.bottom-cell h3 {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--border);
+  color: var(--blue);
+}
+
+/* DODO TABLE */
+.dodo { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+.dodo th {
+  text-align: left; padding: 4px 8px;
+  font-size: 0.63rem; letter-spacing: 0.08em;
+  text-transform: uppercase; font-weight: 700;
+}
+.dodo td {
+  padding: 5px 8px;
+  border-top: 1px solid var(--border);
+  vertical-align: top; line-height: 1.4;
+}
+.yes { color: var(--green); font-weight: 700; }
+.no  { color: var(--red);   font-weight: 700; }
+
+/* GLOSSARY */
+.glossary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 16px; }
+.gterm { font-size: 0.73rem; line-height: 1.45; }
+.gterm strong { display: block; font-weight: 700; color: var(--blue); font-size: 0.72rem; }
+
+/* COLOR THEMES */
+.m1 { --mc:#1a3a6b; --ml:#e8f0fb; --mb:#1a3a6b; }
+.m2 { --mc:#0a5f6b; --ml:#e6f6f8; --mb:#0a5f6b; }
+.m3 { --mc:#1a6b3a; --ml:#e6f4ec; --mb:#1a6b3a; }
+.m4 { --mc:#c8850a; --ml:#fff7e6; --mb:#c8850a; }
+.m5 { --mc:#4a1a6b; --ml:#f2ecfb; --mb:#4a1a6b; }
+
+.mod .mod-num    { background: var(--mc); }
+.mod .section-label { color: var(--mc); }
+
+@media (max-width: 860px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+  .mod { border-bottom: 1px solid var(--border); }
+  .mod:nth-child(2n) { border-right: none; }
+  .bottom-row { grid-template-columns: 1fr; }
+  .bottom-cell { border-right: none; border-bottom: 1px solid var(--border); }
+}
+@media (max-width: 480px) {
+  .grid { grid-template-columns: 1fr; }
+  .mod { border-right: none !important; }
+}
+@media print {
+  body { background: #fff; padding: 6px; }
+  .grid { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="top-label">
+  <span>EDTC 1017 &nbsp;·&nbsp; Guiding Student Behavior &nbsp;·&nbsp; Dallas College Spring 2026</span>
+  <strong>Field Reference — What to Know &amp; What to Avoid</strong>
+</div>
+
+<div class="grid">
+
+  <!-- MODULE 1 -->
+  <div class="mod m1">
+    <div class="mod-header">
+      <div class="mod-num">1</div>
+      <div class="mod-title">Your Role &amp;<br>Professionalism</div>
+    </div>
+    <div class="mod-body">
+
+      <div class="section-label">⚠ Common Trouble</div>
+
+      <div class="trouble">
+        <div class="t-head">Doing the teacher's job</div>
+        <div class="t-fix">You support. The teacher leads. Never grade, design lessons, or discipline alone.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">Keeping student secrets</div>
+        <div class="t-fix">Always tell the supervising teacher. You cannot promise confidentiality to a student.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">Talking about students in public</div>
+        <div class="t-fix">The break room, hallway, and parking lot are not private. Only debrief with your teacher — in private.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">Posting about students on social media</div>
+        <div class="t-fix">No names, no photos, no descriptions — even from your personal account, even off the clock.</div>
+      </div>
+
+      <div class="section-label">✏ Key Pedagogy</div>
+
+      <div class="teach">
+        <strong>Professional Communication</strong>
+        Use your school email. Be clear and respectful. When unsure what to share — ask the teacher first.
+      </div>
+
+      <div class="teach">
+        <strong>Know Your Role</strong>
+        Help students during transitions, small groups, and individual work. Reinforce the teacher's instructions — do not replace them.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODULE 2 -->
+  <div class="mod m2">
+    <div class="mod-header">
+      <div class="mod-num">2</div>
+      <div class="mod-title">Students, Families<br>&amp; Community</div>
+    </div>
+    <div class="mod-body">
+
+      <div class="section-label">⚠ Common Trouble</div>
+
+      <div class="trouble">
+        <div class="t-head">Judging a student's behavior without context</div>
+        <div class="t-fix">Poverty, trauma, and home stress affect how students act. Ask "what happened to this student?" not "what is wrong with them?"</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">Talking to parents about student progress</div>
+        <div class="t-fix">Redirect to the teacher. You can be warm and kind — but do not share academic or behavioral observations with families.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">Assuming a student is "just being difficult"</div>
+        <div class="t-fix">At-risk students signal need through behavior. Tiredness, absences, and withdrawal are signs — not excuses.</div>
+      </div>
+
+      <div class="section-label">✏ Key Pedagogy</div>
+
+      <div class="teach">
+        <strong>Asset-Based Mindset</strong>
+        See students' cultures and languages as strengths. Never assume a quiet or struggling student does not care.
+      </div>
+
+      <div class="teach">
+        <strong>Relationship First</strong>
+        Learn names. Say hello. Notice when someone is absent. Small acts build the trust that makes learning possible.
+      </div>
+
+      <div class="teach">
+        <strong>Behavior = Communication</strong>
+        Ask: "What does this student need right now?" Respond with empathy before correction.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODULE 3 -->
+  <div class="mod m3">
+    <div class="mod-header">
+      <div class="mod-num">3</div>
+      <div class="mod-title">Helping Students<br>Learn</div>
+    </div>
+    <div class="mod-body">
+
+      <div class="section-label">⚠ Common Trouble</div>
+
+      <div class="trouble">
+        <div class="t-head">Doing the work for the student</div>
+        <div class="t-fix">Ask a question instead of giving the answer. "What do you know so far?" is better than telling them the answer.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">The "velcro aide" problem</div>
+        <div class="t-fix">Sitting too close, doing too much = dependence. Fade your support as students gain confidence. The goal is independence.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">Only asking yes/no questions</div>
+        <div class="t-fix">Open questions push thinking. "Why do you think that?" is better than "Is that right?"</div>
+      </div>
+
+      <div class="section-label">✏ Key Pedagogy</div>
+
+      <div class="teach">
+        <strong>Bloom's Taxonomy — Ask at the right level</strong>
+        Remember → Understand → Apply → Analyze → Evaluate → Create. Push students to higher levels when ready.
+      </div>
+
+      <div class="teach">
+        <strong>Scaffolding</strong>
+        Break tasks into small steps. Let students try each step before moving to the next. Remove support gradually.
+      </div>
+
+      <div class="teach">
+        <strong>Small-Group Instruction</strong>
+        Closer proximity = faster feedback. Students can ask questions without fear. Address confusion immediately.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODULE 4 -->
+  <div class="mod m4">
+    <div class="mod-header">
+      <div class="mod-num">4</div>
+      <div class="mod-title">Classroom Behavior<br>&amp; Teamwork</div>
+    </div>
+    <div class="mod-body">
+
+      <div class="section-label">⚠ Common Trouble</div>
+
+      <div class="trouble">
+        <div class="t-head">Creating your own consequences for IEP students</div>
+        <div class="t-fix">The BIP is a legal document. Follow it exactly. Never take away recess or add punishments not in the plan.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">Undermining the teacher's protocol</div>
+        <div class="t-fix">Always use the teacher's system first. Share new ideas privately after — never substitute your method during class.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">Physical intervention without authorization</div>
+        <div class="t-fix">Most districts require CPI training before touching a student to stop a conflict. Use your voice first. Get help fast.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">Taking sides in a student-teacher conflict</div>
+        <div class="t-fix">Never speak against the teacher to a student. Say: "Let's go talk to the teacher together."</div>
+      </div>
+
+      <div class="section-label">✏ Key Pedagogy</div>
+
+      <div class="teach">
+        <strong>CHAMPS — Teach expectations before each activity</strong>
+        C = Conversation level &nbsp;·&nbsp; H = How to get help &nbsp;·&nbsp; A = Activity &nbsp;·&nbsp; M = Movement &nbsp;·&nbsp; P = Participation &nbsp;·&nbsp; S = Success
+      </div>
+
+      <div class="teach">
+        <strong>De-escalation Steps</strong>
+        Calm voice. Give space. Offer a choice. Say: "I can see you are frustrated. Let's figure this out together." Never argue publicly.
+      </div>
+
+      <div class="teach">
+        <strong>Reinforce What You Want to See</strong>
+        "Thank you for getting started right away." Specific praise shapes behavior better than generic praise.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODULE 5 -->
+  <div class="mod m5">
+    <div class="mod-header">
+      <div class="mod-num">5</div>
+      <div class="mod-title">Career &amp;<br>Professional Growth</div>
+    </div>
+    <div class="mod-body">
+
+      <div class="section-label">⚠ Common Trouble</div>
+
+      <div class="trouble">
+        <div class="t-head">Underselling transferable skills</div>
+        <div class="t-fix">Childcare, tutoring, volunteering, caregiving — all count. Name the skill and connect it to the classroom role.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">Using AI to write final assignments</div>
+        <div class="t-fix">AI tools are OK for brainstorming only. All final writing must be your own. Submitting AI text = academic integrity violation.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="t-head">Generic interview answers</div>
+        <div class="t-fix">Use the STAR method: Situation → Task → Action → Result. Be specific. A real story is always stronger than a general answer.</div>
+      </div>
+
+      <div class="section-label">✏ Key Pedagogy</div>
+
+      <div class="teach">
+        <strong>STAR Method for Interviews</strong>
+        <strong style="font-weight:600;display:inline;color:inherit">S</strong>ituation — what was happening? &nbsp;<strong style="font-weight:600;display:inline;color:inherit">T</strong>ask — what did you need to do? &nbsp;<strong style="font-weight:600;display:inline;color:inherit">A</strong>ction — what did you do? &nbsp;<strong style="font-weight:600;display:inline;color:inherit">R</strong>esult — what happened?
+      </div>
+
+      <div class="teach">
+        <strong>Your Resume Must Show</strong>
+        Any experience with children &nbsp;·&nbsp; Communication &amp; patience &nbsp;·&nbsp; This course + any certifications &nbsp;·&nbsp; Bilingual ability (a real strength — list it)
+      </div>
+
+      <div class="teach">
+        <strong>Your Educational Philosophy</strong>
+        Not about the "right" answer. It shows who you are, why you are here, and how you will support students. Be honest and specific.
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end grid -->
+
+<!-- BOTTOM ROW -->
+<div class="bottom-row">
+
+  <!-- GLOSSARY -->
+  <div class="bottom-cell">
+    <h3>📖 Key Words &amp; Meanings</h3>
+    <div class="glossary-grid">
+      <div class="gterm"><strong>IEP</strong>A legal plan for a student with a disability. Follow it exactly — you cannot change it.</div>
+      <div class="gterm"><strong>BIP</strong>Behavior Intervention Plan. The exact steps to follow when a student has a behavior problem.</div>
+      <div class="gterm"><strong>PBIS</strong>School-wide system for teaching good behavior before problems happen.</div>
+      <div class="gterm"><strong>FERPA</strong>Federal law that protects student records. Never share student information outside the professional chain.</div>
+      <div class="gterm"><strong>CHAMPS</strong>Framework for teaching behavior expectations: Conversation, Help, Activity, Movement, Participation, Success.</div>
+      <div class="gterm"><strong>Scaffolding</strong>Breaking a task into smaller steps and removing support as the student gains confidence.</div>
+      <div class="gterm"><strong>Bloom's Taxonomy</strong>6 levels of thinking: Remember, Understand, Apply, Analyze, Evaluate, Create.</div>
+      <div class="gterm"><strong>ACEs</strong>Adverse Childhood Experiences — hard life events that affect how a student learns and behaves.</div>
+      <div class="gterm"><strong>At-Risk</strong>A student who may need extra support. Behavior is often a signal of need, not defiance.</div>
+      <div class="gterm"><strong>De-escalation</strong>Steps to calm a situation before it becomes a crisis. Use voice, space, and choice — not force.</div>
+      <div class="gterm"><strong>Culturally Responsive</strong>Teaching that respects and connects to each student's culture, language, and community.</div>
+      <div class="gterm"><strong>STAR Method</strong>Interview structure: Situation → Task → Action → Result. Always use a real, specific story.</div>
+    </div>
+  </div>
+
+  <!-- DO / DON'T -->
+  <div class="bottom-cell">
+    <h3>✅ Do This &nbsp;·&nbsp; ❌ Not That</h3>
+    <table class="dodo">
+      <thead>
+        <tr>
+          <th style="width:50%"><span class="yes">✅ DO</span></th>
+          <th style="width:50%"><span class="no">❌ DO NOT</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Follow the teacher's behavior plan (BIP/IEP)</td>
+          <td>Make up your own punishments for any student</td>
+        </tr>
+        <tr>
+          <td>Share concerns privately with your teacher</td>
+          <td>Vent about students in the break room or hallway</td>
+        </tr>
+        <tr>
+          <td>Say "Let's go talk to the teacher together"</td>
+          <td>Take the student's side against the teacher</td>
+        </tr>
+        <tr>
+          <td>Redirect parents warmly to the teacher</td>
+          <td>Answer parent questions about student progress</td>
+        </tr>
+        <tr>
+          <td>Ask questions that make students think</td>
+          <td>Give answers — let students do the thinking</td>
+        </tr>
+        <tr>
+          <td>Fade your support as students gain confidence</td>
+          <td>Sit next to and help a student with everything</td>
+        </tr>
+        <tr>
+          <td>Use calm voice and give space when upset student</td>
+          <td>Argue, raise voice, or crowd a dysregulated student</td>
+        </tr>
+        <tr>
+          <td>Contact the special ed coordinator when unsure about IEP</td>
+          <td>Guess or change accommodations on your own</td>
+        </tr>
+        <tr>
+          <td>Keep ALL student information private</td>
+          <td>Post anything about students online — ever</td>
+        </tr>
+        <tr>
+          <td>Use your voice to de-escalate conflicts</td>
+          <td>Physically intervene without CPI authorization</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- end bottom-row -->
+
+</div><!-- end page -->
+</body>
+</html>
